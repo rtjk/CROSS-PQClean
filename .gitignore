@@ -1,5 +1,6 @@
 bin/
 build/
+crypto_sign/
 
 # Prerequisites
 *.d

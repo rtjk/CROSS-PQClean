@@ -20,18 +20,36 @@ def replace_in_dir(dir, text_to_search, replacement_text):
                     replace_in_file(file_path, text_to_search, replacement_text)
 
 #############################################################################################
+variants = {"RSDP", "RSDPG"}
+
+categories = {128: 1,
+              192: 3,
+              256: 5}
+
+targets = {"small": "SIG_SIZE",
+           "balanced": "BALANCED",
+           "fast": "SPEED"}
+
+implementations = {"clean"}
+
+def generate_namespace(variant, category, target, implementation):
+  return f"PQCLEAN_CROSS{variant}{category}{target}_{implementation}_".upper()
+
+def generate_dir_name(variant, category, target, implementation):
+  return f"/cross-{variant}-{category}-{target}/{implementation}".lower()
+#############################################################################################
 
 # Output here
-TARGET_DIR = os.path.realpath('./crypto_sign')
+TARGET_DIR = './crypto_sign'
 
 # csv file
 # the first column 'dir' constains the directory name for a given set of parameters
-# the other columns contain the values to replace (e.g replace "__random-bytes__" with "16")
+# the other columns contain the values to replace (e.g. replace "__random-bytes__" with "16")
 csv_filename = './parameter_sets.csv'
 
 # files and dirs to copy
-meta_file = os.path.realpath('../META.yml')
-clean_dir = os.path.realpath('../clean')
+meta_file = '../META.yml'
+clean_dir = '../clean'
 
 with open(csv_filename, 'r') as csvfile:
 
@@ -49,7 +67,7 @@ with open(csv_filename, 'r') as csvfile:
         # copy META.yml
         shutil.copyfile(meta_file, dir + '/META.yml')
 
-        # TODO
+        # TODO: add 'optimezed-implementation' and follow_symlinks
         # shutil.copyfile(source, destination, *, follow_symlinks = True)
 
         # exclude the first column 'dir'

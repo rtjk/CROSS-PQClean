@@ -160,14 +160,14 @@ void get_leaf_indices(uint16_t merkle_leaf_indices[T],
 }
 
 
-/* PQCLEAN_CROSS_CLEAN_generate_merkle_tree()
+/* __namespace-clean__generate_merkle_tree()
  *
  * unsigned char merkle_tree[NUM_NODES_MERKLE_TREE * HASH_DIGEST_LENGTH] :
  * stores the hashes of the associated tree nodes.
  * const unsigned char commitments[T][HASH_DIGEST_LENGTH]    : Contains the
  * hashed commitments that build the tree.
  */
-void PQCLEAN_CROSS_CLEAN_generate_merkle_tree(unsigned char merkle_tree[NUM_NODES_MERKLE_TREE *
+void __namespace-clean__generate_merkle_tree(unsigned char merkle_tree[NUM_NODES_MERKLE_TREE *
                                                     HASH_DIGEST_LENGTH],
                           unsigned char commitments[T][HASH_DIGEST_LENGTH])
 {
@@ -205,13 +205,13 @@ void PQCLEAN_CROSS_CLEAN_generate_merkle_tree(unsigned char merkle_tree[NUM_NODE
 }
 
 
-/* PQCLEAN_CROSS_CLEAN_generate_merkle_proof()
+/* __namespace-clean__generate_merkle_proof()
  *
  * uint16_t merkle_proof_indices[TREE_NODES_TO_STORE]   : stores the sorted indices required for the proof.
  * uint16_t merkle_proof_len                            : Actual length of the proof. Can vary depending on the challenge.
  * const unsigned char challenge                        : Challenge that indicated which nodes will be recomputed by the verifier.
  */
-void PQCLEAN_CROSS_CLEAN_generate_merkle_proof(uint16_t merkle_proof_indices[TREE_NODES_TO_STORE],
+void __namespace-clean__generate_merkle_proof(uint16_t merkle_proof_indices[TREE_NODES_TO_STORE],
                            uint16_t *merkle_proof_len,
                            const unsigned char challenge[T])
 {
@@ -265,14 +265,14 @@ void PQCLEAN_CROSS_CLEAN_generate_merkle_proof(uint16_t merkle_proof_indices[TRE
 
 
 /*
- * PQCLEAN_CROSS_CLEAN_rebuild_merkle_tree()
+ * __namespace-clean__rebuild_merkle_tree()
  *
  * unsigned char merkle_tree[NUM_NODES_MERKLE_TREE*HASH_DIGEST_LENGTH] : Stores the Hashes of the recomputed Merkle tree.
  * const unsigned char merkle_proof[TREE_NODES_TO_STORE]               : Merkle proof containing the nodes required for recomputation.
  * const unsigned char commitments[T][HASH_DIGEST_LENGTH]              : Stores the commitments.
  * const unsigned char challenge[T]                                    : Challenge vector to indicate the computed commitments.
  */
-void PQCLEAN_CROSS_CLEAN_rebuild_merkle_tree(unsigned char merkle_tree[NUM_NODES_MERKLE_TREE * HASH_DIGEST_LENGTH],
+void __namespace-clean__rebuild_merkle_tree(unsigned char merkle_tree[NUM_NODES_MERKLE_TREE * HASH_DIGEST_LENGTH],
                          const unsigned char merkle_proof[TREE_NODES_TO_STORE * HASH_DIGEST_LENGTH],
                          unsigned char commitments[T][HASH_DIGEST_LENGTH],
                          const unsigned char challenge[T])

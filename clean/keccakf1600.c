@@ -63,7 +63,7 @@ static const uint64_t KeccakF_RoundConstants[NROUNDS] = {
    (uint64_t)0x8000000080008008ULL
 };
 
-void PQCLEAN_CROSS_CLEAN_KeccakF1600_StateExtractBytes(uint64_t *state, unsigned char *data,
+void __namespace-clean__KeccakF1600_StateExtractBytes(uint64_t *state, unsigned char *data,
                                    uint32_t offset, uint32_t length)
 {
    uint32_t i;
@@ -72,7 +72,7 @@ void PQCLEAN_CROSS_CLEAN_KeccakF1600_StateExtractBytes(uint64_t *state, unsigned
    }
 }
 
-void PQCLEAN_CROSS_CLEAN_KeccakF1600_StateXORBytes(uint64_t *state, const unsigned char *data,
+void __namespace-clean__KeccakF1600_StateXORBytes(uint64_t *state, const unsigned char *data,
                                uint32_t offset, uint32_t length)
 {
    uint32_t i;
@@ -81,7 +81,7 @@ void PQCLEAN_CROSS_CLEAN_KeccakF1600_StateXORBytes(uint64_t *state, const unsign
    }
 }
 
-void PQCLEAN_CROSS_CLEAN_KeccakF1600_StatePermute(uint64_t *state)
+void __namespace-clean__KeccakF1600_StatePermute(uint64_t *state)
 {
    int round;
 

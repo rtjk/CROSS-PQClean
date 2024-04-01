@@ -97,7 +97,7 @@ FQ_ELEM fq_star_rnd_state(CSPRNG_STATE_T * const csprng_state)
 /***************** Specialized CSPRNGs for non binary domains *****************/
 
 /* CSPRNG sampling fixed weight strings */
-void PQCLEAN_CROSS_CLEAN_expand_digest_to_fixed_weight(uint8_t fixed_weight_string[T],
+void __namespace-clean__expand_digest_to_fixed_weight(uint8_t fixed_weight_string[T],
                                    const uint8_t digest[HASH_DIGEST_LENGTH]);
 
 #define BITS_FOR_Q BITS_TO_REPRESENT(Q-1) 

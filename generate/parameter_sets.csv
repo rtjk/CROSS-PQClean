@@ -1,3 +1,3 @@
-dir,define,include,
-cross-rsdpg-128-small,AAAAAAAAAAAAAAAAAA,BBBBBBBBBBBBBB,
-cross-rsdpg-256-small,CCCCCCCCCCCCCCCCCC,DDDDDDDDDDDDDD,
+dir,__dir__,__variant__,__nist-level__,__target__,__length-secret-key__,__length-public-key__,__random-bytes__,__length-signature__,__namespace-clean__,__nistkat-sha256__,__testvectors-sha256__,
+cross-rsdp-128-balanced,cross-rsdp-128-balanced,RSDP,1,BALANCED,32,77,16,12912,PQCLEAN_CROSSRSDP128BALANCED_CLEAN_,d27692bc70287f1daf01c4697d40ab475836c4f2e461b281fad0423cd262e10d,5e6e82fa982a857d099d9db4f2fd120d11bade33584fdae887e34c648190e070,
+cross-rsdp-256-fast,cross-rsdp-256-fast,RSDP,5,SPEED,64,153,32,76298,PQCLEAN_CROSSRSDP256FAST_CLEAN_,d27692bc70287f1daf01c4697d40ab475836c4f2e461b281fad0423cd262e10d,5e6e82fa982a857d099d9db4f2fd120d11bade33584fdae887e34c648190e070,

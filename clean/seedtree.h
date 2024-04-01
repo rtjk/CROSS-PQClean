@@ -37,19 +37,19 @@ int publish_round_seeds(unsigned char *seed_storage,
                   const unsigned char rounds_seeds[T*SEED_LENGTH_BYTES],
                   const unsigned char indices_to_publish[T]);
 
-int PQCLEAN_CROSS_CLEAN_regenerate_round_seeds(unsigned char rounds_seeds[T*SEED_LENGTH_BYTES],                           
+int __namespace-clean__regenerate_round_seeds(unsigned char rounds_seeds[T*SEED_LENGTH_BYTES],                           
                            const unsigned char indices_to_publish[T],
                            const unsigned char *seed_storage);
 #else
 /******************************************************************************/
-void PQCLEAN_CROSS_CLEAN_generate_seed_tree_from_root(unsigned char
+void __namespace-clean__generate_seed_tree_from_root(unsigned char
                                   seed_tree[NUM_NODES_SEED_TREE * SEED_LENGTH_BYTES],
                                   const unsigned char root_seed[SEED_LENGTH_BYTES],
                                   const unsigned char salt[SALT_LENGTH_BYTES]) ;
 
 /******************************************************************************/
 /* returns the number of seeds which have been published */
-int PQCLEAN_CROSS_CLEAN_publish_seeds(unsigned char *seed_storage,
+int __namespace-clean__publish_seeds(unsigned char *seed_storage,
                   const unsigned char
                   seed_tree[NUM_NODES_SEED_TREE*SEED_LENGTH_BYTES],
                   // binary array denoting if node has to be released (cell == 0) or not
@@ -57,13 +57,13 @@ int PQCLEAN_CROSS_CLEAN_publish_seeds(unsigned char *seed_storage,
 
 /******************************************************************************/
 /* returns the number of seeds which have been used to regenerate the tree */
-int PQCLEAN_CROSS_CLEAN_regenerate_round_seeds(unsigned char
+int __namespace-clean__regenerate_round_seeds(unsigned char
                       seed_tree[NUM_NODES_SEED_TREE*SEED_LENGTH_BYTES],
                       const unsigned char indices_to_publish[T],
                       const unsigned char *stored_seeds,
                       const unsigned char salt[SALT_LENGTH_BYTES]);   // input
 
-void PQCLEAN_CROSS_CLEAN_pseed(unsigned char seed[SEED_LENGTH_BYTES]);
-void PQCLEAN_CROSS_CLEAN_ptree(unsigned char seed_tree[NUM_NODES_SEED_TREE * SEED_LENGTH_BYTES]);
+void __namespace-clean__pseed(unsigned char seed[SEED_LENGTH_BYTES]);
+void __namespace-clean__ptree(unsigned char seed_tree[NUM_NODES_SEED_TREE * SEED_LENGTH_BYTES]);
 
 #endif

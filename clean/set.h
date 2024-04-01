@@ -1,9 +1,9 @@
 
 #pragma once
 
-#define RSDP 1
-#define CATEGORY_1 1
-#define BALANCED 1
+#define __variant__ 1
+#define CATEGORY___nist-level__ 1
+#define __target__ 1
 
 /* #define AES_CTR_CSPRNG
 #define SHA3_HASH */

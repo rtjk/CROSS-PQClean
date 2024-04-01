@@ -25,54 +25,54 @@
 
 #pragma once
 
-#ifndef PQCLEAN_CROSS_CLEAN_API_H
-#define PQCLEAN_CROSS_CLEAN_API_H
+#ifndef __namespace-clean__API_H
+#define __namespace-clean__API_H
 
 #include <stdint.h>
 
 // TODO: CRYPTO_ALGNAME, CRYPTO_SECRETKEYBYTES, CRYPTO_PUBLICKEYBYTES, CRYPTO_BYTES, CRYPTO_RANDOMBYTES
 
-#define PQCLEAN_CROSS_CLEAN_CRYPTO_ALGNAME "CROSS"
+#define __namespace-clean__CRYPTO_ALGNAME "CROSS"
 
 /*  no. of bytes of the secret key */
-#define PQCLEAN_CROSS_CLEAN_CRYPTO_SECRETKEYBYTES 32L
+#define __namespace-clean__CRYPTO_SECRETKEYBYTES __length-secret-key__L
 
 /*  no. of bytes of the public key */
-#define PQCLEAN_CROSS_CLEAN_CRYPTO_PUBLICKEYBYTES 77L
+#define __namespace-clean__CRYPTO_PUBLICKEYBYTES __length-public-key__L
 
 /* no. of bytes of overhead in a signed message */
-#define PQCLEAN_CROSS_CLEAN_CRYPTO_BYTES 12912L //19056L
+#define __namespace-clean__CRYPTO_BYTES __length-signature__L
 
 /* required bytes of input randomness */
-#define PQCLEAN_CROSS_CLEAN_CRYPTO_RANDOMBYTES 16 //CROSS library -  parameters.h
+#define __namespace-clean__CRYPTO_RANDOMBYTES __random-bytes__
 
 
-int PQCLEAN_CROSS_CLEAN_crypto_sign_keypair(unsigned char *pk,
+int __namespace-clean__crypto_sign_keypair(unsigned char *pk,
                         unsigned char *sk
                        );
 
-int PQCLEAN_CROSS_CLEAN_crypto_sign(unsigned char *sm,
+int __namespace-clean__crypto_sign(unsigned char *sm,
                 uint64_t *smlen,
                 const unsigned char *m,
                 uint64_t mlen,
                 const unsigned char *sk
                );
 
-int PQCLEAN_CROSS_CLEAN_crypto_sign_open(unsigned char *m,
+int __namespace-clean__crypto_sign_open(unsigned char *m,
                      uint64_t *mlen,
                      const unsigned char *sm,
                      uint64_t smlen,
                      const unsigned char *pk
                     );
 
-int PQCLEAN_CROSS_CLEAN_crypto_sign_signature(unsigned char *sig,
+int __namespace-clean__crypto_sign_signature(unsigned char *sig,
                 uint64_t *siglen,
                 const unsigned char *m,
                 uint64_t mlen,
                 const unsigned char *sk
                );
 
-int PQCLEAN_CROSS_CLEAN_crypto_sign_verify(const unsigned char *sig,
+int __namespace-clean__crypto_sign_verify(const unsigned char *sig,
                 uint64_t siglen,
                 const unsigned char *m,
                 uint64_t mlen,

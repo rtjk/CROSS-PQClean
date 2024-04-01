@@ -45,7 +45,7 @@ void xof_shake_init(SHAKE_STATE_STRUCT *state, int val)
 static inline
 void xof_shake_update(SHAKE_STATE_STRUCT *state,
                       const unsigned char *input,
-                      uint16_t inputByteLen)
+                      uint32_t inputByteLen)
 {
    Keccak_HashUpdate(state,
                      (const BitSequence *) input,
@@ -61,7 +61,7 @@ void xof_shake_final(SHAKE_STATE_STRUCT *state)
 static inline
 void xof_shake_extract(SHAKE_STATE_STRUCT *state,
                        unsigned char *output,
-                       uint16_t outputByteLen)
+                       uint32_t outputByteLen)
 {
    Keccak_HashSqueeze(state,
                       (BitSequence *) output,
@@ -93,7 +93,7 @@ void xof_shake_init(SHAKE_STATE_STRUCT *state, int val)
 static inline
 void xof_shake_update(SHAKE_STATE_STRUCT *state,
                       const unsigned char *input,
-                      uint16_t inputByteLen)
+                      uint32_t inputByteLen)
 {
 #if defined(CATEGORY_1)
    PQCLEAN_CROSS_CLEAN_shake128_inc_absorb(state,
@@ -119,7 +119,7 @@ void xof_shake_final(SHAKE_STATE_STRUCT *state)
 static inline
 void xof_shake_extract(SHAKE_STATE_STRUCT *state,
                        unsigned char *output,
-                       uint16_t outputByteLen){
+                       uint32_t outputByteLen){
 #if defined(CATEGORY_1)
    PQCLEAN_CROSS_CLEAN_shake128_inc_squeeze(output, outputByteLen, state);
 #else

@@ -11,10 +11,15 @@ OBJECTS = CROSS.o csprng_hash.o keccakf1600.o merkle.o pack_unpack.o seedtree.o 
 #### remove -Wmissing-prototypes -Wredundant-decls
 #CFLAGS=-I../../../common $(EXTRAFLAGS) -std=c99 -Wall -Wextra -Wpedantic -Werror -Wuninitialized -march=native -O3 -g3
 #### few flags
-CFLAGS=-std=c99 -I../../../common $(EXTRAFLAGS) -march=native -O3 -g3
+#CFLAGS=-std=c99 -I../../../common $(EXTRAFLAGS) -march=native -O3 -g3
 # the flag -std=c99 somehow allows to see fips202.h in /common
 #### empty
 #CFALGS= -I../../../common $(EXTRAFLAGS)
+
+#### incrementally add flags
+# 
+CFLAGS=-std=c99 -I../../../common $(EXTRAFLAGS) -march=native -O3 -g3 -std=c99 -Wpedantic -Werror -Wredundant-decls -Wmissing-prototypes -Wuninitialized -Wall -Wextra
+
 
 all: $(LIB)
 

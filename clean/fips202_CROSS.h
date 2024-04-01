@@ -126,3 +126,6 @@ void PQCLEAN_CROSS_CLEAN_sha3_512_inc_absorb(sha3_512incctx *state, const uint8_
 void PQCLEAN_CROSS_CLEAN_sha3_512_inc_finalize(uint8_t *output, sha3_512incctx *state);
 /* One-stop SHA3-512 shop */
 void PQCLEAN_CROSS_CLEAN_sha3_512(uint8_t *output, const uint8_t *input, size_t inlen);
+
+void PQCLEAN_CROSS_CLEAN_shake128_ctx_clone(shake128ctx *dest, const shake128ctx *src);
+void PQCLEAN_CROSS_CLEAN_shake256_ctx_clone(shake256ctx *dest, const shake256ctx *src);

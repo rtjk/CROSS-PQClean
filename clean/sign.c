@@ -114,6 +114,9 @@ int PQCLEAN_CROSS_CLEAN_crypto_sign_verify(const unsigned char *sig, uint64_t si
                )
 {
 
+   // TODO: useless line added to avoid [-Werror=unused-parameter]
+   if(siglen == 0) siglen = 0;
+
    /* verify returns 1 if signature is ok, 0 otherwise */   
    int ok = PQCLEAN_CROSS_CLEAN_CROSS_verify((const pubkey_t *const) pk,                     // in parameter
                         (const char *const) m, (const uint64_t) mlen,    // in parameter

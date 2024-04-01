@@ -64,18 +64,18 @@ static const uint64_t KeccakF_RoundConstants[NROUNDS] = {
 };
 
 void PQCLEAN_CROSS_CLEAN_KeccakF1600_StateExtractBytes(uint64_t *state, unsigned char *data,
-                                   uint16_t offset, uint16_t length)
+                                   uint32_t offset, uint32_t length)
 {
-   uint16_t i;
+   uint32_t i;
    for(i=0; i<length; i++) {
       data[i] = state[(offset + i) >> 3] >> (8*((offset + i) & 0x07));
    }
 }
 
 void PQCLEAN_CROSS_CLEAN_KeccakF1600_StateXORBytes(uint64_t *state, const unsigned char *data,
-                               uint16_t offset, uint16_t length)
+                               uint32_t offset, uint32_t length)
 {
-   uint16_t i;
+   uint32_t i;
    for(i = 0; i < length; i++) {
       state[(offset + i) >> 3] ^= (uint64_t)data[i] << (8 * ((offset + i) & 0x07));
    }

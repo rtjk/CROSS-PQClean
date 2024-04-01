@@ -23,10 +23,10 @@
  *
  **/
 
+#pragma once
+
 #ifndef PQCLEAN_CROSS_CLEAN_API_H
 #define PQCLEAN_CROSS_CLEAN_API_H
-
-#pragma once
 
 #include <stdint.h>
 
@@ -44,7 +44,7 @@
 #define PQCLEAN_CROSS_CLEAN_CRYPTO_BYTES 12912L //19056L
 
 /* required bytes of input randomness */
-#define PQCLEAN_CROSS_CLEAN_CRYPTO_RANDOMBYTES 16L //CROSS library -  parameters.h
+#define PQCLEAN_CROSS_CLEAN_CRYPTO_RANDOMBYTES 16 //CROSS library -  parameters.h
 
 
 int PQCLEAN_CROSS_CLEAN_crypto_sign_keypair(unsigned char *pk,

@@ -53,8 +53,8 @@
 static
 void setup_tree(uint16_t layer_offsets[LOG2(T)+1], 
                 uint16_t nodes_per_layer[LOG2(T)+1]) {
-    uint16_t depth, layer;
-    int r_leaves;
+    uint32_t depth, layer;
+    uint32_t r_leaves;
     int subtree_found;
 
     /* Initialize array with full node counts */
@@ -114,13 +114,13 @@ void setup_tree(uint16_t layer_offsets[LOG2(T)+1],
 static
 void get_leaf_indices(uint16_t merkle_leaf_indices[T], 
                       const uint16_t layer_offsets[LOG2(T)+1]) {
-    uint16_t r_leaves;
-    uint16_t idx_ctr = 0;
+    uint32_t r_leaves;
+    uint32_t idx_ctr = 0;
 
     /* r_node: current root node of next subtree, will always be right-child of previous root */
     /* l_node: traverses from current root node to left-childs until depth of subtree is found */
-    uint16_t r_node, l_node;
-    uint16_t layer, depth, subtree_found;
+    uint32_t r_node, l_node;
+    uint32_t layer, depth, subtree_found;
 
     /* If tree is already balanced, simply copy leaves to corresponding position */
     if (T == (1UL << LOG2(T))) {
@@ -172,7 +172,7 @@ void PQCLEAN_CROSS_CLEAN_generate_merkle_tree(unsigned char merkle_tree[NUM_NODE
                           unsigned char commitments[T][HASH_DIGEST_LENGTH])
 {
     size_t i;
-    uint16_t node_ctr, parent_layer;
+    uint32_t node_ctr, parent_layer;
 
     uint16_t merkle_leaf_indices[T];
     uint16_t layer_offsets[LOG2(T)+1];
@@ -195,7 +195,7 @@ void PQCLEAN_CROSS_CLEAN_generate_merkle_tree(unsigned char merkle_tree[NUM_NODE
     parent_layer = LOG2(T)-1;
     for (i=NUM_NODES_MERKLE_TREE-1; i>0; i -= 2) {
         hash(merkle_tree + OFFSET(PARENT(i) + layer_offsets[parent_layer]), merkle_tree + OFFSET(SIBLING(i)), 2*HASH_DIGEST_LENGTH);
-        if (node_ctr >= nodes_per_layer[parent_layer+1] - 2) {
+        if (node_ctr >= (uint32_t) nodes_per_layer[parent_layer+1] - 2) {
             parent_layer--;
             node_ctr = 0;
         } else {
@@ -216,7 +216,7 @@ void PQCLEAN_CROSS_CLEAN_generate_merkle_proof(uint16_t merkle_proof_indices[TRE
                            const unsigned char challenge[T])
 {
     unsigned char flag_tree[NUM_NODES_MERKLE_TREE] = {NOT_COMPUTED};
-    uint16_t node_ctr, parent_layer;
+    uint32_t node_ctr, parent_layer;
     size_t i;
 
     uint16_t layer_offsets[LOG2(T)+1];
@@ -254,7 +254,7 @@ void PQCLEAN_CROSS_CLEAN_generate_merkle_proof(uint16_t merkle_proof_indices[TRE
             merkle_proof_indices[(*merkle_proof_len)++] = i;
 
         /* Due to the unbalenced structure we got to keep track of the nodes per layer processed */
-        if (node_ctr >= nodes_per_layer[parent_layer+1] - 2) {
+        if (node_ctr >= (uint32_t) nodes_per_layer[parent_layer+1] - 2) {
             parent_layer--;
             node_ctr = 0;
         } else {
@@ -284,7 +284,7 @@ void PQCLEAN_CROSS_CLEAN_rebuild_merkle_tree(unsigned char merkle_tree[NUM_NODES
     uint16_t nodes_per_layer[LOG2(T)+1];
 
     uint16_t ctr;
-    uint16_t node_ctr, parent_layer;
+    uint32_t node_ctr, parent_layer;
     size_t i;
 
     /* Input consists of hash digests stored at child nodes and the index of the parent node for domain separation */
@@ -310,7 +310,7 @@ void PQCLEAN_CROSS_CLEAN_rebuild_merkle_tree(unsigned char merkle_tree[NUM_NODES
 
         /* Both siblings are unused, but it must be kept track of the node and layer counter to chose the right offsets */
         if (flag_tree_valid[i] == INVALID_MERKLE_NODE && flag_tree_valid[SIBLING(i)] == INVALID_MERKLE_NODE) {
-            if (node_ctr >= nodes_per_layer[parent_layer+1] - 2) {
+            if (node_ctr >= (uint32_t) nodes_per_layer[parent_layer+1] - 2) {
                 parent_layer--;
                 node_ctr = 0;
             } else {
@@ -340,7 +340,7 @@ void PQCLEAN_CROSS_CLEAN_rebuild_merkle_tree(unsigned char merkle_tree[NUM_NODES
         hash(merkle_tree + OFFSET(PARENT(i) + layer_offsets[parent_layer]), hash_input, 2*HASH_DIGEST_LENGTH);
         flag_tree_valid[PARENT(i) + layer_offsets[parent_layer]] = VALID_MERKLE_NODE;
 
-        if (node_ctr >= nodes_per_layer[parent_layer+1] - 2) {
+        if (node_ctr >= (uint32_t) nodes_per_layer[parent_layer+1] - 2) {
             parent_layer--;
             node_ctr = 0;
         } else {

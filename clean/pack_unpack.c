@@ -504,6 +504,10 @@ void unpack_fz_rsdp_g_vec(FZ_ELEM out[M],
 void PQCLEAN_CROSS_CLEAN_generic_unpack_fq(FQ_ELEM *out, const uint8_t *in,
                        size_t outlen, size_t inlen)
 {
+
+   // TODO: useless line added to avoid [-Werror=unused-parameter]
+   if(inlen == 0) inlen = 0;
+
 #if Q == 127
    size_t i;
    for(i = 0; i < outlen; i++)
@@ -732,6 +736,10 @@ void PQCLEAN_CROSS_CLEAN_generic_unpack_fq(FQ_ELEM *out, const uint8_t *in,
 void PQCLEAN_CROSS_CLEAN_generic_unpack_fz(FZ_ELEM *out, const uint8_t *in,
                        size_t outlen, size_t inlen)
 {
+   
+   // TODO: useless line added to avoid [-Werror=unused-parameter]
+   if(inlen == 0) inlen = 0;
+
 #if Z == 127
    size_t i;
    for(i = 0; i < outlen; i++)

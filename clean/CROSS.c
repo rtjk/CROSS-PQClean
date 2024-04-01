@@ -206,7 +206,7 @@ void PQCLEAN_CROSS_CLEAN_CROSS_sign(const prikey_t *SK,
     CSPRNG_STATE_T CSPRNG_state;
     for(uint16_t i = 0; i<T; i++){
         /* CSPRNG is fed with concat(seed,salt,round index) represented
-         * as a 2 bytes little endian uint16_teger */
+         * as a 2 bytes little endian unsigned integer */
         uint8_t csprng_input[SEED_LENGTH_BYTES+SALT_LENGTH_BYTES+sizeof(uint16_t)];
         memcpy(csprng_input,rounds_seeds+SEED_LENGTH_BYTES*i,SEED_LENGTH_BYTES);
         memcpy(csprng_input+SEED_LENGTH_BYTES,sig->salt,SALT_LENGTH_BYTES);
@@ -434,7 +434,7 @@ int PQCLEAN_CROSS_CLEAN_CROSS_verify(const pubkey_t *const PK,
             hash(cmt_1[i],cmt_1_i_input,sizeof(cmt_1_i_input));
 
             /* CSPRNG is fed with concat(seed,salt,round index) represented
-            * as a 2 bytes little endian uint16_teger */
+            * as a 2 bytes little endian unsigned integer */
             const int csprng_input_length = SALT_LENGTH_BYTES+SEED_LENGTH_BYTES+sizeof(uint16_t);
             uint8_t csprng_input[csprng_input_length];
             memcpy(csprng_input+SEED_LENGTH_BYTES,sig->salt,SALT_LENGTH_BYTES);

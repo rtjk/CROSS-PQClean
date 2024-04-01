@@ -25,11 +25,24 @@
  *
  **/
 
+#pragma once
+
 #include "csprng_hash.h"
+
 #if defined(NO_TREES)
 
 #define TO_PUBLISH 1
 #define NOT_TO_PUBLISH 0
+
+void PQCLEAN_CROSS_CLEAN_merkle_tree_root_compute(uint8_t root[HASH_DIGEST_LENGTH],
+                              uint8_t leaves[T][HASH_DIGEST_LENGTH]);
+uint16_t PQCLEAN_CROSS_CLEAN_merkle_tree_proof_compute(uint8_t mtp[W*HASH_DIGEST_LENGTH],
+                                   uint8_t leaves[T][HASH_DIGEST_LENGTH],
+                                   const uint8_t leaves_to_reveal[T]);
+void PQCLEAN_CROSS_CLEAN_merkle_tree_root_recompute(uint8_t root[HASH_DIGEST_LENGTH],
+                                uint8_t recomputed_leaves[T][HASH_DIGEST_LENGTH],
+                                const uint8_t mtp[W*HASH_DIGEST_LENGTH],
+                                const uint8_t leaves_to_reveal[T]);
 
 void PQCLEAN_CROSS_CLEAN_merkle_tree_root_compute(uint8_t root[HASH_DIGEST_LENGTH],
                               uint8_t leaves[T][HASH_DIGEST_LENGTH]){
@@ -79,6 +92,18 @@ void PQCLEAN_CROSS_CLEAN_merkle_tree_root_recompute(uint8_t root[HASH_DIGEST_LEN
     PQCLEAN_CROSS_CLEAN_merkle_tree_root_compute(root,recomputed_leaves);
 }
 #else
+
+void PQCLEAN_CROSS_CLEAN_merkle_tree_root_compute(uint8_t root[HASH_DIGEST_LENGTH],
+                              uint8_t tree[NUM_NODES_MERKLE_TREE * HASH_DIGEST_LENGTH],
+                              uint8_t leaves[T][HASH_DIGEST_LENGTH]);
+uint16_t PQCLEAN_CROSS_CLEAN_merkle_tree_proof_compute(uint8_t mtp[HASH_DIGEST_LENGTH*TREE_NODES_TO_STORE],
+                               const uint8_t tree[NUM_NODES_MERKLE_TREE*HASH_DIGEST_LENGTH],
+                               uint8_t leaves[T][HASH_DIGEST_LENGTH],
+                               const uint8_t leaves_to_reveal[T]);
+void PQCLEAN_CROSS_CLEAN_merkle_tree_root_recompute(uint8_t root[HASH_DIGEST_LENGTH],
+                                uint8_t recomputed_leaves[T][HASH_DIGEST_LENGTH],
+                                const uint8_t mtp[HASH_DIGEST_LENGTH*TREE_NODES_TO_STORE],
+                                const uint8_t leaves_to_reveal[T]);
 
 #include "merkle.h"
 /* Stub of the interface to Merkle tree root computer from all leaves */

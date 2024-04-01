@@ -5,8 +5,12 @@ set(CMAKE_C_STANDARD 11)
 
 set(CC gcc)
 # set(CC clang)
-set(CMAKE_C_FLAGS  "${CMAKE_C_FLAGS} -Wall -pedantic -Wuninitialized -march=native -O3 -g3")
-#set(CMAKE_C_FLAGS  "${CMAKE_C_FLAGS} -Wall -pedantic -Wuninitialized -march=native -Wextra -Wmissing-prototypes -Wredundant-decls")
+
+# origninal flags
+# set(CMAKE_C_FLAGS  "${CMAKE_C_FLAGS} -Wall -pedantic -Wuninitialized -march=native -O3 -g3")
+
+# incrementally add flags
+set(CMAKE_C_FLAGS  "${CMAKE_C_FLAGS} -Wall -pedantic -Wuninitialized -march=native -O3 -g3 -Wredundant-decls")
 
 set(CMAKE_C_FLAGS  "${CMAKE_C_FLAGS} ${SANITIZE}")
 message("Compilation flags:" ${CMAKE_C_FLAGS})

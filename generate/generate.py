@@ -19,26 +19,6 @@ def replace_in_dir(dir, text_to_search, replacement_text):
                 if os.path.isfile(file_path):
                     replace_in_file(file_path, text_to_search, replacement_text)
 
-#############################################################################################
-variants = {"RSDP", "RSDPG"}
-
-categories = {128: 1,
-              192: 3,
-              256: 5}
-
-targets = {"small": "SIG_SIZE",
-           "balanced": "BALANCED",
-           "fast": "SPEED"}
-
-implementations = {"clean"}
-
-def generate_namespace(variant, category, target, implementation):
-  return f"PQCLEAN_CROSS{variant}{category}{target}_{implementation}_".upper()
-
-def generate_dir_name(variant, category, target, implementation):
-  return f"/cross-{variant}-{category}-{target}/{implementation}".lower()
-#############################################################################################
-
 # Output here
 TARGET_DIR = './crypto_sign'
 
@@ -48,8 +28,8 @@ TARGET_DIR = './crypto_sign'
 csv_filename = './parameter_sets.csv'
 
 # files and dirs to copy
-meta_file = '../META.yml'
-clean_dir = '../clean'
+meta_file = '/META.yml'
+clean_dir = '/clean'
 
 with open(csv_filename, 'r') as csvfile:
 
@@ -62,10 +42,10 @@ with open(csv_filename, 'r') as csvfile:
         dir = os.path.join(TARGET_DIR, dir)
         os.makedirs(dir)
 
-        # copy the clean implementation template
-        shutil.copytree(clean_dir, dir + '/clean')
         # copy META.yml
-        shutil.copyfile(meta_file, dir + '/META.yml')
+        shutil.copyfile('..' + meta_file, dir + meta_file)
+        # copy the clean implementation template
+        shutil.copytree('..' + clean_dir, dir + clean_dir)
 
         # TODO: add 'optimezed-implementation' and follow_symlinks
         # shutil.copyfile(source, destination, *, follow_symlinks = True)
@@ -73,7 +53,7 @@ with open(csv_filename, 'r') as csvfile:
         # exclude the first column 'dir'
         columns = csv_reader.fieldnames[1:]
 
-        # replace 'column_name' with 'column_value'
+        # replace 'column_name' with 'column_value' in the files
         for column_name in columns:
             column_value = row[column_name]
             replace_in_dir(dir, column_name, column_value)

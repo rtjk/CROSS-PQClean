@@ -31,7 +31,7 @@ CSPRNG_STATE_T platform_csprng_state;
 
 /* Fisher-Yates shuffle obtaining the entire required randomness in a single 
  * call */
-void __namespace-clean__expand_digest_to_fixed_weight(uint8_t fixed_weight_string[T],
+void __namespace__expand_digest_to_fixed_weight(uint8_t fixed_weight_string[T],
                                    const uint8_t digest[HASH_DIGEST_LENGTH]){
    CSPRNG_STATE_T csprng_state;
    initialize_csprng(&csprng_state,
@@ -76,4 +76,4 @@ void __namespace-clean__expand_digest_to_fixed_weight(uint8_t fixed_weight_strin
            bits_in_sub_buf -= 1;           
         }
    }  
-} /* __namespace-clean__expand_digest_to_fixed_weight */
+} /* __namespace__expand_digest_to_fixed_weight */

@@ -30,42 +30,42 @@
 #include <string.h>  // memcpy
 /*----------------------------------------------------------------------------*/
 
-int __namespace-clean__crypto_sign_keypair(unsigned char *pk,
+int __namespace__crypto_sign_keypair(unsigned char *pk,
                         unsigned char *sk)
 {
    /* keygen cannot fail */
-   __namespace-clean__CROSS_keygen((prikey_t *) sk,
+   __namespace__CROSS_keygen((prikey_t *) sk,
                 (pubkey_t *) pk);
 
    return 0; // NIST convention: 0 == zero errors
-} // end __namespace-clean__crypto_sign_keypair
+} // end __namespace__crypto_sign_keypair
 
 /*----------------------------------------------------------------------------*/
 /*                                                                            */
 /*... generating a signed message sm[0],sm[1],...,sm[*smlen-1]                */
 /*... from original message m[0],m[1],...,m[mlen-1]                           */
 /*... under secret key sk[0],sk[1],...                                        */
-int __namespace-clean__crypto_sign(unsigned char *sm,
+int __namespace__crypto_sign(unsigned char *sm,
                 uint64_t *smlen,     // out parameter
                 const unsigned char *m, uint64_t mlen,  // in parameter
                 const unsigned char *sk)                          // in parameter
 {
    /* sign cannot fail */
    memcpy(sm, m, mlen);
-   __namespace-clean__CROSS_sign((const prikey_t *) sk,                               // in parameter
+   __namespace__CROSS_sign((const prikey_t *) sk,                               // in parameter
              (const char *const) m, (const uint64_t) mlen,         // in parameter
              (sig_t *) (sm+mlen));                                 // out parameter
    *smlen = mlen + (uint64_t) sizeof(sig_t);
 
    return 0;  // NIST convention: 0 == zero errors
-} // end __namespace-clean__crypto_sign
+} // end __namespace__crypto_sign
 
 /*----------------------------------------------------------------------------*/
 /*                                                                            */
 /*.  ... verifying a signed message sm[0],sm[1],...,sm[smlen-1]               */
 /*.  ... under public key pk[0],pk[1],...                                     */
 /*.  ... and producing original message m[0],m[1],...,m[*mlen-1]              */
-int __namespace-clean__crypto_sign_open(unsigned char *m,
+int __namespace__crypto_sign_open(unsigned char *m,
                      uint64_t *mlen,        // out parameter
                      const unsigned char *sm, uint64_t smlen, // in parameter
                      const unsigned char *pk)                           // in parameter
@@ -75,40 +75,40 @@ int __namespace-clean__crypto_sign_open(unsigned char *m,
    *mlen = smlen-(uint64_t) sizeof(sig_t);
    
    memcpy((unsigned char *) m, (const unsigned char *) sm, (size_t) *mlen);
-   int ok = __namespace-clean__CROSS_verify((const pubkey_t *const)
+   int ok = __namespace__CROSS_verify((const pubkey_t *const)
                         pk,                     // in parameter
                         (const char *const) m, (const uint64_t) *mlen,  // in parameter
                         (const sig_t * const) (sm+*mlen));              // in parameter
 
 
    return ok-1; // NIST convention: 0 == zero errors, -1 == error condition
-} // end __namespace-clean__crypto_sign_open
+} // end __namespace__crypto_sign_open
 
 /*----------------------------------------------------------------------------*/
 /*                                                                            */
 /*... generating a signature sig[0],sig[1],...,sig[*siglen-1]                */
 /*... from original message m[0],m[1],...,m[mlen-1]                           */
 /*... under secret key sk[0],sk[1],...                                        */
-int __namespace-clean__crypto_sign_signature(unsigned char *sig, uint64_t *siglen,         // out parameter
+int __namespace__crypto_sign_signature(unsigned char *sig, uint64_t *siglen,         // out parameter
                 const unsigned char *m, uint64_t mlen,                  // in parameter
                 const unsigned char *sk                                 // in parameter
                )
 {
    /* sign cannot fail */
-   __namespace-clean__CROSS_sign((const prikey_t *) sk,                                    // in parameter
+   __namespace__CROSS_sign((const prikey_t *) sk,                                    // in parameter
              (const char *const) m, (const uint64_t) mlen,              // in parameter
              (sig_t *) sig);                                            // out parameter
    *siglen = (uint64_t) sizeof(sig_t);
 
    return 0;  // NIST convention: 0 == zero errors
-} // end __namespace-clean__crypto_sign_signature
+} // end __namespace__crypto_sign_signature
 
 /*----------------------------------------------------------------------------*/
 /*                                                                            */
 /*.  ... verifying a signature sig[0],sig[1],...,sig[siglen-1]               */
 /*.  ... under public key pk[0],pk[1],...                                     */
 /*.  ... and producing original message m[0],m[1],...,m[*mlen-1]              */
-int __namespace-clean__crypto_sign_verify(const unsigned char *sig, uint64_t siglen,      // in parameter
+int __namespace__crypto_sign_verify(const unsigned char *sig, uint64_t siglen,      // in parameter
                 const unsigned char *m, uint64_t mlen,                  // in parameter
                 const unsigned char *pk                                 // in parameter
                )
@@ -118,12 +118,12 @@ int __namespace-clean__crypto_sign_verify(const unsigned char *sig, uint64_t sig
    if(siglen == 0) siglen = 0;
 
    /* verify returns 1 if signature is ok, 0 otherwise */   
-   int ok = __namespace-clean__CROSS_verify((const pubkey_t *const) pk,                     // in parameter
+   int ok = __namespace__CROSS_verify((const pubkey_t *const) pk,                     // in parameter
                         (const char *const) m, (const uint64_t) mlen,    // in parameter
                         (const sig_t * const) sig);                      // in parameter
 
 
    return ok-1; // NIST convention: 0 == zero errors, -1 == error condition
-} // end __namespace-clean__crypto_sign_verify
+} // end __namespace__crypto_sign_verify
 
 /*----------------------------------------------------------------------------*/

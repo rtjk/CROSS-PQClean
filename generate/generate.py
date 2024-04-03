@@ -21,7 +21,10 @@ def replace_in_dir(dir, text_to_search, replacement_text):
 
 # Output here
 TARGET_DIR = './crypto_sign'
-shutil.rmtree(TARGET_DIR)
+
+# delete output directory if it already exists
+if os.path.exists(TARGET_DIR):
+    shutil.rmtree(TARGET_DIR)
 
 # csv file
 # the first column 'dir' constains the directory name for a given set of parameters

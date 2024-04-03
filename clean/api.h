@@ -25,54 +25,54 @@
 
 #pragma once
 
-#ifndef __namespace-clean__API_H
-#define __namespace-clean__API_H
+#ifndef __namespace__API_H
+#define __namespace__API_H
 
 #include <stdint.h>
 
 // TODO: CRYPTO_ALGNAME, CRYPTO_SECRETKEYBYTES, CRYPTO_PUBLICKEYBYTES, CRYPTO_BYTES, CRYPTO_RANDOMBYTES
 
-#define __namespace-clean__CRYPTO_ALGNAME "CROSS"
+#define __namespace__CRYPTO_ALGNAME "CROSS"
 
 /*  no. of bytes of the secret key */
-#define __namespace-clean__CRYPTO_SECRETKEYBYTES __length-secret-key__L
+#define __namespace__CRYPTO_SECRETKEYBYTES __length-secret-key__L
 
 /*  no. of bytes of the public key */
-#define __namespace-clean__CRYPTO_PUBLICKEYBYTES __length-public-key__L
+#define __namespace__CRYPTO_PUBLICKEYBYTES __length-public-key__L
 
 /* no. of bytes of overhead in a signed message */
-#define __namespace-clean__CRYPTO_BYTES __length-signature__L
+#define __namespace__CRYPTO_BYTES __length-signature__L
 
 /* required bytes of input randomness */
-#define __namespace-clean__CRYPTO_RANDOMBYTES __random-bytes__
+#define __namespace__CRYPTO_RANDOMBYTES __random-bytes__
 
 
-int __namespace-clean__crypto_sign_keypair(unsigned char *pk,
+int __namespace__crypto_sign_keypair(unsigned char *pk,
                         unsigned char *sk
                        );
 
-int __namespace-clean__crypto_sign(unsigned char *sm,
+int __namespace__crypto_sign(unsigned char *sm,
                 uint64_t *smlen,
                 const unsigned char *m,
                 uint64_t mlen,
                 const unsigned char *sk
                );
 
-int __namespace-clean__crypto_sign_open(unsigned char *m,
+int __namespace__crypto_sign_open(unsigned char *m,
                      uint64_t *mlen,
                      const unsigned char *sm,
                      uint64_t smlen,
                      const unsigned char *pk
                     );
 
-int __namespace-clean__crypto_sign_signature(unsigned char *sig,
+int __namespace__crypto_sign_signature(unsigned char *sig,
                 uint64_t *siglen,
                 const unsigned char *m,
                 uint64_t mlen,
                 const unsigned char *sk
                );
 
-int __namespace-clean__crypto_sign_verify(const unsigned char *sig,
+int __namespace__crypto_sign_verify(const unsigned char *sig,
                 uint64_t siglen,
                 const unsigned char *m,
                 uint64_t mlen,

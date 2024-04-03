@@ -48,84 +48,84 @@ typedef struct {
 /* Initialize the state and absorb the provided input.
  * This function does not support being called multiple times
  * with the same state. */
-void __namespace-clean__shake128_absorb(shake128ctx *state, const uint8_t *input, size_t inlen);
+void __namespace__shake128_absorb(shake128ctx *state, const uint8_t *input, size_t inlen);
 /* Squeeze output out of the sponge.
  * Supports being called multiple times */
-void __namespace-clean__shake128_squeezeblocks(uint8_t *output, size_t nblocks,
+void __namespace__shake128_squeezeblocks(uint8_t *output, size_t nblocks,
                             shake128ctx *state);
 
 
 /* Initialize incremental hashing API */
-void __namespace-clean__shake128_inc_init(shake128incctx *state);
+void __namespace__shake128_inc_init(shake128incctx *state);
 /* Absorb more information into the XOF.
  * Can be called multiple times. */
-void __namespace-clean__shake128_inc_absorb(shake128incctx *state, const uint8_t *input,
+void __namespace__shake128_inc_absorb(shake128incctx *state, const uint8_t *input,
                          size_t inlen);
 /* Finalize the XOF for squeezing */
-void __namespace-clean__shake128_inc_finalize(shake128incctx *state);
+void __namespace__shake128_inc_finalize(shake128incctx *state);
 /* Squeeze output out of the sponge.
  * Supports being called multiple times */
-void __namespace-clean__shake128_inc_squeeze(uint8_t *output, size_t outlen,
+void __namespace__shake128_inc_squeeze(uint8_t *output, size_t outlen,
                           shake128incctx *state);
 
 
 /* Initialize the state and absorb the provided input.
  * This function does not support being called multiple times
  * with the same state. */
-void __namespace-clean__shake256_absorb(shake256ctx *state, const uint8_t *input, size_t inlen);
+void __namespace__shake256_absorb(shake256ctx *state, const uint8_t *input, size_t inlen);
 /* Squeeze output out of the sponge.
  * Supports being called multiple times */
-void __namespace-clean__shake256_squeezeblocks(uint8_t *output, size_t nblocks,
+void __namespace__shake256_squeezeblocks(uint8_t *output, size_t nblocks,
                             shake256ctx *state);
 
 /* Initialize incremental hashing API */
-void __namespace-clean__shake256_inc_init(shake256incctx *state);
-void __namespace-clean__shake256_inc_absorb(shake256incctx *state, const uint8_t *input,
+void __namespace__shake256_inc_init(shake256incctx *state);
+void __namespace__shake256_inc_absorb(shake256incctx *state, const uint8_t *input,
                          size_t inlen);
 /* Prepares for squeeze phase */
-void __namespace-clean__shake256_inc_finalize(shake256incctx *state);
+void __namespace__shake256_inc_finalize(shake256incctx *state);
 /* Squeeze output out of the sponge.
  * Supports being called multiple times */
-void __namespace-clean__shake256_inc_squeeze(uint8_t *output, size_t outlen,
+void __namespace__shake256_inc_squeeze(uint8_t *output, size_t outlen,
                           shake256incctx *state);
 
 
 /* One-stop SHAKE128 call */
-void __namespace-clean__shake128(uint8_t *output, size_t outlen, const uint8_t *input,
+void __namespace__shake128(uint8_t *output, size_t outlen, const uint8_t *input,
               size_t inlen);
 /* One-stop SHAKE256 call */
-void __namespace-clean__shake256(uint8_t *output, size_t outlen, const uint8_t *input,
+void __namespace__shake256(uint8_t *output, size_t outlen, const uint8_t *input,
               size_t inlen);
 
 /* Initialize the incremental hashing state */
-void __namespace-clean__sha3_256_inc_init(sha3_256incctx *state);
+void __namespace__sha3_256_inc_init(sha3_256incctx *state);
 /* Absorb blocks into SHA3 */
-void __namespace-clean__sha3_256_inc_absorb(sha3_256incctx *state, const uint8_t *input,
+void __namespace__sha3_256_inc_absorb(sha3_256incctx *state, const uint8_t *input,
                          size_t inlen);
 /* Obtain the output of the function and free `state` */
-void __namespace-clean__sha3_256_inc_finalize(uint8_t *output, sha3_256incctx *state);
+void __namespace__sha3_256_inc_finalize(uint8_t *output, sha3_256incctx *state);
 /* One-stop SHA3-256 shop */
-void __namespace-clean__sha3_256(uint8_t *output, const uint8_t *input, size_t inlen);
+void __namespace__sha3_256(uint8_t *output, const uint8_t *input, size_t inlen);
 
 /* Initialize the incremental hashing state */
-void __namespace-clean__sha3_384_inc_init(sha3_384incctx *state);
+void __namespace__sha3_384_inc_init(sha3_384incctx *state);
 /* Absorb blocks into SHA3 */
-void __namespace-clean__sha3_384_inc_absorb(sha3_384incctx *state, const uint8_t *input,
+void __namespace__sha3_384_inc_absorb(sha3_384incctx *state, const uint8_t *input,
                          size_t inlen);
 /* Obtain the output of the function and free `state` */
-void __namespace-clean__sha3_384_inc_finalize(uint8_t *output, sha3_384incctx *state);
+void __namespace__sha3_384_inc_finalize(uint8_t *output, sha3_384incctx *state);
 /* One-stop SHA3-384 shop */
-void __namespace-clean__sha3_384(uint8_t *output, const uint8_t *input, size_t inlen);
+void __namespace__sha3_384(uint8_t *output, const uint8_t *input, size_t inlen);
 
 /* Initialize the incremental hashing state */
-void __namespace-clean__sha3_512_inc_init(sha3_512incctx *state);
+void __namespace__sha3_512_inc_init(sha3_512incctx *state);
 /* Absorb blocks into SHA3 */
-void __namespace-clean__sha3_512_inc_absorb(sha3_512incctx *state, const uint8_t *input,
+void __namespace__sha3_512_inc_absorb(sha3_512incctx *state, const uint8_t *input,
                          size_t inlen);
 /* Obtain the output of the function and free `state` */
-void __namespace-clean__sha3_512_inc_finalize(uint8_t *output, sha3_512incctx *state);
+void __namespace__sha3_512_inc_finalize(uint8_t *output, sha3_512incctx *state);
 /* One-stop SHA3-512 shop */
-void __namespace-clean__sha3_512(uint8_t *output, const uint8_t *input, size_t inlen);
+void __namespace__sha3_512(uint8_t *output, const uint8_t *input, size_t inlen);
 
-void __namespace-clean__shake128_ctx_clone(shake128ctx *dest, const shake128ctx *src);
-void __namespace-clean__shake256_ctx_clone(shake256ctx *dest, const shake256ctx *src);
+void __namespace__shake128_ctx_clone(shake128ctx *dest, const shake128ctx *src);
+void __namespace__shake256_ctx_clone(shake256ctx *dest, const shake256ctx *src);

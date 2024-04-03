@@ -30,45 +30,45 @@
  * generic inputs from 1 to 16 bit possible*/
 
 /* 
- * __namespace-clean__pack_fq_vec()
+ * __namespace__pack_fq_vec()
  *
  * uint8_t out[DENSELY_PACKED_FQ_VEC_SIZE]    : FQ packed in bytes
  * const FQ_ELEM in[N]                        :   FQ Vec input, to be packed
  * 
  * This function handles the packing of FQ
  */
-void __namespace-clean__pack_fq_vec(uint8_t out[DENSELY_PACKED_FQ_VEC_SIZE],
+void __namespace__pack_fq_vec(uint8_t out[DENSELY_PACKED_FQ_VEC_SIZE],
                    const FQ_ELEM in[N])
 {
-   __namespace-clean__generic_pack_fq(out, in, DENSELY_PACKED_FQ_VEC_SIZE, N);
+   __namespace__generic_pack_fq(out, in, DENSELY_PACKED_FQ_VEC_SIZE, N);
 }
 
 /* 
- * __namespace-clean__pack_fq_syn()
+ * __namespace__pack_fq_syn()
  *
  * uint8_t out[DENSELY_PACKED_FQ_SYN_SIZE]    :   FQ packed in bytes
  * const FQ_ELEM in[N-K]                      :   FQ Vec input, to be packed
  * 
  * This function handles the packing of FQ
  */
-void __namespace-clean__pack_fq_syn(uint8_t out[DENSELY_PACKED_FQ_SYN_SIZE],
+void __namespace__pack_fq_syn(uint8_t out[DENSELY_PACKED_FQ_SYN_SIZE],
                    const FQ_ELEM in[N-K])
 {
-   __namespace-clean__generic_pack_fq(out, in, DENSELY_PACKED_FQ_SYN_SIZE, N-K);
+   __namespace__generic_pack_fq(out, in, DENSELY_PACKED_FQ_SYN_SIZE, N-K);
 }
 
 /* 
- * __namespace-clean__pack_fz_vec()
+ * __namespace__pack_fz_vec()
  *
  * uint8_t out[DENSELY_PACKED_FZ_VEC_SIZE]    :   FQ packed in bytes
  * const FZ_ELEM in[N]                        :   FQ Vec input, to be packed
  * 
  * This function handles the packing of FQ
  */
-void __namespace-clean__pack_fz_vec(uint8_t out[DENSELY_PACKED_FZ_VEC_SIZE],
+void __namespace__pack_fz_vec(uint8_t out[DENSELY_PACKED_FZ_VEC_SIZE],
                    const FZ_ELEM in[N])
 {
-   __namespace-clean__generic_pack_fz(out, in, DENSELY_PACKED_FZ_VEC_SIZE, N);
+   __namespace__generic_pack_fz(out, in, DENSELY_PACKED_FZ_VEC_SIZE, N);
 }
 
 /* 
@@ -83,12 +83,12 @@ void __namespace-clean__pack_fz_vec(uint8_t out[DENSELY_PACKED_FZ_VEC_SIZE],
 void pack_fz_rsdp_g_vec(uint8_t out[DENSELY_PACKED_FZ_RSDP_G_VEC_SIZE],
                    const FZ_ELEM in[M])
 {
-   __namespace-clean__generic_pack_fz(out, in, DENSELY_PACKED_FZ_RSDP_G_VEC_SIZE, M);
+   __namespace__generic_pack_fz(out, in, DENSELY_PACKED_FZ_RSDP_G_VEC_SIZE, M);
 }
 #endif
 
 /* 
- * __namespace-clean__generic_pack_fq()
+ * __namespace__generic_pack_fq()
  *
  * uint8_t *out      :   FQ packed in bytes
  * const FQ_ELEM *in :   FQ Vec input, to be packed
@@ -97,7 +97,7 @@ void pack_fz_rsdp_g_vec(uint8_t out[DENSELY_PACKED_FZ_RSDP_G_VEC_SIZE],
  * 
  * This function handles the packing of an vector of el. in FQ of arbit. length
  */
-void __namespace-clean__generic_pack_fq(uint8_t *out, const FQ_ELEM *in,
+void __namespace__generic_pack_fq(uint8_t *out, const FQ_ELEM *in,
                        const size_t outlen, const size_t inlen)
 {
 #if Q == 127
@@ -249,10 +249,10 @@ void __namespace-clean__generic_pack_fq(uint8_t *out, const FQ_ELEM *in,
    {
 	   in_tmp[i] = (uint16_t)in[i];
    }
-   __namespace-clean__generic_uint16_t_pack(out, in_tmp, outlen, inlen, BITS_TO_REPRESENT(Q-1));
+   __namespace__generic_uint16_t_pack(out, in_tmp, outlen, inlen, BITS_TO_REPRESENT(Q-1));
 
 #elif FQ_ELEM == uint16_t
-   __namespace-clean__generic_uint16_t_pack(out, in, outlen, inlen, BITS_TO_REPRESENT(Q-1));
+   __namespace__generic_uint16_t_pack(out, in, outlen, inlen, BITS_TO_REPRESENT(Q-1));
 
 #else
    #error not implemented
@@ -261,7 +261,7 @@ void __namespace-clean__generic_pack_fq(uint8_t *out, const FQ_ELEM *in,
 }
 
 /* 
- * __namespace-clean__generic_pack_fz()
+ * __namespace__generic_pack_fz()
  *
  * uint8_t *out      :   Zz packed in bytes
  * const FZ_ELEM *in :   Zz Vec input, to be packed
@@ -270,7 +270,7 @@ void __namespace-clean__generic_pack_fq(uint8_t *out, const FQ_ELEM *in,
  * 
  * This function handles the packing of an vector of el. in Zz of arbit. length
  */
-void __namespace-clean__generic_pack_fz(uint8_t *out, const FZ_ELEM *in, const size_t outlen, const size_t inlen)
+void __namespace__generic_pack_fz(uint8_t *out, const FZ_ELEM *in, const size_t outlen, const size_t inlen)
 {
 #if Z == 127
    size_t i;
@@ -422,10 +422,10 @@ void __namespace-clean__generic_pack_fz(uint8_t *out, const FZ_ELEM *in, const s
    {
 	   in_tmp[i] = (uint16_t)in[i];
    }
-   __namespace-clean__generic_uint16_t_pack(out, in_tmp, outlen, inlen, BITS_TO_REPRESENT(Z-1));
+   __namespace__generic_uint16_t_pack(out, in_tmp, outlen, inlen, BITS_TO_REPRESENT(Z-1));
 
 #elif FZ_ELEM == uint16_t
-   __namespace-clean__generic_uint16_t_pack(out, in, outlen, inlen, BITS_TO_REPRESENT(Z-1));
+   __namespace__generic_uint16_t_pack(out, in, outlen, inlen, BITS_TO_REPRESENT(Z-1));
 
 #else
    #error not implemented
@@ -434,45 +434,45 @@ void __namespace-clean__generic_pack_fz(uint8_t *out, const FZ_ELEM *in, const s
 }
 
 /* 
- * __namespace-clean__unpack_fq_vec()
+ * __namespace__unpack_fq_vec()
  *
  * FQ_ELEM out[N]                               :   FQ Vec output
  * const uint8_t in[DENSELY_PACKED_FQ_VEC_SIZE] :   FQ Byte input, to be unpckd
  * 
  * This function handles the unpacking of FQ
  */
-void __namespace-clean__unpack_fq_vec(FQ_ELEM out[N],
+void __namespace__unpack_fq_vec(FQ_ELEM out[N],
                    const uint8_t in[DENSELY_PACKED_FQ_VEC_SIZE])
 {
-   __namespace-clean__generic_unpack_fq(out, in, N, DENSELY_PACKED_FQ_VEC_SIZE);
+   __namespace__generic_unpack_fq(out, in, N, DENSELY_PACKED_FQ_VEC_SIZE);
 }
 
 /* 
- * __namespace-clean__unpack_fq_syn()
+ * __namespace__unpack_fq_syn()
  *
  * FQ_ELEM out[N]                               :   FQ Vec output
  * const uint8_t in[DENSELY_PACKED_FQ_SYN_SIZE] :   FQ Byte input, to be unpckd
  * 
  * This function handles the unpacking of FQ
  */
-void __namespace-clean__unpack_fq_syn(FQ_ELEM out[N-K],
+void __namespace__unpack_fq_syn(FQ_ELEM out[N-K],
                    const uint8_t in[DENSELY_PACKED_FQ_SYN_SIZE])
 {
-   __namespace-clean__generic_unpack_fq(out, in, N-K, DENSELY_PACKED_FQ_SYN_SIZE);
+   __namespace__generic_unpack_fq(out, in, N-K, DENSELY_PACKED_FQ_SYN_SIZE);
 }
 
 /* 
- * __namespace-clean__unpack_fz_vec()
+ * __namespace__unpack_fz_vec()
  *
  * FZ_ELEM out[N]                               :   FQ Vec output
  * const uint8_t in[DENSELY_PACKED_FZ_VEC_SIZE] :   FQ Byte input, to be unpckd
  * 
  * This function handles the unpacking of FQ
  */
-void __namespace-clean__unpack_fz_vec(FZ_ELEM out[N],
+void __namespace__unpack_fz_vec(FZ_ELEM out[N],
                    const uint8_t in[DENSELY_PACKED_FZ_VEC_SIZE])
 {
-   __namespace-clean__generic_unpack_fz(out, in, N, DENSELY_PACKED_FZ_VEC_SIZE);
+   __namespace__generic_unpack_fz(out, in, N, DENSELY_PACKED_FZ_VEC_SIZE);
 }
 
 /* 
@@ -487,12 +487,12 @@ void __namespace-clean__unpack_fz_vec(FZ_ELEM out[N],
 void unpack_fz_rsdp_g_vec(FZ_ELEM out[M],
                    const uint8_t in[DENSELY_PACKED_FZ_RSDP_G_VEC_SIZE])
 {
-   __namespace-clean__generic_unpack_fz(out, in, M, DENSELY_PACKED_FZ_RSDP_G_VEC_SIZE);
+   __namespace__generic_unpack_fz(out, in, M, DENSELY_PACKED_FZ_RSDP_G_VEC_SIZE);
 }
 #endif
 
 /* 
- * __namespace-clean__generic_unpack_fq()
+ * __namespace__generic_unpack_fq()
  *
  * FQ_ELEM *out      :   FQ output, unpacked
  * const uint8_t *in :   FQ Vec input, packed in bytes
@@ -501,7 +501,7 @@ void unpack_fz_rsdp_g_vec(FZ_ELEM out[M],
  * 
  * This function unpacks an vector of el. in FQ of arbit. length
  */
-void __namespace-clean__generic_unpack_fq(FQ_ELEM *out, const uint8_t *in,
+void __namespace__generic_unpack_fq(FQ_ELEM *out, const uint8_t *in,
                        size_t outlen, size_t inlen)
 {
 
@@ -708,14 +708,14 @@ void __namespace-clean__generic_unpack_fq(FQ_ELEM *out, const uint8_t *in,
 
 #elif FQ_ELEM == uint8_t
    uint16_t out_tmp[outlen];
-   __namespace-clean__generic_uint16_t_unpack(out_tmp, in, outlen, inlen, BITS_TO_REPRESENT(Q-1));
+   __namespace__generic_uint16_t_unpack(out_tmp, in, outlen, inlen, BITS_TO_REPRESENT(Q-1));
    for(size_t i = 0; i < outlen; i++)
    {
 	   out[i] = (uint8_t)out_tmp[i];
    }
 
 #elif FQ_ELEM == uint16_t
-   __namespace-clean__generic_uint16_t_unpack(out, in, outlen, inlen, BITS_TO_REPRESENT(Q-1));
+   __namespace__generic_uint16_t_unpack(out, in, outlen, inlen, BITS_TO_REPRESENT(Q-1));
 
 #else
    #error not implemented
@@ -724,7 +724,7 @@ void __namespace-clean__generic_unpack_fq(FQ_ELEM *out, const uint8_t *in,
 }
 
 /* 
- * __namespace-clean__generic_unpack_fz()
+ * __namespace__generic_unpack_fz()
  *
  * FZ_ELEM *out      :   Zz output, unpacked
  * const uint8_t *in :   Zz Vec input, packed in bytes
@@ -733,7 +733,7 @@ void __namespace-clean__generic_unpack_fq(FQ_ELEM *out, const uint8_t *in,
  * 
  * This function unpacks an vector of el. in Zz of arbit. length
  */
-void __namespace-clean__generic_unpack_fz(FZ_ELEM *out, const uint8_t *in,
+void __namespace__generic_unpack_fz(FZ_ELEM *out, const uint8_t *in,
                        size_t outlen, size_t inlen)
 {
    
@@ -913,14 +913,14 @@ void __namespace-clean__generic_unpack_fz(FZ_ELEM *out, const uint8_t *in,
 
 #elif FZ_ELEM == uint8_t
    uint16_t out_tmp[outlen];
-   __namespace-clean__generic_uint16_t_unpack(out_tmp, in, outlen, inlen, BITS_TO_REPRESENT(Z-1));
+   __namespace__generic_uint16_t_unpack(out_tmp, in, outlen, inlen, BITS_TO_REPRESENT(Z-1));
    for(size_t i = 0; i < outlen; i++)
    {
 	   out[i] = (uint8_t)out_tmp[i];
    }
 
 #elif FZ_ELEM == uint16_t
-   __namespace-clean__generic_uint16_t_unpack(out, in, outlen, inlen, BITS_TO_REPRESENT(Z-1));
+   __namespace__generic_uint16_t_unpack(out, in, outlen, inlen, BITS_TO_REPRESENT(Z-1));
 
 #else
    #error not implemented
@@ -928,7 +928,7 @@ void __namespace-clean__generic_unpack_fz(FZ_ELEM *out, const uint8_t *in,
 #endif
 }
 
-void __namespace-clean__generic_uint16_t_pack(uint8_t *out, const uint16_t *in,
+void __namespace__generic_uint16_t_pack(uint8_t *out, const uint16_t *in,
                        size_t outlen, size_t inlen, uint8_t btr)
 {
    size_t i;
@@ -1028,7 +1028,7 @@ void __namespace-clean__generic_uint16_t_pack(uint8_t *out, const uint16_t *in,
    }
 }
 
-void __namespace-clean__generic_uint16_t_unpack(uint16_t *out, const uint8_t *in,
+void __namespace__generic_uint16_t_unpack(uint16_t *out, const uint8_t *in,
 		       size_t outlen, size_t inlen, uint8_t btr)
 {
    size_t i;

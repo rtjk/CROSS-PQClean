@@ -69,17 +69,17 @@ typedef struct {
 
 
 /* keygen cannot fail */
-void __namespace-clean__CROSS_keygen(prikey_t *SK,
+void __namespace__CROSS_keygen(prikey_t *SK,
                  pubkey_t *PK);
 
 /* sign cannot fail */
-void __namespace-clean__CROSS_sign(const prikey_t * const SK,
+void __namespace__CROSS_sign(const prikey_t * const SK,
                 const char * const m,
                 const uint64_t mlen,
                 sig_t * const sig);
 
 /* verify returns 1 if signature is ok, 0 otherwise */
-int __namespace-clean__CROSS_verify(const pubkey_t * const PK,
+int __namespace__CROSS_verify(const pubkey_t * const PK,
                  const char * const m,
                  const uint64_t mlen,
                  const sig_t * const sig);

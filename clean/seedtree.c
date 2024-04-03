@@ -39,7 +39,7 @@
 /****************************** Pretty Printers ******************************/
 
 #include <stdio.h>
-void __namespace-clean__pseed(unsigned char seed[SEED_LENGTH_BYTES]){
+void __namespace__pseed(unsigned char seed[SEED_LENGTH_BYTES]){
      fprintf(stderr,"-");
    for (int i = 0 ; i < SEED_LENGTH_BYTES; i++){
      fprintf(stderr,"%02X", seed[i]);
@@ -47,7 +47,7 @@ void __namespace-clean__pseed(unsigned char seed[SEED_LENGTH_BYTES]){
      fprintf(stderr,"- ");
 }
 
-void __namespace-clean__ptree(unsigned char seed_tree[NUM_NODES_SEED_TREE * SEED_LENGTH_BYTES]){
+void __namespace__ptree(unsigned char seed_tree[NUM_NODES_SEED_TREE * SEED_LENGTH_BYTES]){
    int node_idx =0;
    fprintf(stderr,"Tree dump\n");
    int ancestors = 0;
@@ -57,7 +57,7 @@ void __namespace-clean__ptree(unsigned char seed_tree[NUM_NODES_SEED_TREE * SEED
       for (int idx_in_level = 0; idx_in_level < nodes_in_level_full; idx_in_level++ ) {
           node_idx = ancestors + idx_in_level ;
           fprintf(stderr," [%d] ",node_idx);
-          __namespace-clean__pseed(seed_tree+node_idx*SEED_LENGTH_BYTES);
+          __namespace__pseed(seed_tree+node_idx*SEED_LENGTH_BYTES);
       }
       ancestors += nodes_in_level_full ;
       fprintf(stderr,"\n");
@@ -123,7 +123,7 @@ int publish_round_seeds(unsigned char *seed_storage,
 }
 
 /* simply picks seeds out of the storage and places them in the in-memory array */
-int __namespace-clean__regenerate_round_seeds(unsigned char rounds_seeds[T*SEED_LENGTH_BYTES],                           
+int __namespace__regenerate_round_seeds(unsigned char rounds_seeds[T*SEED_LENGTH_BYTES],                           
                            const unsigned char indices_to_publish[T],
                            const unsigned char *seed_storage){
     int published = 0;
@@ -202,7 +202,7 @@ static void compute_seeds_to_publish(
  *             from roots to leaves layer-by-layer from left to right,
  *             counting from 0 (the integer bound with the root node)"
  */
-void __namespace-clean__generate_seed_tree_from_root(unsigned char
+void __namespace__generate_seed_tree_from_root(unsigned char
                                   seed_tree[NUM_NODES_SEED_TREE * SEED_LENGTH_BYTES],
                                   const unsigned char root_seed[SEED_LENGTH_BYTES],
                                   const unsigned char salt[SALT_LENGTH_BYTES])
@@ -255,7 +255,7 @@ void __namespace-clean__generate_seed_tree_from_root(unsigned char
 
 
 /*****************************************************************************/
-int __namespace-clean__publish_seeds(unsigned char *seed_storage,
+int __namespace__publish_seeds(unsigned char *seed_storage,
                   // OUTPUT: sequence of seeds to be released
                   const unsigned char
                   seed_tree[NUM_NODES_SEED_TREE*SEED_LENGTH_BYTES],
@@ -296,11 +296,11 @@ int __namespace-clean__publish_seeds(unsigned char *seed_storage,
    }
 
    return num_seeds_published;
-} /* end __namespace-clean__publish_seeds */
+} /* end __namespace__publish_seeds */
 
 /*****************************************************************************/
 
-int __namespace-clean__regenerate_round_seeds(unsigned char
+int __namespace__regenerate_round_seeds(unsigned char
                       seed_tree[NUM_NODES_SEED_TREE*SEED_LENGTH_BYTES],
                       const unsigned char indices_to_publish[T],
                       const unsigned char *stored_seeds,

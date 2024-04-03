@@ -84,9 +84,9 @@ void xof_shake_init(SHAKE_STATE_STRUCT *state, int val)
 {
    if(val == 0) {val = 0;}; // TODO: useless line added to avoid -Werror=unused-parameter and Werror=unused-value
 #if defined(CATEGORY_1)
-   __namespace-clean__shake128_inc_init(state);
+   __namespace__shake128_inc_init(state);
 #else
-   __namespace-clean__shake256_inc_init(state);
+   __namespace__shake256_inc_init(state);
 #endif
 }
 
@@ -96,11 +96,11 @@ void xof_shake_update(SHAKE_STATE_STRUCT *state,
                       uint32_t inputByteLen)
 {
 #if defined(CATEGORY_1)
-   __namespace-clean__shake128_inc_absorb(state,
+   __namespace__shake128_inc_absorb(state,
                        (const uint8_t *)input,
                        inputByteLen);
 #else
-   __namespace-clean__shake256_inc_absorb(state,
+   __namespace__shake256_inc_absorb(state,
                        (const uint8_t *)input,
                        inputByteLen);
 #endif
@@ -110,9 +110,9 @@ static inline
 void xof_shake_final(SHAKE_STATE_STRUCT *state)
 {
 #if defined(CATEGORY_1)
-   __namespace-clean__shake128_inc_finalize(state);
+   __namespace__shake128_inc_finalize(state);
 #else
-   __namespace-clean__shake256_inc_finalize(state);
+   __namespace__shake256_inc_finalize(state);
 #endif
 }
 
@@ -121,9 +121,9 @@ void xof_shake_extract(SHAKE_STATE_STRUCT *state,
                        unsigned char *output,
                        uint32_t outputByteLen){
 #if defined(CATEGORY_1)
-   __namespace-clean__shake128_inc_squeeze(output, outputByteLen, state);
+   __namespace__shake128_inc_squeeze(output, outputByteLen, state);
 #else
-   __namespace-clean__shake256_inc_squeeze(output, outputByteLen, state);
+   __namespace__shake256_inc_squeeze(output, outputByteLen, state);
 #endif
 }
 #endif

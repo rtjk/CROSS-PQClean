@@ -28,6 +28,9 @@
 #include "parameters.h"
 #include "csprng_hash.h"
 
+void __namespace__pseed(unsigned char seed[SEED_LENGTH_BYTES]);
+void __namespace__ptree(unsigned char seed_tree[NUM_NODES_SEED_TREE * SEED_LENGTH_BYTES]);
+
 #if defined(NO_TREES)
 int compute_round_seeds(unsigned char rounds_seeds[T*SEED_LENGTH_BYTES],
                   const unsigned char root_seed[SEED_LENGTH_BYTES],
@@ -63,7 +66,5 @@ int __namespace__regenerate_round_seeds(unsigned char
                       const unsigned char *stored_seeds,
                       const unsigned char salt[SALT_LENGTH_BYTES]);   // input
 
-void __namespace__pseed(unsigned char seed[SEED_LENGTH_BYTES]);
-void __namespace__ptree(unsigned char seed_tree[NUM_NODES_SEED_TREE * SEED_LENGTH_BYTES]);
 
 #endif

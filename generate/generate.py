@@ -38,7 +38,7 @@ with open(csv_filename, 'r') as csvfile:
     for row in csv_reader:
         
         # create the directory for a given set of parameters 
-        dir = row['dir']
+        dir = row['__dir__']
         dir = os.path.join(TARGET_DIR, dir)
         os.makedirs(dir)
 
@@ -50,8 +50,7 @@ with open(csv_filename, 'r') as csvfile:
         # TODO: add 'optimezed-implementation' and follow_symlinks
         # shutil.copyfile(source, destination, *, follow_symlinks = True)
 
-        # exclude the first column 'dir'
-        columns = csv_reader.fieldnames[1:]
+        columns = csv_reader.fieldnames
 
         # replace 'column_name' with 'column_value' in the files
         for column_name in columns:

@@ -1,3 +1,10 @@
-__dir__,__implementation__,__variant__,__nist-level__,__target__,__length-secret-key__,__length-public-key__,__random-bytes__,__length-signature__,__namespace__,__nistkat-sha256__,__testvectors-sha256__,
-cross-rsdp-128-balanced,clean,RSDP,1,BALANCED,32,77,16,12912,PQCLEAN_CROSSRSDP128BALANCED_CLEAN_,d27692bc70287f1daf01c4697d40ab475836c4f2e461b281fad0423cd262e10d,5e6e82fa982a857d099d9db4f2fd120d11bade33584fdae887e34c648190e070,
-cross-rsdp-256-fast,clean,RSDP,5,SPEED,64,153,32,76298,PQCLEAN_CROSSRSDP256FAST_CLEAN_,d27692bc70287f1daf01c4697d40ab475836c4f2e461b281fad0423cd262e10d,5e6e82fa982a857d099d9db4f2fd120d11bade33584fdae887e34c648190e070,
+__dir__,__implementation__,__variant__,__nist-level__,__target__,__length-secret-key__,__length-public-key__,__random-bytes__,__length-signature__,__namespace__,__nistkat-sha256__,__testvectors-sha256__
+cross-rsdp-128-small,clean,RSDP,1,SIG_SIZE,32,77,16,10080,PQCLEAN_CROSSRSDP128SMALL_CLEAN_,e62360ece4c469deed495078cf5e828703311baf4331ee5b1b77adf2c71ff0e7,c340a0102ce0dd8eef778719b2354739adb3e83025fcb3b2a5b1c4c65d72656e
+cross-rsdp-128-balanced,clean,RSDP,1,BALANCED,32,77,16,12912,PQCLEAN_CROSSRSDP128BALANCED_CLEAN_,d27692bc70287f1daf01c4697d40ab475836c4f2e461b281fad0423cd262e10d,5e6e82fa982a857d099d9db4f2fd120d11bade33584fdae887e34c648190e070
+cross-rsdp-128-fast,clean,RSDP,1,SPEED,32,77,16,19152,PQCLEAN_CROSSRSDP128FAST_CLEAN_,43a7813d1f5ec3fe1ba9a77c4ae7c299e4b5f6c83fae0ceb29bf12f00ec322d9,1869529ca3566eace1b8e9470bf16dbd10df4c1bfc8f4131bcf0cfbec440240f
+cross-rsdp-192-small,clean,RSDP,3,SIG_SIZE,48,115,24,23642,PQCLEAN_CROSSRSDP192SMALL_CLEAN_,TODO,TODO
+cross-rsdp-192-balanced,clean,RSDP,3,BALANCED,48,115,24,28222,PQCLEAN_CROSSRSDP192BALANCED_CLEAN_,TODO,TODO
+cross-rsdp-192-fast,clean,RSDP,3,SPEED,48,115,24,42682,PQCLEAN_CROSSRSDP192FAST_CLEAN_,TODO,TODO
+cross-rsdp-256-small,clean,RSDP,5,SIG_SIZE,64,153,32,43592,PQCLEAN_CROSSRSDP256SMALL_CLEAN_,TODO,TODO
+cross-rsdp-256-balanced,clean,RSDP,5,BALANCED,64,153,32,51056,PQCLEAN_CROSSRSDP256BALANCED_CLEAN_,TODO,TODO
+cross-rsdp-256-fast,clean,RSDP,5,SPEED,64,153,32,76298,PQCLEAN_CROSSRSDP256FAST_CLEAN_,73c2bd385a07aeacb99ab6b1d63f88b2d12780575c40f4194da81e2dd66ffe84,6a220f96f2a9dcc46e05944faa82faaba50204fc0ec68018ef4c8bb7a961e4dd

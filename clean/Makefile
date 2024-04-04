@@ -14,7 +14,7 @@ OBJECTS = CROSS.o csprng_hash.o keccakf1600.o merkle.o pack_unpack.o seedtree.o 
 #CFLAGS=-std=c99 -I../../../common $(EXTRAFLAGS) -march=native -O3 -g3
 # the flag -std=c99 somehow allows to see fips202.h in /common
 #### empty
-#CFALGS= -I../../../common $(EXTRAFLAGS)
+#CFLAGS= -I../../../common $(EXTRAFLAGS)
 
 #### incrementally add flags
 # 

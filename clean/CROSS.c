@@ -540,7 +540,7 @@ int __namespace__CROSS_verify(const pubkey_t *const PK,
 
     // TODO: remove this assetion to pass test_wrong_pk in PQClean
     // test_wrong_pk needs CROSS_verify to return is_signature_ok and NOT exit before returning
-    assert(does_digest_01_match);
+    //assert(does_digest_01_match);
 
     int does_digest_b_match = ( memcmp(digest_b_recomputed,
                                         sig->digest_b,

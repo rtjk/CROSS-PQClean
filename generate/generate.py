@@ -34,6 +34,7 @@ csv_filename = './parameter_sets.csv'
 # files and directories to copy
 meta_file = '/META.yml'
 clean_dir = '/clean'
+avx2_dir = '/avx2'
 
 with open(csv_filename, 'r') as csvfile:
 
@@ -48,11 +49,12 @@ with open(csv_filename, 'r') as csvfile:
 
         # copy META.yml
         shutil.copyfile('..' + meta_file, dir + meta_file)
-        # copy the clean implementation template
+        # copy the reference (clean) implementation template
         shutil.copytree('..' + clean_dir, dir + clean_dir)
+        # copy the optimized (avx2) implementation template
+        shutil.copytree('..' + clean_dir, dir + avx2_dir)
+        shutil.copytree('..' + avx2_dir, dir + avx2_dir, dirs_exist_ok=True)
 
-        # TODO: add 'optimezed-implementation' and follow_symlinks
-        # shutil.copyfile(source, destination, *, follow_symlinks = True)
 
         columns = csv_reader.fieldnames
 

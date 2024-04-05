@@ -19,7 +19,7 @@ def replace_in_dir(dir, text_to_search, replacement_text):
                 if os.path.isfile(file_path):
                     replace_in_file(file_path, text_to_search, replacement_text)
 
-# Output here
+# output here
 TARGET_DIR = './crypto_sign'
 
 # delete output directory if it already exists
@@ -27,11 +27,11 @@ if os.path.exists(TARGET_DIR):
     shutil.rmtree(TARGET_DIR)
 
 # csv file
-# the first column 'dir' constains the directory name for a given set of parameters
+# the first column '__dir__' constains the directory name for a given set of parameters
 # the other columns contain the values to replace (e.g. replace "__random-bytes__" with "16")
 csv_filename = './parameter_sets.csv'
 
-# files and dirs to copy
+# files and directories to copy
 meta_file = '/META.yml'
 clean_dir = '/clean'
 

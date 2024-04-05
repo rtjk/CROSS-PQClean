@@ -39,24 +39,28 @@ avx2_dir = '/avx2'
 with open(csv_filename, 'r') as csvfile:
 
     csv_reader = csv.DictReader(csvfile)
+    columns = csv_reader.fieldnames
 
     for row in csv_reader:
         
         # create the directory for a given set of parameters 
         dir = row['__dir__']
         dir = os.path.join(TARGET_DIR, dir)
-        os.makedirs(dir)
+        if(not os.path.isdir(dir)):
+            os.makedirs(dir)
+            # copy META.yml
+            shutil.copyfile('..' + meta_file, dir + meta_file)
+            # copy the reference (clean) implementation template
+            shutil.copytree('..' + clean_dir, dir + clean_dir)
+            # copy the optimized (avx2) implementation template
+            shutil.copytree('..' + clean_dir, dir + avx2_dir)
+            shutil.copytree('..' + avx2_dir, dir + avx2_dir, dirs_exist_ok=True)
+            # replace 'column_name' with 'column_value' in META.yml
+            for column_name in columns:
+                column_value = row[column_name]
+                replace_in_file(dir + meta_file, column_name, column_value)
 
-        # copy META.yml
-        shutil.copyfile('..' + meta_file, dir + meta_file)
-        # copy the reference (clean) implementation template
-        shutil.copytree('..' + clean_dir, dir + clean_dir)
-        # copy the optimized (avx2) implementation template
-        shutil.copytree('..' + clean_dir, dir + avx2_dir)
-        shutil.copytree('..' + avx2_dir, dir + avx2_dir, dirs_exist_ok=True)
-
-
-        columns = csv_reader.fieldnames
+        dir = dir + '/' + row['__implementation__']
 
         # replace 'column_name' with 'column_value' in the files
         for column_name in columns:

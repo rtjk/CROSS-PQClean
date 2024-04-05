@@ -107,7 +107,7 @@ void expand_private_seed(FZ_ELEM eta[N],
 #endif
 
 
-void CROSS_keygen(prikey_t *SK,
+void __namespace__CROSS_keygen(prikey_t *SK,
                   pubkey_t *PK){
   /* generation of random material for public and private key */
   randombytes(SK->seed,KEYPAIR_SEED_LENGTH_BYTES);
@@ -156,11 +156,11 @@ void CROSS_keygen(prikey_t *SK,
   FQ_ELEM pub_syn[N-K];
   restr_vec_by_fq_matrix(pub_syn,eta,V_tr);
   fq_dz_norm_synd(pub_syn);
-  pack_fq_syn(PK->s,pub_syn);
+  __namespace__pack_fq_syn(PK->s,pub_syn);
 }
 
 /* sign cannot fail */
-void CROSS_sign(const prikey_t *SK,
+void __namespace__CROSS_sign(const prikey_t *SK,
                const char *const m,
                const uint64_t mlen,
                sig_t *sig){
@@ -205,7 +205,7 @@ void CROSS_sign(const prikey_t *SK,
     compute_round_seeds(rounds_seeds,root_seed,sig->salt);
 #else
     uint8_t seed_tree[SEED_LENGTH_BYTES*NUM_NODES_SEED_TREE] = {0};
-    generate_seed_tree_from_root(seed_tree,root_seed,sig->salt);
+    __namespace__generate_seed_tree_from_root(seed_tree,root_seed,sig->salt);
     uint8_t * rounds_seeds = seed_tree +
                                  SEED_LENGTH_BYTES*NUM_INNER_NODES_SEED_TREE;
 #endif
@@ -289,10 +289,10 @@ void CROSS_sign(const prikey_t *SK,
         fq_dz_norm_synd(s_tilde);
 
         /* cmt_0_i_input contains s-tilde || sigma_i || salt */
-        pack_fq_syn(cmt_0_i_input,s_tilde);
+        __namespace__pack_fq_syn(cmt_0_i_input,s_tilde);
 
 #if defined(RSDP)
-        pack_fz_vec(cmt_0_i_input + DENSELY_PACKED_FQ_SYN_SIZE, sigma[i]);
+        __namespace__pack_fz_vec(cmt_0_i_input + DENSELY_PACKED_FQ_SYN_SIZE, sigma[i]);
 #elif defined(RSDPG)
         pack_fz_rsdp_g_vec(cmt_0_i_input + DENSELY_PACKED_FQ_SYN_SIZE, delta[i]);
 #endif
@@ -314,10 +314,10 @@ void CROSS_sign(const prikey_t *SK,
     /* vector containing d_0 and d_1 from spec */
     uint8_t commit_digests[2][HASH_DIGEST_LENGTH];
 #if defined(NO_TREES)
-    merkle_tree_root_compute(commit_digests[0], cmt_0);
+    __namespace__merkle_tree_root_compute(commit_digests[0], cmt_0);
 #else
     uint8_t merkle_tree_0[NUM_NODES_MERKLE_TREE * HASH_DIGEST_LENGTH];
-    merkle_tree_root_compute(commit_digests[0], merkle_tree_0, cmt_0);
+    __namespace__merkle_tree_root_compute(commit_digests[0], merkle_tree_0, cmt_0);
 #endif
     hash(commit_digests[1], (unsigned char*)cmt_1, sizeof(cmt_1));
     hash(sig->digest_01,
@@ -350,7 +350,7 @@ void CROSS_sign(const prikey_t *SK,
     /* y vectors are packed before being hashed */
     uint8_t digest_b_buf[T*DENSELY_PACKED_FQ_VEC_SIZE+HASH_DIGEST_LENGTH];
     for(int x = 0; x < T; x++){
-        pack_fq_vec(digest_b_buf+(x*DENSELY_PACKED_FQ_VEC_SIZE),y[x]);
+        __namespace__pack_fq_vec(digest_b_buf+(x*DENSELY_PACKED_FQ_VEC_SIZE),y[x]);
     }
     /* Second challenge extraction */
     memcpy(digest_b_buf+T*DENSELY_PACKED_FQ_VEC_SIZE,d_beta,HASH_DIGEST_LENGTH);
@@ -358,25 +358,25 @@ void CROSS_sign(const prikey_t *SK,
     hash(sig->digest_b, digest_b_buf, sizeof(digest_b_buf));
 
     uint8_t fixed_weight_b[T]={0};
-    expand_digest_to_fixed_weight(fixed_weight_b,sig->digest_b);
+    __namespace__expand_digest_to_fixed_weight(fixed_weight_b,sig->digest_b);
 
     /* Computation of the second round of responses */
 
 #if defined(NO_TREES)
-    merkle_tree_proof_compute(sig->mtp,cmt_0,fixed_weight_b);
+    __namespace__merkle_tree_proof_compute(sig->mtp,cmt_0,fixed_weight_b);
     publish_round_seeds(sig->stp,rounds_seeds,fixed_weight_b);
 #else
-    merkle_tree_proof_compute(sig->mtp,merkle_tree_0,cmt_0,fixed_weight_b);
-    publish_seeds(sig->stp,seed_tree,fixed_weight_b);
+    __namespace__merkle_tree_proof_compute(sig->mtp,merkle_tree_0,cmt_0,fixed_weight_b);
+    __namespace__publish_seeds(sig->stp,seed_tree,fixed_weight_b);
 #endif
 
     int published_rsps = 0;
     for(int i = 0; i<T; i++){
         if(fixed_weight_b[i] == 0){
             assert(published_rsps < T-W);
-            pack_fq_vec(sig->rsp_0[published_rsps].y, y[i]);
+            __namespace__pack_fq_vec(sig->rsp_0[published_rsps].y, y[i]);
 #if defined(RSDP)
-            pack_fz_vec(sig->rsp_0[published_rsps].sigma, sigma[i]);
+            __namespace__pack_fz_vec(sig->rsp_0[published_rsps].sigma, sigma[i]);
 #elif defined(RSDPG)
             pack_fz_rsdp_g_vec(sig->rsp_0[published_rsps].delta, delta[i]);
 #endif
@@ -387,7 +387,7 @@ void CROSS_sign(const prikey_t *SK,
 }
 
 /* verify returns 1 if signature is ok, 0 otherwise */
-int CROSS_verify(const pubkey_t *const PK,
+int __namespace__CROSS_verify(const pubkey_t *const PK,
                  const char *const m,
                  const uint64_t mlen,
                  const sig_t *const sig){
@@ -419,7 +419,7 @@ int CROSS_verify(const pubkey_t *const PK,
 #endif
 
     FQ_ELEM pub_syn[N-K];
-    unpack_fq_syn(pub_syn,PK->s);
+    __namespace__unpack_fq_syn(pub_syn,PK->s);
 
     uint8_t beta_buf[2*HASH_DIGEST_LENGTH+SALT_LENGTH_BYTES];
     hash(beta_buf,(uint8_t*) m,mlen);
@@ -434,14 +434,14 @@ int CROSS_verify(const pubkey_t *const PK,
     CSPRNG_fq_vec_beta(beta, &CSPRNG_state);
 
     uint8_t fixed_weight_b[T]={0};
-    expand_digest_to_fixed_weight(fixed_weight_b,sig->digest_b);
+    __namespace__expand_digest_to_fixed_weight(fixed_weight_b,sig->digest_b);
 
 #if defined(NO_TREES)
     uint8_t rounds_seeds[T*SEED_LENGTH_BYTES] = {0};
-    regenerate_round_seeds(rounds_seeds,fixed_weight_b,sig->stp);
+    __namespace__regenerate_round_seeds(rounds_seeds,fixed_weight_b,sig->stp);
 #else
     uint8_t seed_tree[SEED_LENGTH_BYTES*NUM_NODES_SEED_TREE] = {0};
-    regenerate_round_seeds(seed_tree, fixed_weight_b, sig->stp, sig->salt);
+    __namespace__regenerate_round_seeds(seed_tree, fixed_weight_b, sig->stp, sig->salt);
     uint8_t * rounds_seeds = seed_tree +
                                  SEED_LENGTH_BYTES*NUM_INNER_NODES_SEED_TREE;
 #endif
@@ -527,13 +527,13 @@ int CROSS_verify(const pubkey_t *const PK,
             fq_dz_norm(y[i]);
         } else {
             /* place y[i] in the buffer for later on hashing */
-            unpack_fq_vec(y[i], sig->rsp_0[used_rsps].y);
+            __namespace__unpack_fq_vec(y[i], sig->rsp_0[used_rsps].y);
 
             FZ_ELEM sigma_local[N];
 #if defined(RSDP)
             /*sigma is memcpy'ed directly into cmt_0 input buffer */
             FZ_ELEM* sigma_ptr = cmt_0_i_input+DENSELY_PACKED_FQ_SYN_SIZE;
-	        unpack_fz_vec(sigma_local, sig->rsp_0[used_rsps].sigma);
+	        __namespace__unpack_fz_vec(sigma_local, sig->rsp_0[used_rsps].sigma);
             memcpy(sigma_ptr,
                    &sig->rsp_0[used_rsps].sigma,
                    DENSELY_PACKED_FZ_VEC_SIZE);
@@ -574,7 +574,7 @@ int CROSS_verify(const pubkey_t *const PK,
                                         beta[i],
                                         pub_syn);
             fq_dz_norm_synd(to_compress);
-            pack_fq_syn(cmt_0_i_input,to_compress);
+            __namespace__pack_fq_syn(cmt_0_i_input,to_compress);
             cmt_0_i_input[offset_round_idx] = (domain_sep_idx_hash >> 8) &0xFF;
             cmt_0_i_input[offset_round_idx+1] = domain_sep_idx_hash & 0xFF;
 
@@ -585,7 +585,7 @@ int CROSS_verify(const pubkey_t *const PK,
     assert(is_signature_ok);
 
     uint8_t commit_digests[2][HASH_DIGEST_LENGTH];
-    merkle_tree_root_recompute(commit_digests[0],
+    __namespace__merkle_tree_root_recompute(commit_digests[0],
                                cmt_0,
                                sig->mtp,
                                fixed_weight_b);
@@ -599,7 +599,7 @@ int CROSS_verify(const pubkey_t *const PK,
 
     uint8_t digest_b_buf[T*DENSELY_PACKED_FQ_VEC_SIZE+HASH_DIGEST_LENGTH];
     for(int x = 0; x < T; x++){
-        pack_fq_vec(digest_b_buf+(x*DENSELY_PACKED_FQ_VEC_SIZE),y[x]);
+        __namespace__pack_fq_vec(digest_b_buf+(x*DENSELY_PACKED_FQ_VEC_SIZE),y[x]);
     }
     memcpy(digest_b_buf+T*DENSELY_PACKED_FQ_VEC_SIZE,d_beta,HASH_DIGEST_LENGTH);
 

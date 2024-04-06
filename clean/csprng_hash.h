@@ -109,7 +109,7 @@ void CSPRNG_fq_vec(FQ_ELEM res[N],
     const FQ_ELEM mask = ( (FQ_ELEM) 1 << BITS_FOR_Q) - 1;
     
     // TODO: check max buffer size
-    int buffer_bits = N * BITS_FOR_Q + 64;
+    int buffer_bits = (N * BITS_FOR_Q + 32) * 2;
     int buffer_size = ROUND_UP(buffer_bits,8)/8;
     uint8_t CSPRNG_buffer[buffer_size];
     //uint8_t CSPRNG_buffer[ROUND_UP(BITS_N_ZQ_CT_RNG,8)/8];
@@ -227,7 +227,13 @@ static inline
 void CSPRNG_zz_vec(FZ_ELEM res[N],
                    CSPRNG_STATE_T * const csprng_state){
     const FZ_ELEM mask = ( (FZ_ELEM) 1 << BITS_TO_REPRESENT(Z-1)) - 1;
-    uint8_t CSPRNG_buffer[ROUND_UP(BITS_N_ZZ_CT_RNG,8)/8];
+
+    // TODO: check max buffer size
+    int buffer_bits = (N * BITS_FOR_Z + 32) * 2;
+    int buffer_size = ROUND_UP(buffer_bits,8)/8;
+    uint8_t CSPRNG_buffer[buffer_size];
+    //uint8_t CSPRNG_buffer[ROUND_UP(BITS_N_ZZ_CT_RNG,8)/8];
+
     /* To facilitate hardware implementations, the uint64_t 
      * sub-buffer is consumed starting from the least significant byte 
      * i.e., from the first being output by SHAKE. Bits in the byte are 

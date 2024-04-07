@@ -42,7 +42,7 @@ void __namespace__pack_fz_vec(uint8_t out[DENSELY_PACKED_FZ_VEC_SIZE],
                    const FZ_ELEM in[N]);
 
 #ifdef RSDPG
-void pack_fz_rsdp_g_vec(uint8_t out[DENSELY_PACKED_FZ_RSDP_G_VEC_SIZE],
+void __namespace__pack_fz_rsdp_g_vec(uint8_t out[DENSELY_PACKED_FZ_RSDP_G_VEC_SIZE],
                           const FZ_ELEM in[M]);
 #endif
 
@@ -62,7 +62,7 @@ void __namespace__unpack_fz_vec(FZ_ELEM out[N],
                    const uint8_t in[DENSELY_PACKED_FZ_VEC_SIZE]);
 
 #ifdef RSDPG
-void unpack_fz_rsdp_g_vec(FZ_ELEM out[M],
+void __namespace__unpack_fz_rsdp_g_vec(FZ_ELEM out[M],
                           const uint8_t in[DENSELY_PACKED_FZ_RSDP_G_VEC_SIZE]);
 #endif
 

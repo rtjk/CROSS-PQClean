@@ -202,7 +202,7 @@ void __namespace__CROSS_sign(const prikey_t *SK,
 
 #if defined(NO_TREES)
     unsigned char rounds_seeds[T*SEED_LENGTH_BYTES] = {0};
-    compute_round_seeds(rounds_seeds,root_seed,sig->salt);
+    __namespace__compute_round_seeds(rounds_seeds,root_seed,sig->salt);
 #else
     uint8_t seed_tree[SEED_LENGTH_BYTES*NUM_NODES_SEED_TREE] = {0};
     __namespace__generate_seed_tree_from_root(seed_tree,root_seed,sig->salt);
@@ -294,7 +294,7 @@ void __namespace__CROSS_sign(const prikey_t *SK,
 #if defined(RSDP)
         __namespace__pack_fz_vec(cmt_0_i_input + DENSELY_PACKED_FQ_SYN_SIZE, sigma[i]);
 #elif defined(RSDPG)
-        pack_fz_rsdp_g_vec(cmt_0_i_input + DENSELY_PACKED_FQ_SYN_SIZE, delta[i]);
+        __namespace__pack_fz_rsdp_g_vec(cmt_0_i_input + DENSELY_PACKED_FQ_SYN_SIZE, delta[i]);
 #endif
         /* i+c+dsc */
         uint16_t domain_sep_idx_hash = domain_sep_i+HASH_CSPRNG_DOMAIN_SEP_CONST;
@@ -364,7 +364,7 @@ void __namespace__CROSS_sign(const prikey_t *SK,
 
 #if defined(NO_TREES)
     __namespace__merkle_tree_proof_compute(sig->mtp,cmt_0,fixed_weight_b);
-    publish_round_seeds(sig->stp,rounds_seeds,fixed_weight_b);
+    __namespace__publish_round_seeds(sig->stp,rounds_seeds,fixed_weight_b);
 #else
     __namespace__merkle_tree_proof_compute(sig->mtp,merkle_tree_0,cmt_0,fixed_weight_b);
     __namespace__publish_seeds(sig->stp,seed_tree,fixed_weight_b);
@@ -378,7 +378,7 @@ void __namespace__CROSS_sign(const prikey_t *SK,
 #if defined(RSDP)
             __namespace__pack_fz_vec(sig->rsp_0[published_rsps].sigma, sigma[i]);
 #elif defined(RSDPG)
-            pack_fz_rsdp_g_vec(sig->rsp_0[published_rsps].delta, delta[i]);
+            __namespace__pack_fz_rsdp_g_vec(sig->rsp_0[published_rsps].delta, delta[i]);
 #endif
             memcpy(sig->rsp_1[published_rsps], cmt_1[i], HASH_DIGEST_LENGTH);
             published_rsps++;
@@ -546,7 +546,7 @@ int __namespace__CROSS_verify(const pubkey_t *const PK,
                    &sig->rsp_0[used_rsps].delta,
                    DENSELY_PACKED_FZ_RSDP_G_VEC_SIZE);
             FZ_ELEM delta_local[M];
-	        unpack_fz_rsdp_g_vec(delta_local, sig->rsp_0[used_rsps].delta);
+	        __namespace__unpack_fz_rsdp_g_vec(delta_local, sig->rsp_0[used_rsps].delta);
             is_signature_ok = is_signature_ok &&
                               is_zz_inf_w_valid(delta_local);
 #if defined(HIGH_PERFORMANCE_X86_64)

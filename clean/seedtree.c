@@ -70,7 +70,7 @@ void __namespace__ptree(unsigned char seed_tree[NUM_NODES_SEED_TREE * SEED_LENGT
 #define NOT_TO_PUBLISH 0
 
 #if defined(NO_TREES)
-int compute_round_seeds(unsigned char rounds_seeds[T*SEED_LENGTH_BYTES],
+int __namespace__compute_round_seeds(unsigned char rounds_seeds[T*SEED_LENGTH_BYTES],
                   const unsigned char root_seed[SEED_LENGTH_BYTES],
                   const unsigned char salt[SALT_LENGTH_BYTES]){
    const uint32_t csprng_input_len = SALT_LENGTH_BYTES +
@@ -107,7 +107,7 @@ int compute_round_seeds(unsigned char rounds_seeds[T*SEED_LENGTH_BYTES],
    return T;
 }
 
-int publish_round_seeds(unsigned char *seed_storage,
+int __namespace__publish_round_seeds(unsigned char *seed_storage,
                   const unsigned char rounds_seeds[T*SEED_LENGTH_BYTES],
                   const unsigned char indices_to_publish[T]){
     int published = 0;

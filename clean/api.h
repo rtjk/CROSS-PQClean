@@ -32,7 +32,7 @@
 
 // TODO: CRYPTO_ALGNAME, CRYPTO_SECRETKEYBYTES, CRYPTO_PUBLICKEYBYTES, CRYPTO_BYTES, CRYPTO_RANDOMBYTES
 
-#define __namespace__CRYPTO_ALGNAME "CROSS"
+#define __namespace__CRYPTO_ALGNAME "__dir__"
 
 /*  no. of bytes of the secret key */
 #define __namespace__CRYPTO_SECRETKEYBYTES __length-secret-key__L

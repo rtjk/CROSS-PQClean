@@ -341,6 +341,10 @@ void __namespace__CROSS_sign(const prikey_t *SK,
     }
 }
 
+// TODO: no vla
+//const int csprng_input_length = SALT_LENGTH_BYTES+SEED_LENGTH_BYTES+sizeof(uint16_t);
+#define CSPRNG_INPUT_LENGTH (SALT_LENGTH_BYTES+SEED_LENGTH_BYTES+2)
+
 /* verify returns 1 if signature is ok, 0 otherwise */
 int __namespace__CROSS_verify(const pubkey_t *const PK,
                  const char *const m,
@@ -436,7 +440,7 @@ int __namespace__CROSS_verify(const pubkey_t *const PK,
             /* CSPRNG is fed with concat(seed,salt,round index) represented
             * as a 2 bytes little endian unsigned integer */
             const int csprng_input_length = SALT_LENGTH_BYTES+SEED_LENGTH_BYTES+sizeof(uint16_t);
-            uint8_t csprng_input[csprng_input_length];
+            uint8_t csprng_input[CSPRNG_INPUT_LENGTH];
             memcpy(csprng_input+SEED_LENGTH_BYTES,sig->salt,SALT_LENGTH_BYTES);
             memcpy(csprng_input,rounds_seeds+SEED_LENGTH_BYTES*i,SEED_LENGTH_BYTES);
             csprng_input[SALT_LENGTH_BYTES+SEED_LENGTH_BYTES] = (domain_sep_i >> 8) &0xFF;

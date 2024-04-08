@@ -69,6 +69,10 @@ void __namespace__ptree(unsigned char seed_tree[NUM_NODES_SEED_TREE * SEED_LENGT
 #define TO_PUBLISH 1
 #define NOT_TO_PUBLISH 0
 
+// TODO: no vla
+//csprng_input_len = SALT_LENGTH_BYTES + SEED_LENGTH_BYTES + sizeof(uint16_t);
+#define CSPRNG_INPUT_LEN (SALT_LENGTH_BYTES + SEED_LENGTH_BYTES + 2)
+
 #if defined(NO_TREES)
 int __namespace__compute_round_seeds(unsigned char rounds_seeds[T*SEED_LENGTH_BYTES],
                   const unsigned char root_seed[SEED_LENGTH_BYTES],
@@ -76,7 +80,7 @@ int __namespace__compute_round_seeds(unsigned char rounds_seeds[T*SEED_LENGTH_BY
    const uint32_t csprng_input_len = SALT_LENGTH_BYTES +
                                      SEED_LENGTH_BYTES +
                                      sizeof(uint16_t);
-   unsigned char csprng_input[csprng_input_len];
+   unsigned char csprng_input[CSPRNG_INPUT_LEN];
    memcpy(csprng_input,root_seed,SEED_LENGTH_BYTES);   
    memcpy(csprng_input+SEED_LENGTH_BYTES,salt,SALT_LENGTH_BYTES);
    /* set counter for domain separation to 1 */
@@ -212,7 +216,7 @@ void __namespace__generate_seed_tree_from_root(unsigned char
    const uint32_t csprng_input_len = SALT_LENGTH_BYTES +
                                      SEED_LENGTH_BYTES +
                                      sizeof(uint16_t);
-   unsigned char csprng_input[csprng_input_len];
+   unsigned char csprng_input[CSPRNG_INPUT_LEN];
    CSPRNG_STATE_T tree_csprng_state;
    memcpy(csprng_input+SEED_LENGTH_BYTES, salt, SALT_LENGTH_BYTES);
 
@@ -315,7 +319,7 @@ int __namespace__regenerate_round_seeds(unsigned char
    const uint32_t csprng_input_len = SALT_LENGTH_BYTES +
                                      SEED_LENGTH_BYTES +
                                      sizeof(uint16_t);
-   unsigned char csprng_input[csprng_input_len];
+   unsigned char csprng_input[CSPRNG_INPUT_LEN];
    CSPRNG_STATE_T tree_csprng_state;
 
    memcpy(csprng_input + SEED_LENGTH_BYTES, salt, SALT_LENGTH_BYTES);

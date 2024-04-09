@@ -122,8 +122,10 @@ void xof_shake_extract(SHAKE_STATE_STRUCT *state,
                        uint32_t outputByteLen){
 #if defined(CATEGORY_1)
    __namespace__shake128_inc_squeeze(output, outputByteLen, state);
+   // TODO: release CSPRNG_state
 #else
    __namespace__shake256_inc_squeeze(output, outputByteLen, state);
+   // TODO: release CSPRNG_state
 #endif
 }
 #endif

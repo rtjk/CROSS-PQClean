@@ -1,3 +1,8 @@
+# for every every parameter set create the corresponding directory
+# then copy the templates for the 'clean' and 'avx2' implementations inside that directory
+# finally substitute the actual parameters
+# parameters are listed in parameter_sets.csv
+
 import os
 import fileinput
 import re

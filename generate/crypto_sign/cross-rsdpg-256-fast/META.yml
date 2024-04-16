@@ -20,3 +20,7 @@ implementations: # TODO: add optimized implementation
     version: 1.2
   - name: avx2
     version: 1.2
+    supported_platforms:
+      - architecture: x86_64
+        required_flags:
+          - avx2

@@ -71,3 +71,5 @@ with open(csv_filename, 'r') as csvfile:
         for column_name in columns:
             column_value = row[column_name]
             replace_in_dir(dir, column_name, column_value)
+
+print("Implementations placed in", TARGET_DIR)

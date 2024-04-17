@@ -22,8 +22,6 @@
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  **/
-#pragma once
-
 #include <string.h>
 #include "csprng_hash.h"
 // TODO: remove definition to avoid "multiple definition" error in liboqs

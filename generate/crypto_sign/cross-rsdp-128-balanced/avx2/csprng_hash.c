@@ -25,13 +25,13 @@
 #include <string.h>
 #include "csprng_hash.h"
 // TODO: remove definition to avoid "multiple definition" error in liboqs
-CSPRNG_STATE_T PQCLEAN_CROSSRSDP128BALANCED_CLEAN_platform_csprng_state;
+CSPRNG_STATE_T PQCLEAN_CROSSRSDP128BALANCED_AVX2_platform_csprng_state;
 
 #define  POSITION_MASK (( (uint16_t)1 << BITS_TO_REPRESENT(T-1))-1)
 
 /* Fisher-Yates shuffle obtaining the entire required randomness in a single 
  * call */
-void PQCLEAN_CROSSRSDP128BALANCED_CLEAN_expand_digest_to_fixed_weight(uint8_t fixed_weight_string[T],
+void PQCLEAN_CROSSRSDP128BALANCED_AVX2_expand_digest_to_fixed_weight(uint8_t fixed_weight_string[T],
                                    const uint8_t digest[HASH_DIGEST_LENGTH]){
    CSPRNG_STATE_T csprng_state;
    initialize_csprng(&csprng_state,
@@ -76,4 +76,4 @@ void PQCLEAN_CROSSRSDP128BALANCED_CLEAN_expand_digest_to_fixed_weight(uint8_t fi
            bits_in_sub_buf -= 1;           
         }
    }  
-} /* PQCLEAN_CROSSRSDP128BALANCED_CLEAN_expand_digest_to_fixed_weight */
+} /* PQCLEAN_CROSSRSDP128BALANCED_AVX2_expand_digest_to_fixed_weight */

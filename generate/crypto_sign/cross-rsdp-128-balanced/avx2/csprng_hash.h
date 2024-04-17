@@ -55,12 +55,12 @@ void csprng_randombytes(unsigned char * const x,
 /******************************************************************************/
 
 /* global csprng state employed to have deterministic randombytes for testing */
-extern CSPRNG_STATE_T PQCLEAN_CROSSRSDP128BALANCED_CLEAN_platform_csprng_state;
+extern CSPRNG_STATE_T PQCLEAN_CROSSRSDP128BALANCED_AVX2_platform_csprng_state;
 /* extracts xlen bytes from the global CSPRNG */
 static inline
 void randombytes(unsigned char * x,
                  uint64_t xlen) {
-   csprng_randombytes(x,xlen,&PQCLEAN_CROSSRSDP128BALANCED_CLEAN_platform_csprng_state);
+   csprng_randombytes(x,xlen,&PQCLEAN_CROSSRSDP128BALANCED_AVX2_platform_csprng_state);
 }
 
 /************************* HASH functions ********************************/
@@ -100,7 +100,7 @@ FQ_ELEM fq_star_rnd_state(CSPRNG_STATE_T * const csprng_state)
 /***************** Specialized CSPRNGs for non binary domains *****************/
 
 /* CSPRNG sampling fixed weight strings */
-void PQCLEAN_CROSSRSDP128BALANCED_CLEAN_expand_digest_to_fixed_weight(uint8_t fixed_weight_string[T],
+void PQCLEAN_CROSSRSDP128BALANCED_AVX2_expand_digest_to_fixed_weight(uint8_t fixed_weight_string[T],
                                    const uint8_t digest[HASH_DIGEST_LENGTH]);
 
 #define BITS_FOR_Q BITS_TO_REPRESENT(Q-1) 

@@ -27,6 +27,9 @@
 
 #include "parameters.h"
 
+// TODO: include immintrin.h to avoid error on type __m256i in liboqs
+#include <immintrin.h>
+
 #if defined(RSDP)
 #define FZRED_SINGLE(x)   (((x) & 0x07) + ((x) >> 3))
 #define FZRED_OPPOSITE(x) ((x) ^ 0x07)

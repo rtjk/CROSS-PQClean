@@ -32,6 +32,9 @@
 #include "pack_unpack.h"
 #include "architecture_detect.h"
 
+// TODO: CSPRNG remove randombytes definition here to use PQClean randombytes
+#include "randombytes.h"
+
 #if defined(RSDP)
 static
 void expand_public_seed(FQ_ELEM V_tr[K][N-K],

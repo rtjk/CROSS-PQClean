@@ -90,7 +90,7 @@ void hash(uint8_t digest[HASH_DIGEST_LENGTH],
    xof_shake_final(&csprng_state);    
    xof_shake_extract(&csprng_state,digest,HASH_DIGEST_LENGTH);
    // TODO: CSPRNG release context
-   xof_shake_final(&csprng_state);
+   xof_shake_release(&csprng_state);
 }
 
 

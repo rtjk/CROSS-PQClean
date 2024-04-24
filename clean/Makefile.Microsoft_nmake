@@ -2,7 +2,7 @@
 #    nmake /f Makefile.Microsoft_nmake
 
 LIBRARY=__dir_____implementation__.lib
-OBJECTS=CROSS.obj csprng_hash.obj keccakf1600.obj merkle.obj pack_unpack.obj seedtree.obj sign.obj fips202_CROSS.obj
+OBJECTS=CROSS.obj csprng_hash.obj merkle.obj pack_unpack.obj seedtree.obj sign.obj
 
 # TODO: flags
 CFLAGS=

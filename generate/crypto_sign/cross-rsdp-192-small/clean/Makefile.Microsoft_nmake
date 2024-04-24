@@ -1,0 +1,26 @@
+# This Makefile can be used with Microsoft Visual Studio's nmake using the command:
+#    nmake /f Makefile.Microsoft_nmake
+
+LIBRARY=cross-rsdp-192-small_clean.lib
+OBJECTS=CROSS.obj csprng_hash.obj merkle.obj pack_unpack.obj seedtree.obj sign.obj
+
+# TODO: flags
+CFLAGS=
+/I ..\..\..\common 
+/nologo 
+#/W4 
+#/WX 
+#/wd4146
+#/O2 
+
+all: $(LIBRARY)
+
+# Make sure objects are recompiled if headers change.
+$(OBJECTS): *.h
+
+$(LIBRARY): $(OBJECTS)
+LIB.EXE /NOLOGO /WX /OUT:$@ $**
+
+clean:
+-DEL $(OBJECTS)
+-DEL $(LIBRARY)

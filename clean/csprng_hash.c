@@ -25,7 +25,8 @@
 #include <string.h>
 #include "csprng_hash.h"
 // TODO: remove definition to avoid "multiple definition" error in liboqs
-CSPRNG_STATE_T __namespace__platform_csprng_state;
+// TODO: CSPRNG remove randombytes definition here to use PQClean randombytes
+//CSPRNG_STATE_T __namespace__platform_csprng_state;
 
 #define  POSITION_MASK (( (uint16_t)1 << BITS_TO_REPRESENT(T-1))-1)
 

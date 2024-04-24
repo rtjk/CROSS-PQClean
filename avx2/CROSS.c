@@ -374,6 +374,7 @@ void __namespace__CROSS_sign(const prikey_t *SK,
     for(int i = 0; i<T; i++){
         if(fixed_weight_b[i] == 0){
             // TODO: remove this assetion to pass "speed_sig -f" in liboqs
+            // TODO: "speed_sig -f" still not passing
             //assert(published_rsps < T-W);
             __namespace__pack_fq_vec(sig->rsp_0[published_rsps].y, y[i]);
 #if defined(RSDP)

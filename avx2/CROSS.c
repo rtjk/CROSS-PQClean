@@ -42,6 +42,9 @@ void expand_public_seed(FQ_ELEM V_tr[K][N-K],
   CSPRNG_STATE_T CSPRNG_state_mat;
   initialize_csprng(&CSPRNG_state_mat, seed_pub, KEYPAIR_SEED_LENGTH_BYTES);
   CSPRNG_fq_mat(V_tr,&CSPRNG_state_mat);
+  
+  // TODO: CSPRNG release context
+  csprng_release(&CSPRNG_state_mat);
 }
 #elif defined(RSDPG)
 static
@@ -53,6 +56,9 @@ void expand_public_seed(FQ_ELEM V_tr[K][N-K],
 
   CSPRNG_fq_mat(V_tr,&CSPRNG_state_mat);
   CSPRNG_fz_mat(W_mat,&CSPRNG_state_mat);
+
+  // TODO: CSPRNG release context
+  csprng_release(&CSPRNG_state_mat);
 }
 #endif
 
@@ -69,11 +75,17 @@ void expand_private_seed(FZ_ELEM eta[N],
                      2*KEYPAIR_SEED_LENGTH_BYTES,
                      &CSPRNG_state);
 
+  // TODO: CSPRNG release context
+  csprng_release(&CSPRNG_state);
+
   expand_public_seed(V_tr,seede_seed_pub[1]);
 
   CSPRNG_STATE_T CSPRNG_state_eta;
   initialize_csprng(&CSPRNG_state_eta, seede_seed_pub[0], KEYPAIR_SEED_LENGTH_BYTES);
   CSPRNG_zz_vec(eta,&CSPRNG_state_eta);
+
+  // TODO: CSPRNG release context
+  csprng_release(&CSPRNG_state_eta);
 }
 #elif defined(RSDPG)
 static
@@ -89,11 +101,18 @@ void expand_private_seed(FZ_ELEM eta[N],
                      2*KEYPAIR_SEED_LENGTH_BYTES,
                      &CSPRNG_state);
 
+  // TODO: CSPRNG release context
+  csprng_release(&CSPRNG_state);
+
   expand_public_seed(V_tr,W_mat,seede_seed_pub[1]);
 
   CSPRNG_STATE_T CSPRNG_state_eta;
   initialize_csprng(&CSPRNG_state_eta, seede_seed_pub[0], KEYPAIR_SEED_LENGTH_BYTES);
   CSPRNG_zz_inf_w(zeta,&CSPRNG_state_eta);
+
+  // TODO: CSPRNG release context
+  csprng_release(&CSPRNG_state_eta);
+
 #if (defined(HIGH_PERFORMANCE_X86_64) && defined(RSDPG) )
     alignas(EPI8_PER_REG) uint16_t W_mat_avx[M][ROUND_UP(N-M,EPI16_PER_REG)] = {{0}};
     for(int i = 0; i < M; i++){
@@ -121,6 +140,10 @@ void __namespace__CROSS_keygen(prikey_t *SK,
   csprng_randombytes((uint8_t *)seede_seed_pub,
                      2*KEYPAIR_SEED_LENGTH_BYTES,
                      &CSPRNG_state);
+
+  // TODO: CSPRNG release context
+  csprng_release(&CSPRNG_state);
+
   memcpy(PK->seed_pub,seede_seed_pub[1],KEYPAIR_SEED_LENGTH_BYTES);
 
   /* expansion of matrix/matrices */
@@ -155,6 +178,10 @@ void __namespace__CROSS_keygen(prikey_t *SK,
 #endif
   fz_dz_norm_sigma(eta);
 #endif
+
+  // TODO: CSPRNG release context
+  csprng_release(&CSPRNG_state_eta);
+
   /* compute public syndrome */
   FQ_ELEM pub_syn[N-K];
   restr_vec_by_fq_matrix(pub_syn,eta,V_tr);
@@ -312,6 +339,9 @@ void __namespace__CROSS_sign(const prikey_t *SK,
         cmt_1_i_input[SEED_LENGTH_BYTES+SALT_LENGTH_BYTES] = (domain_sep_idx_hash >> 8) &0xFF;
         cmt_1_i_input[SEED_LENGTH_BYTES+SALT_LENGTH_BYTES+1] = domain_sep_idx_hash & 0xFF;
         hash(cmt_1[i],cmt_1_i_input,sizeof(cmt_1_i_input));
+
+        // TODO: CSPRNG release context
+        csprng_release(&CSPRNG_state);
     }
 
     /* vector containing d_0 and d_1 from spec */
@@ -340,6 +370,9 @@ void __namespace__CROSS_sign(const prikey_t *SK,
     FQ_ELEM beta[T];
     initialize_csprng(&CSPRNG_state,d_beta,HASH_DIGEST_LENGTH);
     CSPRNG_fq_vec_beta(beta, &CSPRNG_state);
+
+    // TODO: CSPRNG release context
+    csprng_release(&CSPRNG_state);
 
     /* Computation of the first round of responses */
     FQ_ELEM y[T][N];
@@ -438,6 +471,9 @@ int __namespace__CROSS_verify(const pubkey_t *const PK,
     initialize_csprng(&CSPRNG_state,d_beta,HASH_DIGEST_LENGTH);
     CSPRNG_fq_vec_beta(beta, &CSPRNG_state);
 
+    // TODO: CSPRNG release context
+    csprng_release(&CSPRNG_state);
+
     uint8_t fixed_weight_b[T]={0};
     __namespace__expand_digest_to_fixed_weight(fixed_weight_b,sig->digest_b);
 
@@ -525,6 +561,10 @@ int __namespace__CROSS_verify(const pubkey_t *const PK,
 #endif
             /* expand u_tilde */
             CSPRNG_fq_vec(u_tilde, &CSPRNG_state);
+
+            // TODO: CSPRNG release context
+            csprng_release(&CSPRNG_state);
+
             fq_vec_by_restr_vec_scaled(y[i],
                                        eta_tilde,
                                        beta[i],

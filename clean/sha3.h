@@ -122,10 +122,19 @@ void xof_shake_extract(SHAKE_STATE_STRUCT *state,
                        uint32_t outputByteLen){
 #if defined(CATEGORY_1)
    shake128_inc_squeeze(output, outputByteLen, state);
-   // TODO: release CSPRNG_state
 #else
    shake256_inc_squeeze(output, outputByteLen, state);
-   // TODO: release CSPRNG_state
+#endif
+}
+
+// TODO: CSPRNG release context
+static inline
+void xof_shake_release(SHAKE_STATE_STRUCT *state)
+{
+#if defined(CATEGORY_1)
+   shake128_inc_ctx_release(state);
+#else
+   shake256_inc_ctx_release(state);
 #endif
 }
 #endif

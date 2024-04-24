@@ -92,6 +92,9 @@ int __namespace__compute_round_seeds(unsigned char rounds_seeds[T*SEED_LENGTH_BY
    initialize_csprng(&csprng_states[0], csprng_input, csprng_input_len);
    csprng_randombytes(quad_seed,4*SEED_LENGTH_BYTES,&csprng_states[0]);
 
+   // TODO: CSPRNG release context
+   csprng_release(&csprng_states[0]);
+
    int remainders[4] = {0};
    if(T%4 > 0){ remainders[0] = 1; } 
    if(T%4 > 1){ remainders[1] = 1; } 
@@ -106,6 +109,10 @@ int __namespace__compute_round_seeds(unsigned char rounds_seeds[T*SEED_LENGTH_BY
        csprng_randombytes(&rounds_seeds[((T/4)*i+offset)*SEED_LENGTH_BYTES],
                           (T/4+remainders[i])*SEED_LENGTH_BYTES,
                           &csprng_states[i]);
+
+       // TODO: CSPRNG release context
+       csprng_release(&csprng_states[i]);
+
        offset += remainders[i];
    }
    return T;
@@ -249,6 +256,10 @@ void __namespace__generate_seed_tree_from_root(unsigned char
                                  SEED_LENGTH_BYTES,
                                  &tree_csprng_state);
           }
+
+          // TODO: CSPRNG release context
+          csprng_release(&tree_csprng_state);
+
       }
     ancestors += (1L << level);
    }
@@ -363,6 +374,9 @@ int __namespace__regenerate_round_seeds(unsigned char
                 csprng_randombytes(seed_tree + (RIGHT_CHILD(father_node_idx)-missing_nodes_before[level+1])*SEED_LENGTH_BYTES,
                                    SEED_LENGTH_BYTES,
                                    &tree_csprng_state);
+
+                // TODO: CSPRNG release context
+                csprng_release(&tree_csprng_state);
           }
       }
       ancestors += (1L << level);

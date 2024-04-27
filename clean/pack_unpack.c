@@ -472,7 +472,7 @@ void __namespace__unpack_fq_syn(FQ_ELEM out[N-K],
 void __namespace__unpack_fz_vec(FZ_ELEM out[N],
                    const uint8_t in[DENSELY_PACKED_FZ_VEC_SIZE])
 {
-   __namespace__generic_unpack_fz(out, in, N, DENSELY_PACKED_FZ_VEC_SIZE);
+   __namespace__generic_unpack_fz(out, in, N);
 }
 
 /* 
@@ -487,7 +487,7 @@ void __namespace__unpack_fz_vec(FZ_ELEM out[N],
 void __namespace__unpack_fz_rsdp_g_vec(FZ_ELEM out[M],
                    const uint8_t in[DENSELY_PACKED_FZ_RSDP_G_VEC_SIZE])
 {
-   __namespace__generic_unpack_fz(out, in, M, DENSELY_PACKED_FZ_RSDP_G_VEC_SIZE);
+   __namespace__generic_unpack_fz(out, in, M);
 }
 #endif
 
@@ -505,10 +505,12 @@ void __namespace__generic_unpack_fq(FQ_ELEM *out, const uint8_t *in,
                        size_t outlen, size_t inlen)
 {
 
+
+#if Q == 127
+
    // TODO: useless line added to avoid [-Werror=unused-parameter]
    if(inlen == 0) inlen = 0;
 
-#if Q == 127
    size_t i;
    for(i = 0; i < outlen; i++)
    {
@@ -729,16 +731,16 @@ void __namespace__generic_unpack_fq(FQ_ELEM *out, const uint8_t *in,
  * FZ_ELEM *out      :   Zz output, unpacked
  * const uint8_t *in :   Zz Vec input, packed in bytes
  * size_t outlen     :   Length of out
- * size_t in         :   Length of in
  * 
  * This function unpacks an vector of el. in Zz of arbit. length
  */
 void __namespace__generic_unpack_fz(FZ_ELEM *out, const uint8_t *in,
-                       size_t outlen, size_t inlen)
+                       size_t outlen)
 {
    
-   // TODO: useless line added to avoid [-Werror=unused-parameter]
-   if(inlen == 0) inlen = 0;
+   // TODO: remove parameter to avoid -Werror=unused-parameter
+   // size_t inlen
+   //if(inlen == 0) inlen = 0;
 
 #if Z == 127
    size_t i;

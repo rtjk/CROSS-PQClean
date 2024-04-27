@@ -98,7 +98,6 @@ void __namespace__merkle_tree_root_compute(uint8_t root[HASH_DIGEST_LENGTH],
                               uint8_t leaves[T][HASH_DIGEST_LENGTH]);
 uint16_t __namespace__merkle_tree_proof_compute(uint8_t mtp[HASH_DIGEST_LENGTH*TREE_NODES_TO_STORE],
                                const uint8_t tree[NUM_NODES_MERKLE_TREE*HASH_DIGEST_LENGTH],
-                               uint8_t leaves[T][HASH_DIGEST_LENGTH],
                                const uint8_t leaves_to_reveal[T]);
 void __namespace__merkle_tree_root_recompute(uint8_t root[HASH_DIGEST_LENGTH],
                                 uint8_t recomputed_leaves[T][HASH_DIGEST_LENGTH],
@@ -121,12 +120,13 @@ void __namespace__merkle_tree_root_compute(uint8_t root[HASH_DIGEST_LENGTH],
  * in the signature. Returns the number of digests in the merkle tree proof */
 uint16_t __namespace__merkle_tree_proof_compute(uint8_t mtp[HASH_DIGEST_LENGTH*TREE_NODES_TO_STORE],
                                const uint8_t tree[NUM_NODES_MERKLE_TREE*HASH_DIGEST_LENGTH],
-                               uint8_t leaves[T][HASH_DIGEST_LENGTH],
                                const uint8_t leaves_to_reveal[T]){
     uint16_t mtp_len; 
     uint16_t merkle_proof_indices[TREE_NODES_TO_STORE];
 
-    if(leaves == NULL) {leaves = NULL;}; // TODO: useless line added to avoid -Werror=unused-parameter and Werror=unused-value
+    // TODO: remove parameter to avoid -Werror=unused-parameter and Werror=unused-value
+    // uint8_t leaves[T][HASH_DIGEST_LENGTH]
+    //if(leaves == NULL) {leaves = NULL;};
 
     __namespace__generate_merkle_proof(merkle_proof_indices, &mtp_len, leaves_to_reveal);
 

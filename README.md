@@ -2,12 +2,15 @@
 
 this is a test `TODO`
 
+<!-- generate table of contents -->
+<!-- https://derlin.github.io/bitdowntoc/ -->
+
 - [Get CROSS ready for PQClean](#get-cross-ready-for-pqclean)
    * [Directory structure](#directory-structure)
    * [SHAKE](#shake)
-   * [Detached Signatures](#detached-signatures)
+   * [Detached signatures](#detached-signatures)
    * [Fixed size integers](#fixed-size-integers)
-   * [Remove Assertions](#remove-assertions)
+   * [Remove assertions](#remove-assertions)
    * [Missing prototypes](#missing-prototypes)
    * [Parameter sets](#parameter-sets)
    * [Placeholders](#placeholders)
@@ -23,6 +26,7 @@ this is a test `TODO`
 - [liboqs](#liboqs)
    * [Copy from upstream](#copy-from-upstream)
    * [Test liboqs](#test-liboqs)
+- [liboqs-provider](#liboqs-provider)
 
 ## Get CROSS ready for PQClean
 
@@ -45,7 +49,7 @@ Migrate the internal implementation of SHAKE used by CROSS to the one in `PQClea
     * In `sha3.h` define function `csprng_release` simply calling `xof_shake_release` which in turn wraps SHAKE's `inc_ctx_release`.
     * For every call to `initialize_csprng` wait for `csprng_randombytes` to be called (possibly more than once) and then add `csprng_release` to free up the memory.
 
-### Detached Signatures
+### Detached signatures
 
 PQClean requires two additional functions `crypto_sign_signature` and `crypto_sign_verify` wich compute signing and verification usign detached signatures (the signature is reurned separately from the message insted of appended to it). Declare them in `api.h` and define them in `sign.c` by simply wrapping the existing CROSS funcitons.
 
@@ -59,7 +63,7 @@ PQClean requires fixed sized integer types.
 | `unsigned long` | `uint32_t` |
 | `unsigned long long` | `uint64_t` |
 
-### Remove Assertions
+### Remove assertions
 
 In `CROSS.c` during signing and verification `assert` is used multiple times to abort and display an error when something went wrong. This is useful for debugging but some tests in PQClean an liboqs require program termination, for example `test_wrong_pk` tries to verify a signature using the wrong public key and checks that `crypto_sign_open` returns `-1`. The assertions must therefore be deleted.
 
@@ -116,8 +120,16 @@ Run `generate.py` to create a directory for each parameter set. The clean and av
 
 * Edit `copy_from_upstream.yml`
 * Run `copy_from_upstream.py`
+* Edit `cross.yml`
+* Run `update_docs_from_yaml.py`
+* Run `update_cbom.py`
+* Build
 
 ### Test liboqs
+
+`TODO`
+
+## liboqs-provider
 
 `TODO`
 

@@ -1,6 +1,11 @@
 # test
 
-this is a test `TODO`
+This is a recipe for adding the CROSS signature algorithm to post-quantum libraries ([PQClean][repo_PQClean], [liboqs][repo_liboqs], [oqs-provider][repo_oqs-provider]) starting from the [NIST submission package][CROSS_package].
+
+[CROSS_package]: https://www.cross-crypto.com/nist-submission.html
+[repo_PQClean]: https://github.com/PQClean/PQClean/
+[repo_liboqs]: https://github.com/open-quantum-safe/liboqs
+[repo_oqs-provider]: https://github.com/open-quantum-safe/oqs-provider
 
 <!-- generate table of contents -->
 <!-- https://derlin.github.io/bitdowntoc/ -->

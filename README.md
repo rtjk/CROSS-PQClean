@@ -10,6 +10,7 @@ this is a test `TODO`
    * [SHAKE](#shake)
    * [Detached signatures](#detached-signatures)
    * [Fixed size integers](#fixed-size-integers)
+   * [No variable-length arrays](#no-variable-length-arrays)
    * [Remove assertions](#remove-assertions)
    * [Missing prototypes](#missing-prototypes)
    * [Parameter sets](#parameter-sets)
@@ -19,14 +20,16 @@ this is a test `TODO`
    * [META.yml](#metayml)
    * [KATs and test vectors](#kats-and-test-vectors)
    * [Parameter file](#parameter-file)
-   * [No external inludes in `api.h`](#no-external-inludes-in-apih)
+   * [No external includes in `api.h`](#no-external-includes-in-apih)
 - [PQClean](#pqclean)
    * [Generate parameter sets](#generate-parameter-sets)
    * [Test PQClean](#test-pqclean)
 - [liboqs](#liboqs)
    * [Copy from upstream](#copy-from-upstream)
    * [Test liboqs](#test-liboqs)
-- [liboqs-provider](#liboqs-provider)
+- [oqs-provider](#oqs-provider)
+   * [Code generation](#code-generation)
+   * [Test oqs-provider](#test-oqs-provider)
 
 ## Get CROSS ready for PQClean
 
@@ -57,11 +60,15 @@ PQClean requires two additional functions `crypto_sign_signature` and `crypto_si
 
 PQClean requires fixed sized integer types.
 
-| Substitute | With |
+| Replace | With |
 | - | - |
 | `unsigned int` | `uint32_t` |
 | `unsigned long` | `uint32_t` |
 | `unsigned long long` | `uint64_t` |
+
+### No variable-length arrays
+
+`TODO`
 
 ### Remove assertions
 
@@ -80,11 +87,11 @@ PQClean requires that every parameter set is placed in a separate directory. The
 ### Namespacing
 PQClean requires functions and constants to be prefixed with a string corresponding to the parameter set and implementation, for example function `crypto_sign` becomes `PQCLEAN_CROSSRSDP128BALANCED_CLEAN_crypto_sign`. Use the placeholder `__namespace__` wich will then be substituted when generating the parameter sets.
 
+`TODO: namespacing all functions " All exported symbols"?`
+
 ### Makefiles
 
-`TODO: namespacing all functions?`
-
-For PQClean's compilation a two makefiles (make and NMAKE) are necessary in each parameter set's directory. Add CROSS's source files and compilation flags to `Makefile` and `Makefile.Microsoft_nmake`.
+For PQClean's compilation two makefiles (make and NMAKE) are necessary in each parameter set's directory. Add CROSS's source files and compilation flags to `Makefile` and `Makefile.Microsoft_nmake`.
 
 ### META.yml
 Every parameter set in PQClean also needs a file wich listing its parameters, the hashes for KATs and test vectors, and the implementations (clean and avx2). Placeholders are used again since `META.yml` is also copied as a template by `generate.py`. For liboqs an extra flag is added in `required_flags` for the avx2 implementation.
@@ -94,11 +101,9 @@ Every parameter set in PQClean also needs a file wich listing its parameters, th
 `TODO`
 
 ### Parameter file
-Create a new file `set.h` with placeholders for the parameters in a set, the deinclude any external file. Define parameters such as the length of the public key as placeholders, wich will be substituted by actual values.
+Create a new file `set.h` with placeholders for the parameters in a set, the definitions in here were previously done externally like in `Benchmarking/CMakeLists.txt`. Include `set.h` in `parameters.h` and in the makefiles.
 
-finistions in here were previously done externally like in `Benchmarking/CMakeLists.txt`. Include `set.h` in `parameters.h` and in the makefiles.
-
-### No external inludes in `api.h`
+### No external includes in `api.h`
 PQClean requires that the api file does not include any external file. Define parameters such as the length of the public key as placeholders, wich will be substituted by actual values.
 
 ## PQClean
@@ -113,6 +118,8 @@ Run `generate.py` to create a directory for each parameter set. The clean and av
 `TODO`
 
 ## liboqs
+
+`TODO`
 
 ### Copy from upstream
 
@@ -129,10 +136,20 @@ Run `generate.py` to create a directory for each parameter set. The clean and av
 
 `TODO`
 
-## liboqs-provider
+## oqs-provider
+
+openssl and liboqs `TODO`
+
+### Code generation
+
+* Edit `generate.yml`
+* Run `generate.py`
+* Run `generate_oid_nid_table.py`
+* Build
+
+### Test oqs-provider
 
 `TODO`
-
 
 
 

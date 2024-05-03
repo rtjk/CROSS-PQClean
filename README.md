@@ -1,11 +1,12 @@
 # test
 
-This is a recipe for adding the CROSS signature algorithm to post-quantum libraries ([PQClean][repo_PQClean], [liboqs][repo_liboqs], [oqs-provider][repo_oqs-provider]) starting from the [NIST submission package][CROSS_package].
+This is a recipe for adding the CROSS signature algorithm to post-quantum libraries ([PQClean][repo_PQClean], [liboqs][repo_liboqs], [oqs-provider][repo_oqs-provider], [oqs-demos][repo_oqs-demos]) starting from the [NIST submission package][CROSS_package].
 
 [CROSS_package]: https://www.cross-crypto.com/nist-submission.html
 [repo_PQClean]: https://github.com/PQClean/PQClean/
 [repo_liboqs]: https://github.com/open-quantum-safe/liboqs
 [repo_oqs-provider]: https://github.com/open-quantum-safe/oqs-provider
+[repo_oqs-demos]: https://github.com/open-quantum-safe/oqs-demos
 
 <!-- generate table of contents -->
 <!-- https://derlin.github.io/bitdowntoc/ -->
@@ -35,6 +36,7 @@ This is a recipe for adding the CROSS signature algorithm to post-quantum librar
 - [oqs-provider](#oqs-provider)
    * [Code generation](#code-generation)
    * [Test oqs-provider](#test-oqs-provider)
+- [oqs-demos](#oqs-demos)
 
 ## Get CROSS ready for PQClean
 
@@ -99,7 +101,7 @@ PQClean requires functions and constants to be prefixed with a string correspond
 For PQClean's compilation two makefiles (make and NMAKE) are necessary in each parameter set's directory. Add CROSS's source files and compilation flags to `Makefile` and `Makefile.Microsoft_nmake`.
 
 ### META.yml
-Every parameter set in PQClean also needs a file wich listing its parameters, the hashes for KATs and test vectors, and the implementations (clean and avx2). Placeholders are used again since `META.yml` is also copied as a template by `generate.py`. For liboqs an extra flag is added in `required_flags` for the avx2 implementation.
+Every parameter set in PQClean also needs a file listing its parameters, the hashes for KATs and test vectors, and the implementations (clean and avx2). Placeholders are used again since `META.yml` is also copied as a template by `generate.py`. For liboqs an extra flag is added in `required_flags` for the avx2 implementation.
 
 ### KATs and test vectors
 
@@ -145,6 +147,8 @@ Run `generate.py` to create a directory for each parameter set. The clean and av
 
 openssl and liboqs `TODO`
 
+replace liboqs cloning with fork `TODO`
+
 ### Code generation
 
 * Edit `generate.yml`
@@ -156,7 +160,9 @@ openssl and liboqs `TODO`
 
 `TODO`
 
+## oqs-demos
 
+`TODO`
 
 
 

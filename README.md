@@ -32,6 +32,7 @@ This is a recipe for adding the CROSS signature algorithm to post-quantum librar
    * [Test PQClean](#test-pqclean)
 - [liboqs](#liboqs)
    * [Copy from upstream](#copy-from-upstream)
+   * [Build liboqs](#build-liboqs)
    * [Test liboqs](#test-liboqs)
 - [oqs-provider](#oqs-provider)
    * [Code generation](#code-generation)
@@ -55,7 +56,7 @@ Migrate the internal implementation of SHAKE used by CROSS to the one in `PQClea
     * `keccakf1600.h`
 * Delete the definition of `randombytes` from `csprng_hash.h`. This function is called during key generation and signing to obtain salts and seeds. To make results like KATs reproducible it is substituted by the one defined in PQClean.
 * Delete the declaration of `platform_csprng_state` from `csprng_hash.c` as it was only used by the `randombytes` function.
-* Free the memory allocated by SHAKE (the implementation in PQClean uses dynamic memory allocation while the internal one in CROSS used fixed sizes).
+* Free the memory allocated by SHAKE (the implementation in PQClean uses dynamic memory allocation while the internal one in CROSS uses fixed sizes).
     * In `sha3.h` define function `csprng_release` simply calling `xof_shake_release` which in turn wraps SHAKE's `inc_ctx_release`.
     * For every call to `initialize_csprng` wait for `csprng_randombytes` to be called (possibly more than once) and then add `csprng_release` to free up the memory.
 
@@ -75,7 +76,7 @@ PQClean requires fixed sized integer types.
 
 ### No variable-length arrays
 
-`TODO`
+PQClean requires the absence of variable-lenght arrays: use a `#define` placed before the function (instead of a normal variable definition) for the size of the array. This happens in functions `CROSS_verify` of `CROSS.c` and function `compute_round_seeds` of `seedtree.c`.
 
 ### Remove assertions
 
@@ -111,37 +112,54 @@ Every parameter set in PQClean also needs a file listing its parameters, the has
 Create a new file `set.h` with placeholders for the parameters in a set, the definitions in here were previously done externally like in `Benchmarking/CMakeLists.txt`. Include `set.h` in `parameters.h` and in the makefiles.
 
 ### No external includes in `api.h`
-PQClean requires that the api file does not include any external file. Define parameters such as the length of the public key as placeholders, wich will be substituted by actual values.
+PQClean requires that the api file does not include any external file. Define parameters such as the length of the public key as placeholders, wich will be substituted by actual values by `generate.py`.
 
 ## PQClean
 
-`TODO`
+The goal of [PQClean][repo_PQClean] is to collect implementations of post-quantum key encapsulation mechanisms and signature schemes. The rules for contributing a new scheme are clearly stated in its `README.md` and `CONTRIBUTING.md` files. These rules are also enforced by an extensive test framework built using Python's `pytest` and documented in the Wiki. After applying to CROSS all the changes just discussed the parameter sets can be generated using `generate.py` and then tested in PQClean.
 
 ### Generate parameter sets
-Run `generate.py` to create a directory for each parameter set. The clean and avx2 implementations will be copied in it along with the META file. Then the placeholders will be substituted by the actual parameters taken from the csv file. The 18 directories can then be copied inside PQClean's `crypto-sign`.
+Run `generate.py` to create a directory for each parameter set. The clean and avx2 implementations will be copied in it along with the META file. Then the placeholders will be substituted by the actual parameters taken from the csv file. The 18 directories can then be copied directly into PQClean's `crypto-sign`.
 
 ### Test PQClean
 
-`TODO`
+Install all required Python packages from `requirements.txt` then simply move inside the test folder and run the Python scripts. Here are some of the most essential tests:
+* `test_nistkat.py` checks the consinstency between the KATs produced by PQClean and the ones declared in the `META.yml` files.
+* `test_functest.py` checks that the signatures work as expected, e.g. verifying a signed message with the wrong public key returns `-1` meaning failure.
+* `test_symbol_namespace.py` checks that the all exported symbols are properly namespaced.
 
 ## liboqs
 
-`TODO`
+The aim of [liboqs][repo_liboqs] is to collect quantum-safe cryptographic algorithms (same as PQClean) and make them available and easy to use trough a common API and benchmarking framework. The coding conventions are similar to PQClean, although less strict.
+
+There are two methods for including a new scheme as docmented by the Wiki: either add it directly ore use the handy "copy-from-upstream" functionality (chosen here). After inclusion liboqs can be compiled and CROSS benchmarked against other signature schemes.
 
 ### Copy from upstream
 
-`TODO`
+The idea is to edit a configuration file in liboqs, adding a git repository as an "upstream" from which the source code for the new scheme will be automatically pulled.
 
-* Edit `copy_from_upstream.yml`
-* Run `copy_from_upstream.py`
-* Edit `cross.yml`
-* Run `update_docs_from_yaml.py`
-* Run `update_cbom.py`
-* Build
+* Edit `copy_from_upstream.yml`:
+   * Add CROSS's repo under `upstreams` with the last commit SHA.
+   * Add a new entry for CROSS under `sigs` specifying every paraemter set. The signature should be appended to the message using `signed_msg_order: msg_then_sig`.
+* Run `copy_from_upstream.py`, which will use the YAML file to download CROSS into `src/sig`.
+* Update liboqs' documentation:
+   * Edit `docs/algs/sig/cross.yml` to add information about the scheme in generale (e.g. the website), and about each specific parameter set (e.g. `length-secret-key`).
+   * Run `update_docs_from_yaml.py` and `update_cbom.py` to update the documentation files
+
+### Build liboqs
+
+First install all dependencies listed in `README.md`. Then export the variable indicating liboqs' source folder and build with:
+
+```
+export LIBOQS_DIR=/path/to/liboqs
+rm -rf build; mkdir build && cd build; cmake -GNinja ..; ninja
+```
 
 ### Test liboqs
 
-`TODO`
+Move into `liboqs/build/tests` and run the C executables. For example `speed_sig -f` will measure the time and CPU cycles it takes to generate the keypair, sign, and verify. 
+
+Other tests are available in the `liboqs/tests` directory, for example `test_kat.py` will check the consistency of KATs.
 
 ## oqs-provider
 

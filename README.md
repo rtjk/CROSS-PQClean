@@ -145,7 +145,7 @@ The idea is to edit a configuration file in liboqs, adding a git repository as a
    * Add a new entry for CROSS under `sigs` specifying every paraemter set. The signature should be appended to the message using `signed_msg_order: msg_then_sig`.
 * Run `copy_from_upstream.py`, which will use the YAML file to download CROSS into `src/sig`.
 * Update liboqs' documentation:
-   * Edit `docs/algs/sig/cross.yml` to add information about the scheme in generale (e.g. the website), and about each specific parameter set (e.g. `length-secret-key`).
+   * Create `docs/algs/sig/cross.yml` to add information about the scheme in generale (e.g. the website), and about each specific parameter set (e.g. `length-secret-key`).
    * Run `update_docs_from_yaml.py` and `update_cbom.py` to update the documentation files
 
 ### Build liboqs

@@ -131,7 +131,7 @@ void CSPRNG_fq_vec(FQ_ELEM res[N],
     
     // TODO: check max buffer size
     //uint8_t CSPRNG_buffer[ROUND_UP(BITS_N_ZQ_CT_RNG,8)/8];
-    uint8_t CSPRNG_buffer[ROUND_UP(BITS_N_ZQ_CT_RNG,64)/8];
+    uint8_t CSPRNG_buffer[ROUND_UP(BITS_N_ZQ_CT_RNG,64)/64];
     
     /* To facilitate hardware implementations, the uint64_t 
      * sub-buffer is consumed starting from the least significant byte 
@@ -174,7 +174,7 @@ void CSPRNG_fq_vec_beta(FQ_ELEM res[T],
 
     // TODO: check max buffer size
     //uint8_t CSPRNG_buffer[ROUND_UP(BITS_BETA_ZQSTAR_CT_RNG,8)/8];
-    uint8_t CSPRNG_buffer[ROUND_UP(BITS_BETA_ZQSTAR_CT_RNG,64)/8];
+    uint8_t CSPRNG_buffer[ROUND_UP(BITS_BETA_ZQSTAR_CT_RNG,64)/64];
 
     /* To facilitate hardware implementations, the uint64_t 
      * sub-buffer is consumed starting from the least significant byte 
@@ -215,7 +215,7 @@ void CSPRNG_fq_mat(FQ_ELEM res[K][N-K],
 
     // TODO: check max buffer size
     //uint8_t CSPRNG_buffer[ROUND_UP(BITS_V_CT_RNG,8)/8];
-    uint8_t CSPRNG_buffer[ROUND_UP(BITS_V_CT_RNG,64)/8];
+    uint8_t CSPRNG_buffer[ROUND_UP(BITS_V_CT_RNG,64)/64];
 
     /* To facilitate hardware implementations, the uint64_t 
      * sub-buffer is consumed starting from the least significant byte 
@@ -257,7 +257,7 @@ void CSPRNG_zz_vec(FZ_ELEM res[N],
 
     // TODO: check max buffer size
     //uint8_t CSPRNG_buffer[ROUND_UP(BITS_N_ZZ_CT_RNG,8)/8];
-    uint8_t CSPRNG_buffer[ROUND_UP(BITS_N_ZZ_CT_RNG,64)/8];
+    uint8_t CSPRNG_buffer[ROUND_UP(BITS_N_ZZ_CT_RNG,64)/64];
 
     /* To facilitate hardware implementations, the uint64_t 
      * sub-buffer is consumed starting from the least significant byte 
@@ -299,7 +299,7 @@ void CSPRNG_zz_inf_w(FZ_ELEM res[M],
 
     // TODO: check max buffer size
     //uint8_t CSPRNG_buffer[ROUND_UP(BITS_M_ZZ_CT_RNG,8)/8];
-    uint8_t CSPRNG_buffer[ROUND_UP(BITS_M_ZZ_CT_RNG,64)/8];
+    uint8_t CSPRNG_buffer[ROUND_UP(BITS_M_ZZ_CT_RNG,64)/64];
 
     /* To facilitate hardware implementations, the uint64_t 
      * sub-buffer is consumed starting from the least significant byte 
@@ -340,7 +340,7 @@ void CSPRNG_fz_mat(FZ_ELEM res[M][N-M],
 
     // TODO: check max buffer size
     //uint8_t CSPRNG_buffer[ROUND_UP(BITS_W_CT_RNG,8)/8];
-    uint8_t CSPRNG_buffer[ROUND_UP(BITS_W_CT_RNG,64)/8];
+    uint8_t CSPRNG_buffer[ROUND_UP(BITS_W_CT_RNG,64)/64];
 
     /* To facilitate hardware implementations, the uint64_t 
      * sub-buffer is consumed starting from the least significant byte 

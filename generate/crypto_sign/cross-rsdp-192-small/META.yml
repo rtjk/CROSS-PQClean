@@ -12,9 +12,9 @@ nistkat-sha256: 67f3b7e24f8d28227bb9e51b1ba0d712ea9ab62b3161b743af30d6864088eedf
 # TODO: run "bin/testvectors_scheme_implementation | sha256sum" when the scheme is first imported to PQClean
 testvectors-sha256: 7889ec8e89ec9e09160f4352454b6d83680b3775866ea45fc6628c3102842d61
 principal-submitters:
-  - # TODO: add principal-submitters
+  - TODO # TODO: add principal-submitters
 auxiliary-submitters: # optional
-  - # TODO: add auxiliary-submitters
+  - TODO # TODO: add auxiliary-submitters
 implementations: # TODO: add optimized implementation
   - name: clean
     version: 1.2

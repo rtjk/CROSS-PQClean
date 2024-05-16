@@ -60,6 +60,8 @@ Migrate the internal implementation of SHAKE used by CROSS to the one in `PQClea
     * In `sha3.h` define function `csprng_release` simply calling `xof_shake_release` which in turn wraps SHAKE's `inc_ctx_release`.
     * For every call to `initialize_csprng` wait for `csprng_randombytes` to be called (possibly more than once) and then add `csprng_release` to free up the memory.
 
+`TODO: the other calls are agnostico to the implementation of shake (dynamic vs static)`
+
 ### Detached signatures
 
 PQClean requires two additional functions `crypto_sign_signature` and `crypto_sign_verify` wich compute signing and verification usign detached signatures (the signature is reurned separately from the message insted of appended to it). Declare them in `api.h` and define them in `sign.c` by simply wrapping the existing CROSS funcitons.

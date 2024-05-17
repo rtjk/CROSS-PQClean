@@ -26,6 +26,8 @@
 #pragma once
 #include <stdint.h>
 
+#include "set.h"
+
 /******************************************************************************/
 /*************************** Base Fields Parameters ***************************/
 /******************************************************************************/
@@ -228,7 +230,7 @@
 #define ROUND_UP(amount, round_amt) ( ((amount+round_amt-1)/round_amt)*round_amt )
 
 #define IS_REPRESENTABLE_IN_D_BITS(D, N)                \
-  (((unsigned long) N>=(1UL << (D-1)) && (unsigned long) N<(1UL << D)) ? D : -1)
+(((uint32_t) N>=(1UL << (D-1)) && (uint32_t) N<(1UL << D)) ? D : -1)
 
 #define BITS_TO_REPRESENT(N)                            \
   (N == 0 ? 1 : (15                                     \

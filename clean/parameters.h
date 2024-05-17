@@ -295,7 +295,7 @@
 #define BITS_BETA_ZQSTAR_CT_RNG 1280
 #define BITS_V_CT_RNG 27657
 #define BITS_N_ZZ_CT_RNG 552
-#define BITS_CWSTR_RNG 2*1355
+#define BITS_CWSTR_RNG 1355
 #elif ( defined(CATEGORY_1) && defined(RSDP)  && defined(BALANCED) )
 #define TREE_NODES_TO_STORE 107
 #define NUM_NODES_SEED_TREE 504
@@ -305,7 +305,7 @@
 #define BITS_BETA_ZQSTAR_CT_RNG 1920
 #define BITS_V_CT_RNG 27657
 #define BITS_N_ZZ_CT_RNG 552
-#define BITS_CWSTR_RNG 2*2102
+#define BITS_CWSTR_RNG 2102
 #elif ( defined(CATEGORY_1) && defined(RSDP)  && defined(SIG_SIZE) )
 #define TREE_NODES_TO_STORE 120
 #define NUM_NODES_SEED_TREE 1920
@@ -315,7 +315,7 @@
 #define BITS_BETA_ZQSTAR_CT_RNG 7033
 #define BITS_V_CT_RNG 27657
 #define BITS_N_ZZ_CT_RNG 552
-#define BITS_CWSTR_RNG 2*9371
+#define BITS_CWSTR_RNG 9371
 #elif ( defined(CATEGORY_3) && defined(RSDP)  && defined(SPEED) )
 #define TREE_NODES_TO_STORE 125
 #define NUM_NODES_SEED_TREE 492
@@ -325,7 +325,7 @@
 #define BITS_BETA_ZQSTAR_CT_RNG 1892
 #define BITS_V_CT_RNG 60103
 #define BITS_N_ZZ_CT_RNG 799
-#define BITS_CWSTR_RNG 2*2125
+#define BITS_CWSTR_RNG 2125
 #elif ( defined(CATEGORY_3) && defined(RSDP)  && defined(BALANCED) )
 #define TREE_NODES_TO_STORE 162
 #define NUM_NODES_SEED_TREE 799
@@ -335,7 +335,7 @@
 #define BITS_BETA_ZQSTAR_CT_RNG 2994
 #define BITS_V_CT_RNG 60103
 #define BITS_N_ZZ_CT_RNG 799
-#define BITS_CWSTR_RNG 2*3647
+#define BITS_CWSTR_RNG 3647
 #elif ( defined(CATEGORY_3) && defined(RSDP)  && defined(SIG_SIZE) )
 #define TREE_NODES_TO_STORE 177
 #define NUM_NODES_SEED_TREE 1894
@@ -345,7 +345,7 @@
 #define BITS_BETA_ZQSTAR_CT_RNG 6948
 #define BITS_V_CT_RNG 60103
 #define BITS_N_ZZ_CT_RNG 799
-#define BITS_CWSTR_RNG 2*9332
+#define BITS_CWSTR_RNG 9332
 #elif ( defined(CATEGORY_5) && defined(RSDP)  && defined(SPEED) )
 #define TREE_NODES_TO_STORE 166
 #define NUM_NODES_SEED_TREE 658
@@ -355,7 +355,7 @@
 #define BITS_BETA_ZQSTAR_CT_RNG 2504
 #define BITS_V_CT_RNG 107866
 #define BITS_N_ZZ_CT_RNG 1060
-#define BITS_CWSTR_RNG 2*3044
+#define BITS_CWSTR_RNG 3044
 #elif ( defined(CATEGORY_5) && defined(RSDP)  && defined(BALANCED) )
 #define TREE_NODES_TO_STORE 214
 #define NUM_NODES_SEED_TREE 1015
@@ -365,7 +365,7 @@
 #define BITS_BETA_ZQSTAR_CT_RNG 3805
 #define BITS_V_CT_RNG 107866
 #define BITS_N_ZZ_CT_RNG 1060
-#define BITS_CWSTR_RNG 2*4734
+#define BITS_CWSTR_RNG 4734
 #elif ( defined(CATEGORY_5) && defined(RSDP)  && defined(SIG_SIZE) )
 #define TREE_NODES_TO_STORE 231
 #define NUM_NODES_SEED_TREE 1938
@@ -375,7 +375,7 @@
 #define BITS_BETA_ZQSTAR_CT_RNG 7133
 #define BITS_V_CT_RNG 107866
 #define BITS_N_ZZ_CT_RNG 1060
-#define BITS_CWSTR_RNG 2*9665
+#define BITS_CWSTR_RNG 9665
 #elif ( defined(CATEGORY_1) &&  defined(RSDPG)  && defined(SPEED) )
 #define TREE_NODES_TO_STORE 78
 #define NUM_NODES_SEED_TREE 310
@@ -386,7 +386,7 @@
 #define BITS_V_CT_RNG 6356
 #define BITS_W_CT_RNG 5433
 #define BITS_M_ZZ_CT_RNG 276
-#define BITS_CWSTR_RNG 2*1264
+#define BITS_CWSTR_RNG 1264
 #elif ( defined(CATEGORY_1) &&  defined(RSDPG)  && defined(BALANCED) )
 #define TREE_NODES_TO_STORE 101
 #define NUM_NODES_SEED_TREE 488
@@ -397,7 +397,7 @@
 #define BITS_V_CT_RNG 6356
 #define BITS_W_CT_RNG 5433
 #define BITS_M_ZZ_CT_RNG 276
-#define BITS_CWSTR_RNG 2*2030
+#define BITS_CWSTR_RNG 2030
 #elif ( defined(CATEGORY_1) &&  defined(RSDPG)  && defined(SIG_SIZE) )
 #define TREE_NODES_TO_STORE 113
 #define NUM_NODES_SEED_TREE 1745
@@ -408,7 +408,7 @@
 #define BITS_V_CT_RNG 6356
 #define BITS_W_CT_RNG 5433
 #define BITS_M_ZZ_CT_RNG 276
-#define BITS_CWSTR_RNG 2*8468
+#define BITS_CWSTR_RNG 8468
 #elif ( defined(CATEGORY_3) &&  defined(RSDPG)  && defined(SPEED) )
 #define TREE_NODES_TO_STORE 119
 #define NUM_NODES_SEED_TREE 462
@@ -419,7 +419,7 @@
 #define BITS_V_CT_RNG 13707
 #define BITS_W_CT_RNG 11211
 #define BITS_M_ZZ_CT_RNG 403
-#define BITS_CWSTR_RNG 2*2003
+#define BITS_CWSTR_RNG 2003
 #elif ( defined(CATEGORY_3) &&  defined(RSDPG)  && defined(BALANCED) )
 #define TREE_NODES_TO_STORE 134
 #define NUM_NODES_SEED_TREE 510
@@ -430,7 +430,7 @@
 #define BITS_V_CT_RNG 13707
 #define BITS_W_CT_RNG 11211
 #define BITS_M_ZZ_CT_RNG 403
-#define BITS_CWSTR_RNG 2*2205
+#define BITS_CWSTR_RNG 2205
 #elif ( defined(CATEGORY_3) &&  defined(RSDPG)  && defined(SIG_SIZE) )
 #define TREE_NODES_TO_STORE 167
 #define NUM_NODES_SEED_TREE 1901
@@ -441,7 +441,7 @@
 #define BITS_V_CT_RNG 13707
 #define BITS_W_CT_RNG 11211
 #define BITS_M_ZZ_CT_RNG 403
-#define BITS_CWSTR_RNG 2*9373
+#define BITS_CWSTR_RNG 9373
 #elif ( defined(CATEGORY_5) &&  defined(RSDPG)  && defined(SPEED) )
 #define TREE_NODES_TO_STORE 155
 #define NUM_NODES_SEED_TREE 616
@@ -452,7 +452,7 @@
 #define BITS_V_CT_RNG 23421
 #define BITS_W_CT_RNG 19931
 #define BITS_M_ZZ_CT_RNG 480
-#define BITS_CWSTR_RNG 2*2832
+#define BITS_CWSTR_RNG 2832
 #elif ( defined(CATEGORY_5) &&  defined(RSDPG)  && defined(BALANCED) )
 #define TREE_NODES_TO_STORE 183
 #define NUM_NODES_SEED_TREE 715
@@ -463,7 +463,7 @@
 #define BITS_V_CT_RNG 23421
 #define BITS_W_CT_RNG 19931
 #define BITS_M_ZZ_CT_RNG 480
-#define BITS_CWSTR_RNG 2*3330
+#define BITS_CWSTR_RNG 3330
 #elif ( defined(CATEGORY_5) &&  defined(RSDPG)  && defined(SIG_SIZE) )
 #define TREE_NODES_TO_STORE 219
 #define NUM_NODES_SEED_TREE 1994
@@ -474,6 +474,6 @@
 #define BITS_V_CT_RNG 23421
 #define BITS_W_CT_RNG 19931
 #define BITS_M_ZZ_CT_RNG 480
-#define BITS_CWSTR_RNG 2*9947
+#define BITS_CWSTR_RNG 9947
 #endif
 ////////////////////////////////////////////////////////////////////

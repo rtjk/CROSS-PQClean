@@ -28,7 +28,7 @@
 #include "sha3.h"
 
 // TODO: check max buffer size
-#define EXTRA_BYTES_FIX 0
+#define EXTRA_BYTES_FIX 5
 
 /************************* CSPRNG ********************************/
 

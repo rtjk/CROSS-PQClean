@@ -84,10 +84,6 @@ PQClean requires the absence of variable length arrays: use a `#define` placed b
 
 In `CROSS.c` during signing and verification `assert` is used multiple times to abort and display an error when something went wrong. This is useful for debugging but some tests in PQClean and liboqs require program termination, for example `test_wrong_pk` tries to verify a signature using the wrong public key and checks that `crypto_sign_open` returns `-1`. The assertions must therefore be deleted.
 
-### Missing prototypes
-
-PQClean is compiled with flag `-Werror=missing-prototypes`, add the missing declarations in `merkle_tree.h`.
-
 ### Unused parameters
 
 PQClean is compiled with flags `-Werror=unused-parameter` and `Werror=unused-value`. The occurrences of unused parameters in CROSS can be eliminated by either changing the function definition and declaration or simply adding a line that uses that parameter, this happens with:
@@ -95,6 +91,10 @@ PQClean is compiled with flags `-Werror=unused-parameter` and `Werror=unused-val
 * Parameter `inlen` of function `generic_unpack_fz` in `pack_unpack.c`
 * Parameter `inlen` of function `generic_unpack_fq` in file `pack_unpack.c`
 * Parameter `val` of function `xof_shake_init` in `sha3.h`
+
+### Missing prototypes
+
+PQClean is compiled with flag `-Werror=missing-prototypes`, add the missing declarations in `merkle_tree.h`.
 
 ### Parameter sets
 A parameter set is an instance of the algorithm defined by all its possible parameters. CROSS has two variants (RSDP and RSPDG), three security levels (128, 192, 256 bits) and three "targets" (signature size, balanced, speed). In total there are 18 possible parameter sets. Each parameter set contains two implementations: the reference (clean) one and the avx2 optimized one. The script `make_csv.py` uses Python's `itertools` to generate all the possible combinations of parameters, which will be used as placeholders in a parameter set.

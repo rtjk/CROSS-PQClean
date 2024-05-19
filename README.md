@@ -18,8 +18,8 @@ This is a recipe for adding the CROSS signature algorithm to post-quantum librar
    * [Fixed size integers](#fixed-size-integers)
    * [No variable-length arrays](#no-variable-length-arrays)
    * [Remove assertions](#remove-assertions)
-   * [Missing prototypes](#missing-prototypes)
    * [Unused parameters](#unused-parameters)
+   * [Missing prototypes](#missing-prototypes)
    * [Parameter sets](#parameter-sets)
    * [Placeholders](#placeholders)
    * [Namespacing](#namespacing)
@@ -40,6 +40,8 @@ This is a recipe for adding the CROSS signature algorithm to post-quantum librar
    * [Code generation](#code-generation)
    * [Test oqs-provider](#test-oqs-provider)
 - [oqs-demos](#oqs-demos)
+   * [curl](#curl)
+   * [httpd](#httpd)
 
 ## Get CROSS ready for PQClean
 
@@ -160,7 +162,7 @@ The idea is to edit a configuration file in liboqs, adding a git repository as a
 
 ### Build liboqs
 
-First install all dependencies listed in `README.md`. Then export the variable indicating liboqs' source folder and build with:
+First install all dependencies listed in liboqs' `README.md`. Then export the variable indicating the source folder and build with:
 
 ```
 export LIBOQS_DIR=/path/to/liboqs
@@ -194,5 +196,11 @@ replace liboqs cloning with fork `TODO`
 
 `TODO`
 
+### curl
 
+`TODO`
+
+### httpd
+
+`TODO`
 

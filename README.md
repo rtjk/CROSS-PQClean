@@ -11,14 +11,42 @@ This is a recipe for adding the CROSS signature algorithm to post-quantum librar
 <!-- generate table of contents -->
 <!-- https://derlin.github.io/bitdowntoc/ -->
 
-
+- [Get CROSS ready for PQClean](#get-cross-ready-for-pqclean)
+   * [Directory structure](#directory-structure)
+   * [SHAKE](#shake)
+   * [Detached signatures](#detached-signatures)
+   * [Fixed size integers](#fixed-size-integers)
+   * [No variable-length arrays](#no-variable-length-arrays)
+   * [Remove assertions](#remove-assertions)
+   * [Missing prototypes](#missing-prototypes)
+   * [Unused parameters](#unused-parameters)
+   * [Parameter sets](#parameter-sets)
+   * [Placeholders](#placeholders)
+   * [Namespacing](#namespacing)
+   * [Makefiles](#makefiles)
+   * [META.yml](#metayml)
+   * [KATs and test vectors](#kats-and-test-vectors)
+   * [Parameter file](#parameter-file)
+   * [No external includes in `api.h`](#no-external-includes-in-apih)
+   * [Astyle](#astyle)
+- [PQClean](#pqclean)
+   * [Generate parameter sets](#generate-parameter-sets)
+   * [Test PQClean](#test-pqclean)
+- [liboqs](#liboqs)
+   * [Copy from upstream](#copy-from-upstream)
+   * [Build liboqs](#build-liboqs)
+   * [Test liboqs](#test-liboqs)
+- [oqs-provider](#oqs-provider)
+   * [Code generation](#code-generation)
+   * [Test oqs-provider](#test-oqs-provider)
+- [oqs-demos](#oqs-demos)
 
 ## Get CROSS ready for PQClean
 
 ### Directory structure
 
 * Create the `clean` directory and populate it with all the `.c` and `.h` files from the Reference Implementation, add also the `LICENSE` file.
-* Create the `avx2` direcotry and populate it with all the `.c` and `.h` files from the Optimized Implementation.
+* Create the `avx2` directory and populate it with all the `.c` and `.h` files from the Optimized Implementation.
 
 ### SHAKE
 
@@ -34,11 +62,9 @@ Migrate the internal implementation of SHAKE used by CROSS to the one in `PQClea
     * In `sha3.h` define function `csprng_release` simply calling `xof_shake_release` which in turn wraps SHAKE's `inc_ctx_release`.
     * For every call to `initialize_csprng` wait for `csprng_randombytes` to be called (possibly more than once) and then add `csprng_release` to free up the memory.
 
-`TODO: the other calls are agnostico to the implementation of shake (dynamic vs static)`
-
 ### Detached signatures
 
-PQClean requires two additional functions `crypto_sign_signature` and `crypto_sign_verify` wich compute signing and verification usign detached signatures (the signature is reurned separately from the message insted of appended to it). Declare them in `api.h` and define them in `sign.c` by simply wrapping the existing CROSS funcitons.
+PQClean requires two additional functions `crypto_sign_signature` and `crypto_sign_verify` which compute signing and verification using detached signatures (the signature is returned separately from the message instead of appended to it). Declare them in `api.h` and define them in `sign.c` by simply wrapping the existing CROSS functions.
 
 ### Fixed size integers
 
@@ -52,7 +78,7 @@ PQClean requires fixed sized integer types.
 
 ### No variable-length arrays
 
-PQClean requires the absence of variable-lenght arrays: use a `#define` placed before the function (instead of a normal variable definition) for the size of the array. This happens in function `CROSS_verify` of `CROSS.c` and function `compute_round_seeds` of `seedtree.c`.
+PQClean requires the absence of variable length arrays: use a `#define` placed before the function (instead of a normal variable definition) for the size of the array. This happens in function `CROSS_verify` of `CROSS.c` and function `compute_round_seeds` of `seedtree.c`.
 
 ### Remove assertions
 
@@ -64,22 +90,20 @@ PQClean is compiled with flag `-Werror=missing-prototypes`, add the missing decl
 
 ### Unused parameters
 
-PQClean is compiled with flags `-Werror=unused-parameter` and `Werror=unused-value`. The occourrences of unused parameters in CROSS can be eliminated by either changing the function definition and declaration or simply adding a line that uses that parameter, this happens with:
+PQClean is compiled with flags `-Werror=unused-parameter` and `Werror=unused-value`. The occurrences of unused parameters in CROSS can be eliminated by either changing the function definition and declaration or simply adding a line that uses that parameter, this happens with:
 * Parameter `leaves` of function `merkle_tree_proof_compute` in `merkle_tree.h`.
 * Parameter `inlen` of function `generic_unpack_fz` in `pack_unpack.c`
 * Parameter `inlen` of function `generic_unpack_fq` in file `pack_unpack.c`
 * Parameter `val` of function `xof_shake_init` in `sha3.h`
 
 ### Parameter sets
-A parameter set is an instance of the algorithm defined by all its possible parameters. CROSS has two variants (RSDP and RSPDG), three security levels (128, 192, 256 bits) and three "targets" (signature size, balanced, speed). In total there are 18 possible parameter sets. Each parameter set contains two implementations: the reference (clean) one and the avx2 optimized one. The script `make_csv.py` uses Python's `itertools` to generate all the possible combinations of parameters, wich will be used as placeholders in a parameter set.
+A parameter set is an instance of the algorithm defined by all its possible parameters. CROSS has two variants (RSDP and RSPDG), three security levels (128, 192, 256 bits) and three "targets" (signature size, balanced, speed). In total there are 18 possible parameter sets. Each parameter set contains two implementations: the reference (clean) one and the avx2 optimized one. The script `make_csv.py` uses Python's `itertools` to generate all the possible combinations of parameters, which will be used as placeholders in a parameter set.
 
 ### Placeholders
-PQClean requires that every parameter set is placed in a separate directory. The script `generate.py` will use CROSS's source files as templates, copying them in an apporpiately named directory for each parameter set. After copying it will use text substitution to replace all the necessary parameters in the source files. For example, every time a source file needs to access the length of the public key the placeholder `__length-public-key__` is used instead. The script will then substitute the placeholder with an actual value like 77 while generating the parameter sets.
+PQClean requires that every parameter set is placed in a separate directory. The script `generate.py` will use CROSS's source files as templates, copying them in an appropriately named directory for each parameter set. After copying it will use text substitution to replace all the necessary parameters in the source files. For example, every time a source file needs to access the length of the public key the placeholder `__length-public-key__` is used instead. The script will then substitute the placeholder with an actual value like 77 while generating the parameter sets.
 
 ### Namespacing
-PQClean requires functions and constants to be prefixed with a string corresponding to the parameter set and implementation, for example function `crypto_sign` becomes `PQCLEAN_CROSSRSDP128BALANCED_CLEAN_crypto_sign`. Use the placeholder `__namespace__` wich will then be substituted when generating the parameter sets.
-
-`TODO: namespacing all functions " All exported symbols"?`
+PQClean requires "all exported symbols" to be prefixed with a string corresponding to the parameter set and implementation, for example function `crypto_sign` becomes `PQCLEAN_CROSSRSDP128BALANCED_CLEAN_crypto_sign`. Use the placeholder `__namespace__` which will then be substituted when generating the parameter sets. PQClean has a handy test (`test_symbol_namespace.py`) to check that you didn't forget to namespace something.
 
 ### Makefiles
 
@@ -96,7 +120,7 @@ Every parameter set in PQClean also needs a file listing its parameters, the has
 Create a new file `set.h` with placeholders for the parameters in a set, the definitions in here were previously done externally like in `Benchmarking/CMakeLists.txt`. Include `set.h` in `parameters.h` and in the makefiles.
 
 ### No external includes in `api.h`
-PQClean requires that the api file does not include any external file. Define parameters such as the length of the public key as placeholders, wich will be substituted by actual values by `generate.py`.
+PQClean requires that the api file does not include any external file. Define parameters such as the length of the public key as placeholders, which will be substituted by actual values by `generate.py`.
 
 ### Astyle
 
@@ -112,15 +136,15 @@ Run `generate.py` to create a directory for each parameter set. The clean and av
 ### Test PQClean
 
 Install all required Python packages from `requirements.txt` then simply move inside the test folder and run the Python scripts. Here are some of the most essential tests:
-* `test_nistkat.py` checks the consinstency between the KATs produced by PQClean and the ones declared in the `META.yml` files.
+* `test_nistkat.py` checks the consistency between the KATs produced by PQClean and the ones declared in the `META.yml` files.
 * `test_functest.py` checks that the signatures work as expected, e.g. verifying a signed message with the wrong public key returns `-1` meaning failure.
 * `test_symbol_namespace.py` checks that the all exported symbols are properly namespaced.
 
 ## liboqs
 
-The aim of [liboqs][repo_liboqs] is to collect quantum-safe cryptographic algorithms (same as PQClean) and make them available and easy to use trough a common API and benchmarking framework. The coding conventions are similar to PQClean, although less strict.
+The aim of [liboqs][repo_liboqs] is to collect quantum-safe cryptographic algorithms (same as PQClean) and make them available and easy to use through a common API and benchmarking framework. The coding conventions are similar to PQClean, although less strict.
 
-There are two methods for including a new scheme as docmented by the Wiki: either add it directly ore use the handy "copy-from-upstream" functionality (chosen here). After inclusion liboqs can be compiled and CROSS benchmarked against other signature schemes.
+There are two methods for including a new scheme as documented by the Wiki: either add it directly or use the handy "copy-from-upstream" functionality (chosen here). After inclusion liboqs can be compiled and CROSS benchmarked against other signature schemes.
 
 ### Copy from upstream
 
@@ -128,10 +152,10 @@ The idea is to edit a configuration file in liboqs, adding a git repository as a
 
 * Edit `copy_from_upstream.yml`:
    * Add CROSS's repo under `upstreams` with the last commit SHA.
-   * Add a new entry for CROSS under `sigs` specifying every paraemter set. The signature should be appended to the message using `signed_msg_order: msg_then_sig`.
+   * Add a new entry for CROSS under `sigs` specifying every parameter set. The signature should be appended to the message using `signed_msg_order: msg_then_sig`.
 * Run `copy_from_upstream.py`, which will use the YAML file to download CROSS into `src/sig`.
 * Update liboqs' documentation:
-   * Create `docs/algs/sig/cross.yml` to add information about the scheme in generale (e.g. the website), and about each specific parameter set (e.g. `length-secret-key`).
+   * Create `docs/algs/sig/cross.yml` to add information about the scheme in general (e.g. the website), and about each specific parameter set (e.g. `length-secret-key`).
    * Run `update_docs_from_yaml.py` and `update_cbom.py` to update the documentation files
 
 ### Build liboqs

@@ -1,4 +1,4 @@
-# test
+# CROSS integration
 
 This is a recipe for adding the CROSS signature algorithm to post-quantum libraries ([PQClean][repo_PQClean], [liboqs][repo_liboqs], [oqs-provider][repo_oqs-provider], [oqs-demos][repo_oqs-demos]) starting from the [NIST submission package][CROSS_package].
 

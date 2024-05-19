@@ -11,33 +11,7 @@ This is a recipe for adding the CROSS signature algorithm to post-quantum librar
 <!-- generate table of contents -->
 <!-- https://derlin.github.io/bitdowntoc/ -->
 
-- [Get CROSS ready for PQClean](#get-cross-ready-for-pqclean)
-   * [Directory structure](#directory-structure)
-   * [SHAKE](#shake)
-   * [Detached signatures](#detached-signatures)
-   * [Fixed size integers](#fixed-size-integers)
-   * [No variable-length arrays](#no-variable-length-arrays)
-   * [Remove assertions](#remove-assertions)
-   * [Missing prototypes](#missing-prototypes)
-   * [Parameter sets](#parameter-sets)
-   * [Placeholders](#placeholders)
-   * [Namespacing](#namespacing)
-   * [Makefiles](#makefiles)
-   * [META.yml](#metayml)
-   * [KATs and test vectors](#kats-and-test-vectors)
-   * [Parameter file](#parameter-file)
-   * [No external includes in `api.h`](#no-external-includes-in-apih)
-- [PQClean](#pqclean)
-   * [Generate parameter sets](#generate-parameter-sets)
-   * [Test PQClean](#test-pqclean)
-- [liboqs](#liboqs)
-   * [Copy from upstream](#copy-from-upstream)
-   * [Build liboqs](#build-liboqs)
-   * [Test liboqs](#test-liboqs)
-- [oqs-provider](#oqs-provider)
-   * [Code generation](#code-generation)
-   * [Test oqs-provider](#test-oqs-provider)
-- [oqs-demos](#oqs-demos)
+
 
 ## Get CROSS ready for PQClean
 
@@ -78,15 +52,23 @@ PQClean requires fixed sized integer types.
 
 ### No variable-length arrays
 
-PQClean requires the absence of variable-lenght arrays: use a `#define` placed before the function (instead of a normal variable definition) for the size of the array. This happens in functions `CROSS_verify` of `CROSS.c` and function `compute_round_seeds` of `seedtree.c`.
+PQClean requires the absence of variable-lenght arrays: use a `#define` placed before the function (instead of a normal variable definition) for the size of the array. This happens in function `CROSS_verify` of `CROSS.c` and function `compute_round_seeds` of `seedtree.c`.
 
 ### Remove assertions
 
-In `CROSS.c` during signing and verification `assert` is used multiple times to abort and display an error when something went wrong. This is useful for debugging but some tests in PQClean an liboqs require program termination, for example `test_wrong_pk` tries to verify a signature using the wrong public key and checks that `crypto_sign_open` returns `-1`. The assertions must therefore be deleted.
+In `CROSS.c` during signing and verification `assert` is used multiple times to abort and display an error when something went wrong. This is useful for debugging but some tests in PQClean and liboqs require program termination, for example `test_wrong_pk` tries to verify a signature using the wrong public key and checks that `crypto_sign_open` returns `-1`. The assertions must therefore be deleted.
 
 ### Missing prototypes
 
-`TODO`
+PQClean is compiled with flag `-Werror=missing-prototypes`, add the missing declarations in `merkle_tree.h`.
+
+### Unused parameters
+
+PQClean is compiled with flags `-Werror=unused-parameter` and `Werror=unused-value`. The occourrences of unused parameters in CROSS can be eliminated by either changing the function definition and declaration or simply adding a line that uses that parameter, this happens with:
+* Parameter `leaves` of function `merkle_tree_proof_compute` in `merkle_tree.h`.
+* Parameter `inlen` of function `generic_unpack_fz` in `pack_unpack.c`
+* Parameter `inlen` of function `generic_unpack_fq` in file `pack_unpack.c`
+* Parameter `val` of function `xof_shake_init` in `sha3.h`
 
 ### Parameter sets
 A parameter set is an instance of the algorithm defined by all its possible parameters. CROSS has two variants (RSDP and RSPDG), three security levels (128, 192, 256 bits) and three "targets" (signature size, balanced, speed). In total there are 18 possible parameter sets. Each parameter set contains two implementations: the reference (clean) one and the avx2 optimized one. The script `make_csv.py` uses Python's `itertools` to generate all the possible combinations of parameters, wich will be used as placeholders in a parameter set.
@@ -115,6 +97,10 @@ Create a new file `set.h` with placeholders for the parameters in a set, the def
 
 ### No external includes in `api.h`
 PQClean requires that the api file does not include any external file. Define parameters such as the length of the public key as placeholders, wich will be substituted by actual values by `generate.py`.
+
+### Astyle
+
+`TODO`
 
 ## PQClean
 

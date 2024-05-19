@@ -284,6 +284,7 @@
                                           ROUND_UP( ((M%8)*BITS_TO_REPRESENT(Z-1)),8)/8)
 #endif
 
+// TODO: update parameters after solving CSPRNG_buffer
 ////////////////////////////////////////////////////////////////////
 /* Derived parameters computed via compute_derived_parameters.py */
 #if ( defined(CATEGORY_1) && defined(RSDP)  && defined(SPEED) )

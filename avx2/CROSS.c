@@ -31,8 +31,6 @@
 #include "merkle_tree.h"
 #include "pack_unpack.h"
 #include "architecture_detect.h"
-
-// TODO: CSPRNG remove randombytes definition here to use PQClean randombytes
 #include "randombytes.h"
 
 #if defined(RSDP)
@@ -43,7 +41,7 @@ void expand_public_seed(FQ_ELEM V_tr[K][N-K],
   initialize_csprng(&CSPRNG_state_mat, seed_pub, KEYPAIR_SEED_LENGTH_BYTES);
   CSPRNG_fq_mat(V_tr,&CSPRNG_state_mat);
   
-  // TODO: CSPRNG release context
+  /* PQClean-edit: CSPRNG release context */
   csprng_release(&CSPRNG_state_mat);
 }
 #elif defined(RSDPG)
@@ -57,7 +55,7 @@ void expand_public_seed(FQ_ELEM V_tr[K][N-K],
   CSPRNG_fq_mat(V_tr,&CSPRNG_state_mat);
   CSPRNG_fz_mat(W_mat,&CSPRNG_state_mat);
 
-  // TODO: CSPRNG release context
+  /* PQClean-edit: CSPRNG release context */
   csprng_release(&CSPRNG_state_mat);
 }
 #endif
@@ -75,7 +73,7 @@ void expand_private_seed(FZ_ELEM eta[N],
                      2*KEYPAIR_SEED_LENGTH_BYTES,
                      &CSPRNG_state);
 
-  // TODO: CSPRNG release context
+  /* PQClean-edit: CSPRNG release context */
   csprng_release(&CSPRNG_state);
 
   expand_public_seed(V_tr,seede_seed_pub[1]);
@@ -84,7 +82,7 @@ void expand_private_seed(FZ_ELEM eta[N],
   initialize_csprng(&CSPRNG_state_eta, seede_seed_pub[0], KEYPAIR_SEED_LENGTH_BYTES);
   CSPRNG_zz_vec(eta,&CSPRNG_state_eta);
 
-  // TODO: CSPRNG release context
+  /* PQClean-edit: CSPRNG release context */
   csprng_release(&CSPRNG_state_eta);
 }
 #elif defined(RSDPG)
@@ -101,7 +99,7 @@ void expand_private_seed(FZ_ELEM eta[N],
                      2*KEYPAIR_SEED_LENGTH_BYTES,
                      &CSPRNG_state);
 
-  // TODO: CSPRNG release context
+  /* PQClean-edit: CSPRNG release context */
   csprng_release(&CSPRNG_state);
 
   expand_public_seed(V_tr,W_mat,seede_seed_pub[1]);
@@ -110,7 +108,7 @@ void expand_private_seed(FZ_ELEM eta[N],
   initialize_csprng(&CSPRNG_state_eta, seede_seed_pub[0], KEYPAIR_SEED_LENGTH_BYTES);
   CSPRNG_zz_inf_w(zeta,&CSPRNG_state_eta);
 
-  // TODO: CSPRNG release context
+  /* PQClean-edit: CSPRNG release context */
   csprng_release(&CSPRNG_state_eta);
 
 #if (defined(HIGH_PERFORMANCE_X86_64) && defined(RSDPG) )
@@ -141,7 +139,7 @@ void __namespace__CROSS_keygen(prikey_t *SK,
                      2*KEYPAIR_SEED_LENGTH_BYTES,
                      &CSPRNG_state);
 
-  // TODO: CSPRNG release context
+  /* PQClean-edit: CSPRNG release context */
   csprng_release(&CSPRNG_state);
 
   memcpy(PK->seed_pub,seede_seed_pub[1],KEYPAIR_SEED_LENGTH_BYTES);
@@ -179,7 +177,7 @@ void __namespace__CROSS_keygen(prikey_t *SK,
   fz_dz_norm_sigma(eta);
 #endif
 
-  // TODO: CSPRNG release context
+  /* PQClean-edit: CSPRNG release context */
   csprng_release(&CSPRNG_state_eta);
 
   /* compute public syndrome */
@@ -340,7 +338,7 @@ void __namespace__CROSS_sign(const prikey_t *SK,
         cmt_1_i_input[SEED_LENGTH_BYTES+SALT_LENGTH_BYTES+1] = domain_sep_idx_hash & 0xFF;
         hash(cmt_1[i],cmt_1_i_input,sizeof(cmt_1_i_input));
 
-        // TODO: CSPRNG release context
+        /* PQClean-edit: CSPRNG release context */
         csprng_release(&CSPRNG_state);
     }
 
@@ -371,7 +369,7 @@ void __namespace__CROSS_sign(const prikey_t *SK,
     initialize_csprng(&CSPRNG_state,d_beta,HASH_DIGEST_LENGTH);
     CSPRNG_fq_vec_beta(beta, &CSPRNG_state);
 
-    // TODO: CSPRNG release context
+    /* PQClean-edit: CSPRNG release context */
     csprng_release(&CSPRNG_state);
 
     /* Computation of the first round of responses */
@@ -409,8 +407,7 @@ void __namespace__CROSS_sign(const prikey_t *SK,
     int published_rsps = 0;
     for(int i = 0; i<T; i++){
         if(fixed_weight_b[i] == 0){
-            // TODO: remove this assetion to pass "speed_sig -f" in liboqs
-            // TODO: "speed_sig -f" still not passing
+            /* PQClean-edit: remove assertion */
             //assert(published_rsps < T-W);
             __namespace__pack_fq_vec(sig->rsp_0[published_rsps].y, y[i]);
 #if defined(RSDP)
@@ -471,7 +468,7 @@ int __namespace__CROSS_verify(const pubkey_t *const PK,
     initialize_csprng(&CSPRNG_state,d_beta,HASH_DIGEST_LENGTH);
     CSPRNG_fq_vec_beta(beta, &CSPRNG_state);
 
-    // TODO: CSPRNG release context
+    /* PQClean-edit: CSPRNG release context */
     csprng_release(&CSPRNG_state);
 
     uint8_t fixed_weight_b[T]={0};
@@ -562,7 +559,7 @@ int __namespace__CROSS_verify(const pubkey_t *const PK,
             /* expand u_tilde */
             CSPRNG_fq_vec(u_tilde, &CSPRNG_state);
 
-            // TODO: CSPRNG release context
+            /* PQClean-edit: CSPRNG release context */
             csprng_release(&CSPRNG_state);
 
             fq_vec_by_restr_vec_scaled(y[i],
@@ -627,7 +624,7 @@ int __namespace__CROSS_verify(const pubkey_t *const PK,
         }
     } /* end for iterating on ZKID iterations */
 
-    // TODO: remove this assetion to pass test_cmdline in liboqs
+    /* PQClean-edit: remove assertion */
     //assert(is_signature_ok);
 
     uint8_t commit_digests[2][HASH_DIGEST_LENGTH];
@@ -656,15 +653,13 @@ int __namespace__CROSS_verify(const pubkey_t *const PK,
     int does_digest_01_match = ( memcmp(digest_01_recomputed,
                                         sig->digest_01,
                                         HASH_DIGEST_LENGTH) == 0);
-    // TODO: remove this assetion to pass test_wrong_pk in PQClean
-    // test_wrong_pk needs CROSS_verify to return is_signature_ok and NOT exit before returning
+    /* PQClean-edit: remove assertion */
     //assert(does_digest_01_match);
 
     int does_digest_b_match = ( memcmp(digest_b_recomputed,
                                         sig->digest_b,
                                         HASH_DIGEST_LENGTH) == 0);
-    // TODO: remove this assetion to pass test_wrong_pk in PQClean
-    // test_wrong_pk needs CROSS_verify to return is_signature_ok and NOT exit before returning
+    /* PQClean-edit: remove assertion */
     //assert(does_digest_b_match);
 
     is_signature_ok = is_signature_ok &&

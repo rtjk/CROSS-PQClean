@@ -25,9 +25,6 @@
 
 #include <string.h>
 #include "csprng_hash.h"
-// TODO: remove definition to avoid "multiple definition" error in liboqs
-// : CSPRNG remove randombytes definition here to use PQClean randombytes
-//CSPRNG_STATE_T __namespace__platform_csprng_state;
 
 #define  POSITION_MASK (( (uint16_t)1 << BITS_TO_REPRESENT(T-1))-1)
 
@@ -42,7 +39,7 @@ void __namespace__expand_digest_to_fixed_weight(uint8_t fixed_weight_string[T],
    uint8_t CSPRNG_buffer[ROUND_UP(BITS_CWSTR_RNG,8)/8];
    csprng_randombytes(CSPRNG_buffer,ROUND_UP(BITS_CWSTR_RNG,8)/8,&csprng_state);
 
-   // TODO: CSPRNG release context
+   /* PQClean-edit: CSPRNG release context */
    csprng_release(&csprng_state);
    
    /* initialize CW string */

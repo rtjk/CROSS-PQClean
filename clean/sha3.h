@@ -82,7 +82,8 @@ void xof_shake_extract(SHAKE_STATE_STRUCT *state,
 static inline
 void xof_shake_init(SHAKE_STATE_STRUCT *state, int val)
 {
-   if(val == 0) {val = 0;}; // TODO: useless line added to avoid -Werror=unused-parameter and Werror=unused-value
+   /* PQClean-edit: unused parameter */
+   if(val == 0) {val = 0;};
 #if defined(CATEGORY_1)
    shake128_inc_init(state);
 #else
@@ -127,7 +128,7 @@ void xof_shake_extract(SHAKE_STATE_STRUCT *state,
 #endif
 }
 
-// TODO: CSPRNG release context
+/* PQClean-edit: CSPRNG release context */
 static inline
 void xof_shake_release(SHAKE_STATE_STRUCT *state)
 {

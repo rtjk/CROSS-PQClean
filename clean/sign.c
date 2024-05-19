@@ -114,7 +114,7 @@ int __namespace__crypto_sign_verify(const unsigned char *sig, uint64_t siglen,  
                )
 {
 
-   // TODO: useless line added to avoid [-Werror=unused-parameter]
+   /* PQClean-edit: unused parameter */
    if(siglen == 0) siglen = 0;
 
    /* verify returns 1 if signature is ok, 0 otherwise */   

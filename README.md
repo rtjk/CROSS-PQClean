@@ -1,12 +1,13 @@
 # CROSS integration
 
-This is a recipe for adding the CROSS signature algorithm to post-quantum libraries ([PQClean][repo_PQClean], [liboqs][repo_liboqs], [oqs-provider][repo_oqs-provider], [oqs-demos][repo_oqs-demos]) starting from the [NIST submission package][CROSS_package].
+This is a recipe for adding the CROSS signature algorithm to post-quantum libraries ([PQClean][repo_PQClean], [liboqs][repo_liboqs], [oqs-provider][repo_oqs-provider], [oqs-demos][repo_oqs-demos], [OQS-bind][repo_oqs-bind]) starting from the [NIST submission package][CROSS_package].
 
 [CROSS_package]: https://www.cross-crypto.com/nist-submission.html
 [repo_PQClean]: https://github.com/PQClean/PQClean/
 [repo_liboqs]: https://github.com/open-quantum-safe/liboqs
 [repo_oqs-provider]: https://github.com/open-quantum-safe/oqs-provider
 [repo_oqs-demos]: https://github.com/open-quantum-safe/oqs-demos
+[repo_oqs-bind]: https://github.com/Martyrshot/OQS-bind
 
 <!-- generate table of contents -->
 <!-- https://derlin.github.io/bitdowntoc/ -->
@@ -42,6 +43,7 @@ This is a recipe for adding the CROSS signature algorithm to post-quantum librar
 - [oqs-demos](#oqs-demos)
    * [curl](#curl)
    * [httpd](#httpd)
+- [OQS-bind](#oqs-bind)
 
 ## Get CROSS ready for PQClean
 
@@ -204,3 +206,6 @@ replace liboqs cloning with fork `TODO`
 
 `TODO`
 
+## OQS-bind
+
+`TODO`

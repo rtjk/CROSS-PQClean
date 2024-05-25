@@ -123,6 +123,8 @@ Every parameter set in PQClean also needs a file listing its parameters, the has
 ### Parameter file
 Create a new file `set.h` with placeholders for the parameters in a set, the definitions in here were previously done externally like in `Benchmarking/CMakeLists.txt`. Include `set.h` in `parameters.h` and in the makefiles.
 
+`TODO: set.h also has defines for avx2`
+
 ### No external includes in `api.h`
 PQClean requires that the api file does not include any external file. Define parameters such as the length of the public key as placeholders, which will be substituted by actual values by `generate.py`.
 

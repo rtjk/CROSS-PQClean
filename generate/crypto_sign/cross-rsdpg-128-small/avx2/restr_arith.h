@@ -26,7 +26,15 @@
 #pragma once
 
 #include "parameters.h"
-#include <immintrin.h>
+
+// TODO: diagnose verify error
+// when these three conditions are present
+// - compiling CROSS' optimized implementation (avx2)
+// - avx2 processor flags are absent (e.g. __AVX2__ is not defined)
+// - immintrin.h is included in restr_arith.h
+// then a rare error can occour during verification
+// immintrin.h should NOT be included here
+// #include <immintrin.h>
 
 #if defined(RSDP)
 #define FZRED_SINGLE(x)   (((x) & 0x07) + ((x) >> 3))

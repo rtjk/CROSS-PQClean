@@ -9,7 +9,7 @@
     #define NO_TREES 1
 #endif
 
-// when compiling avx2 override the behaviour of architecture_detect.h
+// When compiling avx2 override the behaviour of architecture_detect.h
 #define IMPLEMENTATION_avx2
 #if defined(IMPLEMENTATION_avx2)
     #define HIGH_COMPATIBILITY_X86_64

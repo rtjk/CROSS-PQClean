@@ -32,6 +32,10 @@
 #include "pack_unpack.h"
 #include "randombytes.h"
 
+///////////////////////////////////////////////////////////
+#include <stdio.h>
+///////////////////////////////////////////////////////////
+
 #if defined(RSDP)
 static
 void expand_public_seed(FQ_ELEM V_tr[K][N-K],
@@ -118,6 +122,9 @@ void expand_private_seed(FZ_ELEM eta[N],
 
 void __namespace__CROSS_keygen(prikey_t *SK,
                   pubkey_t *PK){
+
+                    printf("\n\n**** KEYGEN ****");fflush(stdout);
+
   /* generation of random material for public and private key */
   randombytes(SK->seed,KEYPAIR_SEED_LENGTH_BYTES);
   uint8_t seede_seed_pub[2][KEYPAIR_SEED_LENGTH_BYTES];
@@ -171,6 +178,9 @@ void __namespace__CROSS_sign(const prikey_t *SK,
                const char *const m,
                const uint64_t mlen,
                sig_t *sig){
+
+                printf("\n\n**** SIGN ****");fflush(stdout);
+
     /* Wipe any residual information in the sig structure allocated by the 
      * caller */
     memset(sig,0,sizeof(sig_t));
@@ -384,6 +394,9 @@ int __namespace__CROSS_verify(const pubkey_t *const PK,
                  const char *const m,
                  const uint64_t mlen,
                  const sig_t *const sig){
+
+                    printf("\n\n**** VERIFY ****");fflush(stdout);
+
     CSPRNG_STATE_T CSPRNG_state;
 
     FQ_ELEM V_tr[K][N-K];

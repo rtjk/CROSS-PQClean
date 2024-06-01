@@ -15,14 +15,14 @@ def replace_in_file(path, text_to_search, replacement_text):
       print(re.sub(text_to_search, replacement_text, line), end='')
 
 def replace_in_dir(dir, text_to_search, replacement_text):
-    if(not os.path.isdir(dir)):
-       raise Exception('Directory not found')
-    else:
-        for root, dirs, files in os.walk(dir):
-            for file in files:
-                file_path = os.path.join(root, file)
-                if os.path.isfile(file_path):
-                    replace_in_file(file_path, text_to_search, replacement_text)
+    #if(not os.path.isdir(dir)):
+    #   raise Exception('Directory not found')
+    #else:
+    for root, dirs, files in os.walk(dir):
+        for file in files:
+            file_path = os.path.join(root, file)
+            if os.path.isfile(file_path):
+                replace_in_file(file_path, text_to_search, replacement_text)
 
 # output here
 TARGET_DIR = './crypto_sign'

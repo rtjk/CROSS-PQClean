@@ -237,10 +237,15 @@ void PQCLEAN_CROSSRSDP128BALANCED_CLEAN_generate_seed_tree_from_root(unsigned ch
    unsigned char csprng_input_3[CSPRNG_INPUT_LEN];
    unsigned char csprng_input_4[CSPRNG_INPUT_LEN];
 
+   unsigned char discarded_input[CSPRNG_INPUT_LEN];
+
+   /*
    CSPRNG_STATE_T tree_csprng_x1_state;
    CSPRNG_X2_STATE_T tree_csprng_x2_state;
    CSPRNG_X3_STATE_T tree_csprng_x3_state;
    CSPRNG_X4_STATE_T tree_csprng_x4_state;
+   */
+   PAR_CSPRNG_STATE_T state;
 
    memcpy(csprng_input_1+SEED_LENGTH_BYTES, salt, SALT_LENGTH_BYTES);
    memcpy(csprng_input_2+SEED_LENGTH_BYTES, salt, SALT_LENGTH_BYTES);
@@ -299,16 +304,16 @@ void PQCLEAN_CROSSRSDP128BALANCED_CLEAN_generate_seed_tree_from_root(unsigned ch
                   SEED_LENGTH_BYTES);
             *((uint16_t *)(csprng_input_1 + SALT_LENGTH_BYTES + SEED_LENGTH_BYTES)) = father_node_idx;
             /* expand the children (stored contiguously) */
-            initialize_csprng(&tree_csprng_x1_state, csprng_input_1, CSPRNG_INPUT_LEN);
-            csprng_randombytes(seed_tree + (LEFT_CHILD(father_node_idx) - missing_nodes_before[level+1] ) *SEED_LENGTH_BYTES,
-                              SEED_LENGTH_BYTES,
-                              &tree_csprng_x1_state);
+            par_initialize_csprng(1, &state, csprng_input_1, discarded_input, discarded_input, discarded_input, CSPRNG_INPUT_LEN);
+            par_csprng_randombytes(1, &state, seed_tree + (LEFT_CHILD(father_node_idx) - missing_nodes_before[level+1] ) *SEED_LENGTH_BYTES, discarded_seed, discarded_seed, discarded_seed,
+                              SEED_LENGTH_BYTES
+                              );
             if ((RIGHT_CHILD(father_node_idx)- missing_nodes_before[level+1]) < NUM_NODES_SEED_TREE ) {
-               csprng_randombytes(seed_tree + (RIGHT_CHILD(father_node_idx)- missing_nodes_before[level+1])*SEED_LENGTH_BYTES,
-                                    SEED_LENGTH_BYTES,
-                                    &tree_csprng_x1_state);
+               par_csprng_randombytes(1, &state, seed_tree + (RIGHT_CHILD(father_node_idx)- missing_nodes_before[level+1])*SEED_LENGTH_BYTES, discarded_seed, discarded_seed, discarded_seed,
+                                    SEED_LENGTH_BYTES
+                                    );
             }
-            csprng_release(&tree_csprng_x1_state);
+            par_csprng_release(1, &state);
          }
 
          else if(nodes_in_set[set] == 2) {
@@ -327,13 +332,13 @@ void PQCLEAN_CROSSRSDP128BALANCED_CLEAN_generate_seed_tree_from_root(unsigned ch
             *((uint16_t *)(csprng_input_1 + SALT_LENGTH_BYTES + SEED_LENGTH_BYTES)) = father_node_idx_1;
             *((uint16_t *)(csprng_input_2 + SALT_LENGTH_BYTES + SEED_LENGTH_BYTES)) = father_node_idx_2;
             /* expand the 2 left children */
-            initialize_csprng_x2(&tree_csprng_x2_state, csprng_input_1, csprng_input_2, CSPRNG_INPUT_LEN);
+            par_initialize_csprng(2, &state, csprng_input_1, csprng_input_2, discarded_input, discarded_input, CSPRNG_INPUT_LEN);
             unsigned char *left_child_1 = seed_tree + (LEFT_CHILD(father_node_idx_1) - missing_nodes_before[level+1])*SEED_LENGTH_BYTES;
             unsigned char *left_child_2 = seed_tree + (LEFT_CHILD(father_node_idx_2) - missing_nodes_before[level+1])*SEED_LENGTH_BYTES;
-            csprng_randombytes_x2(left_child_1,
-                                 left_child_2,
-                                 SEED_LENGTH_BYTES,
-                                 &tree_csprng_x2_state);
+            par_csprng_randombytes(2, &state, left_child_1,
+                                 left_child_2, discarded_seed, discarded_seed,
+                                 SEED_LENGTH_BYTES
+                                 );
             /* expand the 2 right children */             
             /* if the rightmost child is a leaf then it might not be needed */
             unsigned char *right_child_1 = seed_tree + (RIGHT_CHILD(father_node_idx_1) - missing_nodes_before[level+1])*SEED_LENGTH_BYTES;
@@ -344,11 +349,11 @@ void PQCLEAN_CROSSRSDP128BALANCED_CLEAN_generate_seed_tree_from_root(unsigned ch
             else {
                right_child_2 = discarded_seed;
             }
-            csprng_randombytes_x2(right_child_1,
-                                 right_child_2,
-                                 SEED_LENGTH_BYTES,
-                                 &tree_csprng_x2_state);
-            csprng_release_x2(&tree_csprng_x2_state);
+            par_csprng_randombytes(2, &state, right_child_1,
+                                 right_child_2, discarded_seed, discarded_seed,
+                                 SEED_LENGTH_BYTES
+                                 );
+            par_csprng_release(2, &state);
          }
 
          else if(nodes_in_set[set] == 3) {
@@ -373,15 +378,15 @@ void PQCLEAN_CROSSRSDP128BALANCED_CLEAN_generate_seed_tree_from_root(unsigned ch
             *((uint16_t *)(csprng_input_2 + SALT_LENGTH_BYTES + SEED_LENGTH_BYTES)) = father_node_idx_2;
             *((uint16_t *)(csprng_input_3 + SALT_LENGTH_BYTES + SEED_LENGTH_BYTES)) = father_node_idx_3;
             /* expand the 3 left children */
-            initialize_csprng_x3(&tree_csprng_x3_state, csprng_input_1, csprng_input_2, csprng_input_3, CSPRNG_INPUT_LEN);
+            par_initialize_csprng(3, &state, csprng_input_1, csprng_input_2, csprng_input_3, discarded_input, CSPRNG_INPUT_LEN);
             unsigned char *left_child_1 = seed_tree + (LEFT_CHILD(father_node_idx_1) - missing_nodes_before[level+1])*SEED_LENGTH_BYTES;
             unsigned char *left_child_2 = seed_tree + (LEFT_CHILD(father_node_idx_2) - missing_nodes_before[level+1])*SEED_LENGTH_BYTES;
             unsigned char *left_child_3 = seed_tree + (LEFT_CHILD(father_node_idx_3) - missing_nodes_before[level+1])*SEED_LENGTH_BYTES;
-            csprng_randombytes_x3(left_child_1,
+            par_csprng_randombytes(3, &state, left_child_1,
                                  left_child_2,
-                                 left_child_3,
-                                 SEED_LENGTH_BYTES,
-                                 &tree_csprng_x3_state);
+                                 left_child_3, discarded_seed,
+                                 SEED_LENGTH_BYTES
+                                 );
             /* expand the 3 right children */
             /* if the rightmost child is a leaf then it might not be needed */
             unsigned char *right_child_1 = seed_tree + (RIGHT_CHILD(father_node_idx_1) - missing_nodes_before[level+1])*SEED_LENGTH_BYTES;
@@ -393,12 +398,12 @@ void PQCLEAN_CROSSRSDP128BALANCED_CLEAN_generate_seed_tree_from_root(unsigned ch
             else {
                right_child_3 = discarded_seed;
             }
-            csprng_randombytes_x3(right_child_1,
+            par_csprng_randombytes(3, &state, right_child_1,
                                  right_child_2,
-                                 right_child_3,
-                                 SEED_LENGTH_BYTES,
-                                 &tree_csprng_x3_state);
-            csprng_release_x3(&tree_csprng_x3_state);
+                                 right_child_3, discarded_seed,
+                                 SEED_LENGTH_BYTES
+                                 );
+            par_csprng_release(3, &state);
          }
 
          else if(nodes_in_set[set] == 4) {
@@ -429,17 +434,16 @@ void PQCLEAN_CROSSRSDP128BALANCED_CLEAN_generate_seed_tree_from_root(unsigned ch
             *((uint16_t *)(csprng_input_3 + SALT_LENGTH_BYTES + SEED_LENGTH_BYTES)) = father_node_idx_3;
             *((uint16_t *)(csprng_input_4 + SALT_LENGTH_BYTES + SEED_LENGTH_BYTES)) = father_node_idx_4;
             /* expand the 4 left children */
-            initialize_csprng_x4(&tree_csprng_x4_state, csprng_input_1, csprng_input_2, csprng_input_3, csprng_input_4, CSPRNG_INPUT_LEN);
+            par_initialize_csprng(4, &state, csprng_input_1, csprng_input_2, csprng_input_3, csprng_input_4, CSPRNG_INPUT_LEN);
             unsigned char *left_child_1 = seed_tree + (LEFT_CHILD(father_node_idx_1) - missing_nodes_before[level+1])*SEED_LENGTH_BYTES;
             unsigned char *left_child_2 = seed_tree + (LEFT_CHILD(father_node_idx_2) - missing_nodes_before[level+1])*SEED_LENGTH_BYTES;
             unsigned char *left_child_3 = seed_tree + (LEFT_CHILD(father_node_idx_3) - missing_nodes_before[level+1])*SEED_LENGTH_BYTES;
             unsigned char *left_child_4 = seed_tree + (LEFT_CHILD(father_node_idx_4) - missing_nodes_before[level+1])*SEED_LENGTH_BYTES;
-            csprng_randombytes_x4(left_child_1,
+            par_csprng_randombytes(4, &state, left_child_1,
                                  left_child_2,
                                  left_child_3,
                                  left_child_4,
-                                 SEED_LENGTH_BYTES,
-                                 &tree_csprng_x4_state);
+                                 SEED_LENGTH_BYTES);
             /* expand the 4 right children */
             /* if the rightmost child is a leaf then it might not be needed */
             unsigned char *right_child_1 = seed_tree + (RIGHT_CHILD(father_node_idx_1) - missing_nodes_before[level+1])*SEED_LENGTH_BYTES;
@@ -452,13 +456,12 @@ void PQCLEAN_CROSSRSDP128BALANCED_CLEAN_generate_seed_tree_from_root(unsigned ch
             else {
                right_child_4 = discarded_seed;
             }
-            csprng_randombytes_x4(right_child_1,
+            par_csprng_randombytes(4, &state, right_child_1,
                                  right_child_2,
                                  right_child_3,
                                  right_child_4,
-                                 SEED_LENGTH_BYTES,
-                                 &tree_csprng_x4_state);
-            csprng_release_x4(&tree_csprng_x4_state);
+                                 SEED_LENGTH_BYTES);
+            par_csprng_release(4, &state);
          }
 
       }
@@ -467,7 +470,6 @@ void PQCLEAN_CROSSRSDP128BALANCED_CLEAN_generate_seed_tree_from_root(unsigned ch
    }
 } /* end generate_seed_tree */
 
-/*****************************************************************************/
 
 
 

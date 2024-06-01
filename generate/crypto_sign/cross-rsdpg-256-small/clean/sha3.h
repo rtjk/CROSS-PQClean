@@ -262,3 +262,12 @@ void xof_shake_x2_release(SHAKE_X2_STATE_STRUCT *states)
    shake128_inc_ctx_release(&(states->state1));
    shake128_inc_ctx_release(&(states->state2));
 }
+
+///////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////
+
+typedef struct {
+   SHAKE_STATE_STRUCT state1;
+   SHAKE_X2_STATE_STRUCT state2;
+   SHAKE_X4_STATE_STRUCT state4;
+} par_shake128_ctx;

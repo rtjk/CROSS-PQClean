@@ -58,6 +58,7 @@ void csprng_release(CSPRNG_STATE_T * const csprng_state){
    xof_shake_release(csprng_state);
 }
 
+
 ///////////////////////////////////////////////////////////////
 //                SHAKE x2 x3 x4 wrappers                    //
 ///////////////////////////////////////////////////////////////
@@ -67,14 +68,12 @@ void csprng_release(CSPRNG_STATE_T * const csprng_state){
 #define CSPRNG_X4_STATE_T SHAKE_X4_STATE_STRUCT
 
 // INITIALIZE
-
 static inline
 void initialize_csprng_x2(CSPRNG_X2_STATE_T * const csprng_state,const unsigned char * const seed1, const unsigned char * const seed2,const uint32_t seed_len_bytes) {
    xof_shake_x2_init(csprng_state);
    xof_shake_x2_update(csprng_state,seed1,seed2,seed_len_bytes);
    xof_shake_x2_final(csprng_state);
 }
-
 static inline
 void initialize_csprng_x3(CSPRNG_X3_STATE_T * const csprng_state,const unsigned char * const seed1, const unsigned char * const seed2,const unsigned char * const seed3,const uint32_t seed_len_bytes) {
    const unsigned char seed4[seed_len_bytes]; // discarded
@@ -82,47 +81,66 @@ void initialize_csprng_x3(CSPRNG_X3_STATE_T * const csprng_state,const unsigned 
    xof_shake_x4_update(csprng_state,seed1,seed2,seed3,seed4,seed_len_bytes);
    xof_shake_x4_final(csprng_state);
 }
-
 static inline
 void initialize_csprng_x4(CSPRNG_X4_STATE_T * const csprng_state,const unsigned char * const seed1, const unsigned char * const seed2,const unsigned char * const seed3,const unsigned char * const seed4,const uint32_t seed_len_bytes) {
    xof_shake_x4_init(csprng_state);
    xof_shake_x4_update(csprng_state,seed1,seed2,seed3,seed4,seed_len_bytes);
    xof_shake_x4_final(csprng_state);
 }
-
 // RANDOMBYTES
-
 static inline
 void csprng_randombytes_x2(unsigned char * const x1, unsigned char * const x2, uint64_t xlen, CSPRNG_X2_STATE_T * const csprng_state){
    xof_shake_x2_extract(csprng_state,x1,x2,xlen);
 }
-
 static inline
 void csprng_randombytes_x3(unsigned char * const x1,unsigned char * const x2,unsigned char * const x3,uint64_t xlen,CSPRNG_X3_STATE_T * const csprng_state){
    unsigned char x4[xlen]; // discarded
    xof_shake_x4_extract(csprng_state,x1,x2,x3,x4,xlen);
 }
-
 static inline
 void csprng_randombytes_x4(unsigned char * const x1,unsigned char * const x2,unsigned char * const x3,unsigned char * const x4,uint64_t xlen,CSPRNG_X4_STATE_T * const csprng_state){
    xof_shake_x4_extract(csprng_state,x1,x2,x3,x4,xlen);
 }
-
 // RELEASE
-
 static inline
 void csprng_release_x2(CSPRNG_X2_STATE_T * const csprng_state){
    xof_shake_x2_release(csprng_state);
 }
-
 static inline
 void csprng_release_x3(CSPRNG_X3_STATE_T * const csprng_state){
    xof_shake_x4_release(csprng_state);
 }
-
 static inline
 void csprng_release_x4(CSPRNG_X4_STATE_T * const csprng_state){
    xof_shake_x4_release(csprng_state);
+}
+
+///////////////////////////////////////////////////////////////
+//  SINGLE INTERFACE FOR ALL SHAKE VERSIONS (x1 x2 x3 x4)    //
+///////////////////////////////////////////////////////////////
+
+#define PAR_CSPRNG_STATE_T par_shake128_ctx
+
+static inline
+void par_initialize_csprng(int par_level, PAR_CSPRNG_STATE_T * const states, const unsigned char * const seed1, const unsigned char * const seed2,const unsigned char * const seed3,const unsigned char * const seed4,const uint32_t seed_len_bytes) {
+   if(par_level == 1) initialize_csprng(&(states->state1), seed1, seed_len_bytes);
+   else if(par_level == 2) initialize_csprng_x2(&(states->state2), seed1, seed2, seed_len_bytes);
+   else if(par_level == 3) initialize_csprng_x3(&(states->state4), seed1, seed2, seed3, seed_len_bytes);
+   else if(par_level == 4) initialize_csprng_x4(&(states->state4), seed1, seed2, seed3, seed4, seed_len_bytes);
+}
+static inline
+void par_csprng_randombytes(int par_level, PAR_CSPRNG_STATE_T * const states, unsigned char * const x1,unsigned char * const x2,unsigned char * const x3,unsigned char * const x4,uint64_t xlen){
+   if(par_level == 1) csprng_randombytes(x1, xlen, &(states->state1));
+   else if(par_level == 2) csprng_randombytes_x2(x1, x2, xlen, &(states->state2));
+   else if(par_level == 3) csprng_randombytes_x3(x1, x2, x3, xlen, &(states->state4));
+   else if(par_level == 4) csprng_randombytes_x4(x1, x2, x3, x4, xlen, &(states->state4));
+}
+static inline
+void par_csprng_release(int par_level, PAR_CSPRNG_STATE_T * const states){
+   if(par_level == 1) csprng_release(&(states->state1));
+   else if(par_level == 2) csprng_release_x2(&(states->state2));
+   else if(par_level == 3) csprng_release_x3(&(states->state4));
+   else if(par_level == 4) csprng_release_x4(&(states->state4));
 }
 
 /******************************************************************************/

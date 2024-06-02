@@ -43,6 +43,9 @@
 #define NOT_COMPUTED 0
 #define COMPUTED 1
 
+/* maximum number of parallel executions of the CSPRNG */
+#define PAR_DEGREE 4
+
 /*
  * setup_tree()
  *
@@ -167,9 +170,8 @@ void get_leaf_indices(uint16_t merkle_leaf_indices[T],
  * const unsigned char commitments[T][HASH_DIGEST_LENGTH]    : Contains the
  * hashed commitments that build the tree.
  */
-void __namespace__generate_merkle_tree(unsigned char merkle_tree[NUM_NODES_MERKLE_TREE *
-                                                    HASH_DIGEST_LENGTH],
-                          unsigned char commitments[T][HASH_DIGEST_LENGTH])
+void __namespace__generate_merkle_tree(unsigned char merkle_tree[NUM_NODES_MERKLE_TREE * HASH_DIGEST_LENGTH],
+                                       unsigned char commitments[T][HASH_DIGEST_LENGTH])
 {
     size_t i;
     uint32_t node_ctr, parent_layer;
@@ -190,11 +192,27 @@ void __namespace__generate_merkle_tree(unsigned char merkle_tree[NUM_NODES_MERKL
                HASH_DIGEST_LENGTH);
     }
 
+    unsigned char hash_inputs[PAR_DEGREE][2*HASH_DIGEST_LENGTH];
+    unsigned char *hash_outputs[PAR_DEGREE];
+
+    /* enqueue the the hash calls */
+    uint16_t to_hash = 0;
+    
     /* Hash the child nodes */
     node_ctr = 0;
     parent_layer = LOG2(T)-1;
     for (i=NUM_NODES_MERKLE_TREE-1; i>0; i -= 2) {
-        hash(merkle_tree + OFFSET(PARENT(i) + layer_offsets[parent_layer]), merkle_tree + OFFSET(SIBLING(i)), 2*HASH_DIGEST_LENGTH);
+        to_hash++;
+        /* prepare tha hash input (2 children) */
+        memcpy(hash_inputs[to_hash-1], merkle_tree + OFFSET(SIBLING(i)), 2*HASH_DIGEST_LENGTH);
+        /* prepare the hash output (parent) */
+        hash_outputs[to_hash-1] = merkle_tree + OFFSET(PARENT(i) + layer_offsets[parent_layer]);
+        /* hash in batches of 4 (or less on the last few batches) */
+        if(to_hash == 4 || i<8) {
+            par_hash(to_hash, hash_outputs[0], hash_outputs[1], hash_outputs[2], hash_outputs[3], hash_inputs[0], hash_inputs[1], hash_inputs[2], hash_inputs[3], 2*HASH_DIGEST_LENGTH);
+            to_hash = 0;
+        }
+        /* jump one layer up */
         if (node_ctr >= (uint32_t) nodes_per_layer[parent_layer+1] - 2) {
             parent_layer--;
             node_ctr = 0;

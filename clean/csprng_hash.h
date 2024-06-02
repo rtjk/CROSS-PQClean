@@ -165,6 +165,23 @@ void hash(uint8_t digest[HASH_DIGEST_LENGTH],
    xof_shake_release(&csprng_state);
 }
 
+static inline
+void par_hash(
+               int par_level,
+               uint8_t digest_1[HASH_DIGEST_LENGTH], 
+               uint8_t digest_2[HASH_DIGEST_LENGTH],
+               uint8_t digest_3[HASH_DIGEST_LENGTH],
+               uint8_t digest_4[HASH_DIGEST_LENGTH],
+               const unsigned char *const m_1, 
+               const unsigned char *const m_2,
+               const unsigned char *const m_3,
+               const unsigned char *const m_4,
+               const uint64_t mlen){
+   PAR_CSPRNG_STATE_T states;
+   par_initialize_csprng(par_level, &states, m_1, m_2, m_3, m_4, mlen);
+   par_csprng_randombytes(par_level, &states, digest_1, digest_2, digest_3, digest_4, HASH_DIGEST_LENGTH);
+   par_csprng_release(par_level, &states);
+}
 
 /********************** CSPRNG Sampling functions helpers ********************/
 

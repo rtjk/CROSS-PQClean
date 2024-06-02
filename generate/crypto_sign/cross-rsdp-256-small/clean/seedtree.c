@@ -27,11 +27,6 @@
 #include <stdint.h>
 #include <string.h> // memcpy(...), memset(...)
 
-
-///////////////////////////////////////////////////////////
-#include <stdio.h>
-///////////////////////////////////////////////////////////
-
 #define LEFT_CHILD(i) (2*i+1)
 #define RIGHT_CHILD(i) (2*i+2)
 #define PARENT(i) ((i-1)/2)
@@ -74,6 +69,8 @@ void PQCLEAN_CROSSRSDP256SMALL_CLEAN_ptree(unsigned char seed_tree[NUM_NODES_SEE
 #define TO_PUBLISH 1
 #define NOT_TO_PUBLISH 0
 
+/* maximum number of parallel executions of the CSPRNG */
+#define PAR_DEGREE 4
 
 /* PQClean-edit: avoid VLA */
 #define SIZEOF_UINT16 2
@@ -207,11 +204,7 @@ static void compute_seeds_to_publish(
    }
 } /* end compute_seeds_to_publish */
 
-
-/////////////////////////////////////////////////////////////////////////
-
-/////////////////////////////////////////////////////////////////////////
-
+/*****************************************************************************/
 /**
  * unsigned char *seed_tree:
  * it is intended as an output parameter;
@@ -224,6 +217,7 @@ static void compute_seeds_to_publish(
  *             from roots to leaves layer-by-layer from left to right,
  *             counting from 0 (the integer bound with the root node)"
  */
+
 void PQCLEAN_CROSSRSDP256SMALL_CLEAN_generate_seed_tree_from_root(unsigned char
                                   seed_tree[NUM_NODES_SEED_TREE * SEED_LENGTH_BYTES],
                                   const unsigned char root_seed[SEED_LENGTH_BYTES],
@@ -231,27 +225,20 @@ void PQCLEAN_CROSSRSDP256SMALL_CLEAN_generate_seed_tree_from_root(unsigned char
 {
    /* input buffer to the CSPRNG, contains a salt, the seed to be expanded
     * and the integer index of the node being expanded for domain separation */
+   unsigned char csprng_inputs[PAR_DEGREE][CSPRNG_INPUT_LEN];
 
-   unsigned char csprng_input_1[CSPRNG_INPUT_LEN];
-   unsigned char csprng_input_2[CSPRNG_INPUT_LEN];
-   unsigned char csprng_input_3[CSPRNG_INPUT_LEN];
-   unsigned char csprng_input_4[CSPRNG_INPUT_LEN];
+   PAR_CSPRNG_STATE_T tree_csprng_state;
 
-   unsigned char discarded_input[CSPRNG_INPUT_LEN];
+   for(int i = 0; i < PAR_DEGREE; i++){
+      memcpy(csprng_inputs[i]+SEED_LENGTH_BYTES, salt, SALT_LENGTH_BYTES);
+   }
 
-   /*
-   CSPRNG_STATE_T tree_csprng_x1_state;
-   CSPRNG_X2_STATE_T tree_csprng_x2_state;
-   CSPRNG_X3_STATE_T tree_csprng_x3_state;
-   CSPRNG_X4_STATE_T tree_csprng_x4_state;
-   */
-   PAR_CSPRNG_STATE_T state;
+   uint16_t father_node_idxs[PAR_DEGREE];
+   uint16_t father_node_storage_idxs[PAR_DEGREE];
 
-   memcpy(csprng_input_1+SEED_LENGTH_BYTES, salt, SALT_LENGTH_BYTES);
-   memcpy(csprng_input_2+SEED_LENGTH_BYTES, salt, SALT_LENGTH_BYTES);
-   memcpy(csprng_input_3+SEED_LENGTH_BYTES, salt, SALT_LENGTH_BYTES);
-   memcpy(csprng_input_4+SEED_LENGTH_BYTES, salt, SALT_LENGTH_BYTES);
-
+   unsigned char *left_children[PAR_DEGREE];
+   unsigned char *right_children[PAR_DEGREE];
+   
    unsigned char discarded_seed[SEED_LENGTH_BYTES];
 
    /* Set the root seed in the tree from the received parameter */
@@ -265,7 +252,7 @@ void PQCLEAN_CROSSRSDP256SMALL_CLEAN_generate_seed_tree_from_root(unsigned char
    const int nodes_in_level[LOG2(T)+1] = NODES_PER_LEVEL_ARRAY;
    int ancestors = 0;
    for (int level = 0; level < LOG2(T); level++){
-      /**
+      /*
        * Parallelize the random seed generation process.
        * The parallelization strategy depends on the number of nodes in the level:
        * - 1 node   >> call shake    >> generate 2 children
@@ -292,186 +279,32 @@ void PQCLEAN_CROSSRSDP256SMALL_CLEAN_generate_seed_tree_from_root(unsigned char
       /* for each group of nodes in the level apply the correct parallelization strategy */
       int nodes_in_level_used = 0;
       for(int set = 0; set < sets_of_nodes; set++) {
-
-         if(nodes_in_set[set] == 1) {
+         for(int i = 0; i < PAR_DEGREE; i++){
+            left_children[i] = discarded_seed;
+            right_children[i] = discarded_seed;
+         }
+         for(int i = 0; i < nodes_in_set[set]; i++){
+            father_node_idxs[i] = ancestors + nodes_in_level_used;
+            father_node_storage_idxs[i] = father_node_idxs[i] - missing_nodes_before[level];
             nodes_in_level_used++;
-            uint16_t father_node_idx = ancestors - 1 + nodes_in_level_used;
-            uint16_t father_node_storage_idx = father_node_idx -missing_nodes_before[level];
-            /* prepare the CSPRNG input to expand the children of node i */
-            /* csprng_input[] = seed || salt || index_of_expanded_node */
-            memcpy(csprng_input_1,
-                  seed_tree + father_node_storage_idx*SEED_LENGTH_BYTES,
-                  SEED_LENGTH_BYTES);
-            *((uint16_t *)(csprng_input_1 + SALT_LENGTH_BYTES + SEED_LENGTH_BYTES)) = father_node_idx;
-            /* expand the children (stored contiguously) */
-            par_initialize_csprng(1, &state, csprng_input_1, discarded_input, discarded_input, discarded_input, CSPRNG_INPUT_LEN);
-            par_csprng_randombytes(1, &state, seed_tree + (LEFT_CHILD(father_node_idx) - missing_nodes_before[level+1] ) *SEED_LENGTH_BYTES, discarded_seed, discarded_seed, discarded_seed,
-                              SEED_LENGTH_BYTES
-                              );
-            if ((RIGHT_CHILD(father_node_idx)- missing_nodes_before[level+1]) < NUM_NODES_SEED_TREE ) {
-               par_csprng_randombytes(1, &state, seed_tree + (RIGHT_CHILD(father_node_idx)- missing_nodes_before[level+1])*SEED_LENGTH_BYTES, discarded_seed, discarded_seed, discarded_seed,
-                                    SEED_LENGTH_BYTES
-                                    );
+            /* prepare the children of node i to be expanded */
+            memcpy(csprng_inputs[i], seed_tree + father_node_storage_idxs[i]*SEED_LENGTH_BYTES, SEED_LENGTH_BYTES);
+            *((uint16_t *)(csprng_inputs[i] + SALT_LENGTH_BYTES + SEED_LENGTH_BYTES)) = father_node_idxs[i];
+            left_children[i] = seed_tree + (LEFT_CHILD(father_node_idxs[i]) - missing_nodes_before[level+1])*SEED_LENGTH_BYTES;
+            /* the last leaf might not be needed */
+            if ((RIGHT_CHILD(father_node_idxs[i]) - missing_nodes_before[level+1]) < NUM_NODES_SEED_TREE ) {
+               right_children[i] = seed_tree + (RIGHT_CHILD(father_node_idxs[i]) - missing_nodes_before[level+1])*SEED_LENGTH_BYTES;
             }
-            par_csprng_release(1, &state);
          }
-
-         else if(nodes_in_set[set] == 2) {
-            nodes_in_level_used += 2;
-            uint16_t father_node_idx_1 = ancestors - 1 + nodes_in_level_used - 1;
-            uint16_t father_node_idx_2 = ancestors - 1 + nodes_in_level_used;
-            uint16_t father_node_storage_idx_1 = father_node_idx_1 - missing_nodes_before[level];
-            uint16_t father_node_storage_idx_2 = father_node_idx_2 - missing_nodes_before[level];
-            /* prepare the CSPRNG input */
-            memcpy(csprng_input_1,
-                  seed_tree + father_node_storage_idx_1*SEED_LENGTH_BYTES,
-                  SEED_LENGTH_BYTES);
-            memcpy(csprng_input_2,
-                  seed_tree + father_node_storage_idx_2*SEED_LENGTH_BYTES,
-                  SEED_LENGTH_BYTES);
-            *((uint16_t *)(csprng_input_1 + SALT_LENGTH_BYTES + SEED_LENGTH_BYTES)) = father_node_idx_1;
-            *((uint16_t *)(csprng_input_2 + SALT_LENGTH_BYTES + SEED_LENGTH_BYTES)) = father_node_idx_2;
-            /* expand the 2 left children */
-            par_initialize_csprng(2, &state, csprng_input_1, csprng_input_2, discarded_input, discarded_input, CSPRNG_INPUT_LEN);
-            unsigned char *left_child_1 = seed_tree + (LEFT_CHILD(father_node_idx_1) - missing_nodes_before[level+1])*SEED_LENGTH_BYTES;
-            unsigned char *left_child_2 = seed_tree + (LEFT_CHILD(father_node_idx_2) - missing_nodes_before[level+1])*SEED_LENGTH_BYTES;
-            par_csprng_randombytes(2, &state, left_child_1,
-                                 left_child_2, discarded_seed, discarded_seed,
-                                 SEED_LENGTH_BYTES
-                                 );
-            /* expand the 2 right children */             
-            /* if the rightmost child is a leaf then it might not be needed */
-            unsigned char *right_child_1 = seed_tree + (RIGHT_CHILD(father_node_idx_1) - missing_nodes_before[level+1])*SEED_LENGTH_BYTES;
-            unsigned char *right_child_2;
-            if ((RIGHT_CHILD(father_node_idx_2) - missing_nodes_before[level+1]) < NUM_NODES_SEED_TREE ) {
-               right_child_2 = seed_tree + (RIGHT_CHILD(father_node_idx_2) - missing_nodes_before[level+1])*SEED_LENGTH_BYTES;
-            }
-            else {
-               right_child_2 = discarded_seed;
-            }
-            par_csprng_randombytes(2, &state, right_child_1,
-                                 right_child_2, discarded_seed, discarded_seed,
-                                 SEED_LENGTH_BYTES
-                                 );
-            par_csprng_release(2, &state);
-         }
-
-         else if(nodes_in_set[set] == 3) {
-            nodes_in_level_used += 3;
-            uint16_t father_node_idx_1 = ancestors - 1 + nodes_in_level_used - 2;
-            uint16_t father_node_idx_2 = ancestors - 1 + nodes_in_level_used - 1;
-            uint16_t father_node_idx_3 = ancestors - 1 + nodes_in_level_used;
-            uint16_t father_node_storage_idx_1 = father_node_idx_1 - missing_nodes_before[level];
-            uint16_t father_node_storage_idx_2 = father_node_idx_2 - missing_nodes_before[level];
-            uint16_t father_node_storage_idx_3 = father_node_idx_3 - missing_nodes_before[level];
-            /* prepare the CSPRNG input */
-            memcpy(csprng_input_1,
-                  seed_tree + father_node_storage_idx_1*SEED_LENGTH_BYTES,
-                  SEED_LENGTH_BYTES);
-            memcpy(csprng_input_2,
-                  seed_tree + father_node_storage_idx_2*SEED_LENGTH_BYTES,
-                  SEED_LENGTH_BYTES);
-            memcpy(csprng_input_3,                
-                  seed_tree + father_node_storage_idx_3*SEED_LENGTH_BYTES,
-                  SEED_LENGTH_BYTES);
-            *((uint16_t *)(csprng_input_1 + SALT_LENGTH_BYTES + SEED_LENGTH_BYTES)) = father_node_idx_1;
-            *((uint16_t *)(csprng_input_2 + SALT_LENGTH_BYTES + SEED_LENGTH_BYTES)) = father_node_idx_2;
-            *((uint16_t *)(csprng_input_3 + SALT_LENGTH_BYTES + SEED_LENGTH_BYTES)) = father_node_idx_3;
-            /* expand the 3 left children */
-            par_initialize_csprng(3, &state, csprng_input_1, csprng_input_2, csprng_input_3, discarded_input, CSPRNG_INPUT_LEN);
-            unsigned char *left_child_1 = seed_tree + (LEFT_CHILD(father_node_idx_1) - missing_nodes_before[level+1])*SEED_LENGTH_BYTES;
-            unsigned char *left_child_2 = seed_tree + (LEFT_CHILD(father_node_idx_2) - missing_nodes_before[level+1])*SEED_LENGTH_BYTES;
-            unsigned char *left_child_3 = seed_tree + (LEFT_CHILD(father_node_idx_3) - missing_nodes_before[level+1])*SEED_LENGTH_BYTES;
-            par_csprng_randombytes(3, &state, left_child_1,
-                                 left_child_2,
-                                 left_child_3, discarded_seed,
-                                 SEED_LENGTH_BYTES
-                                 );
-            /* expand the 3 right children */
-            /* if the rightmost child is a leaf then it might not be needed */
-            unsigned char *right_child_1 = seed_tree + (RIGHT_CHILD(father_node_idx_1) - missing_nodes_before[level+1])*SEED_LENGTH_BYTES;
-            unsigned char *right_child_2 = seed_tree + (RIGHT_CHILD(father_node_idx_2) - missing_nodes_before[level+1])*SEED_LENGTH_BYTES;
-            unsigned char *right_child_3;
-            if ((RIGHT_CHILD(father_node_idx_3) - missing_nodes_before[level+1]) < NUM_NODES_SEED_TREE ) {
-               right_child_3 = seed_tree + (RIGHT_CHILD(father_node_idx_3) - missing_nodes_before[level+1])*SEED_LENGTH_BYTES;
-            }
-            else {
-               right_child_3 = discarded_seed;
-            }
-            par_csprng_randombytes(3, &state, right_child_1,
-                                 right_child_2,
-                                 right_child_3, discarded_seed,
-                                 SEED_LENGTH_BYTES
-                                 );
-            par_csprng_release(3, &state);
-         }
-
-         else if(nodes_in_set[set] == 4) {
-            nodes_in_level_used += 4;
-            uint16_t father_node_idx_1 = ancestors - 1 + nodes_in_level_used - 3;
-            uint16_t father_node_idx_2 = ancestors - 1 + nodes_in_level_used - 2;
-            uint16_t father_node_idx_3 = ancestors - 1 + nodes_in_level_used - 1;
-            uint16_t father_node_idx_4 = ancestors - 1 + nodes_in_level_used;
-            uint16_t father_node_storage_idx_1 = father_node_idx_1 - missing_nodes_before[level];
-            uint16_t father_node_storage_idx_2 = father_node_idx_2 - missing_nodes_before[level];
-            uint16_t father_node_storage_idx_3 = father_node_idx_3 - missing_nodes_before[level];
-            uint16_t father_node_storage_idx_4 = father_node_idx_4 - missing_nodes_before[level];
-            /* prepare the CSPRNG input */
-            memcpy(csprng_input_1,
-                  seed_tree + father_node_storage_idx_1*SEED_LENGTH_BYTES,
-                  SEED_LENGTH_BYTES);
-            memcpy(csprng_input_2,
-                  seed_tree + father_node_storage_idx_2*SEED_LENGTH_BYTES,
-                  SEED_LENGTH_BYTES);
-            memcpy(csprng_input_3,
-                  seed_tree + father_node_storage_idx_3*SEED_LENGTH_BYTES,
-                  SEED_LENGTH_BYTES);
-            memcpy(csprng_input_4,
-                  seed_tree + father_node_storage_idx_4*SEED_LENGTH_BYTES,
-                  SEED_LENGTH_BYTES);
-            *((uint16_t *)(csprng_input_1 + SALT_LENGTH_BYTES + SEED_LENGTH_BYTES)) = father_node_idx_1;
-            *((uint16_t *)(csprng_input_2 + SALT_LENGTH_BYTES + SEED_LENGTH_BYTES)) = father_node_idx_2;
-            *((uint16_t *)(csprng_input_3 + SALT_LENGTH_BYTES + SEED_LENGTH_BYTES)) = father_node_idx_3;
-            *((uint16_t *)(csprng_input_4 + SALT_LENGTH_BYTES + SEED_LENGTH_BYTES)) = father_node_idx_4;
-            /* expand the 4 left children */
-            par_initialize_csprng(4, &state, csprng_input_1, csprng_input_2, csprng_input_3, csprng_input_4, CSPRNG_INPUT_LEN);
-            unsigned char *left_child_1 = seed_tree + (LEFT_CHILD(father_node_idx_1) - missing_nodes_before[level+1])*SEED_LENGTH_BYTES;
-            unsigned char *left_child_2 = seed_tree + (LEFT_CHILD(father_node_idx_2) - missing_nodes_before[level+1])*SEED_LENGTH_BYTES;
-            unsigned char *left_child_3 = seed_tree + (LEFT_CHILD(father_node_idx_3) - missing_nodes_before[level+1])*SEED_LENGTH_BYTES;
-            unsigned char *left_child_4 = seed_tree + (LEFT_CHILD(father_node_idx_4) - missing_nodes_before[level+1])*SEED_LENGTH_BYTES;
-            par_csprng_randombytes(4, &state, left_child_1,
-                                 left_child_2,
-                                 left_child_3,
-                                 left_child_4,
-                                 SEED_LENGTH_BYTES);
-            /* expand the 4 right children */
-            /* if the rightmost child is a leaf then it might not be needed */
-            unsigned char *right_child_1 = seed_tree + (RIGHT_CHILD(father_node_idx_1) - missing_nodes_before[level+1])*SEED_LENGTH_BYTES;
-            unsigned char *right_child_2 = seed_tree + (RIGHT_CHILD(father_node_idx_2) - missing_nodes_before[level+1])*SEED_LENGTH_BYTES;
-            unsigned char *right_child_3 = seed_tree + (RIGHT_CHILD(father_node_idx_3) - missing_nodes_before[level+1])*SEED_LENGTH_BYTES;
-            unsigned char *right_child_4;
-            if ((RIGHT_CHILD(father_node_idx_4) - missing_nodes_before[level+1]) < NUM_NODES_SEED_TREE ) {
-               right_child_4 = seed_tree + (RIGHT_CHILD(father_node_idx_4) - missing_nodes_before[level+1])*SEED_LENGTH_BYTES;
-            }
-            else {
-               right_child_4 = discarded_seed;
-            }
-            par_csprng_randombytes(4, &state, right_child_1,
-                                 right_child_2,
-                                 right_child_3,
-                                 right_child_4,
-                                 SEED_LENGTH_BYTES);
-            par_csprng_release(4, &state);
-         }
-
+         par_initialize_csprng(nodes_in_set[set], &tree_csprng_state, csprng_inputs[0], csprng_inputs[1], csprng_inputs[2], csprng_inputs[3], CSPRNG_INPUT_LEN);
+         par_csprng_randombytes(nodes_in_set[set], &tree_csprng_state, left_children[0], left_children[1], left_children[2], left_children[3], SEED_LENGTH_BYTES);
+         par_csprng_randombytes(nodes_in_set[set], &tree_csprng_state, right_children[0], right_children[1], right_children[2], right_children[3], SEED_LENGTH_BYTES);
+         par_csprng_release(nodes_in_set[set], &tree_csprng_state);
       }
 
     ancestors += (1L << level);
    }
 } /* end generate_seed_tree */
-
-
-
 
 /*****************************************************************************/
 int PQCLEAN_CROSSRSDP256SMALL_CLEAN_publish_seeds(unsigned char *seed_storage,
@@ -530,25 +363,25 @@ int PQCLEAN_CROSSRSDP256SMALL_CLEAN_regenerate_round_seeds(unsigned char
     * oldest ancestor of sets of nodes equal to 0 are to be released */
    unsigned char flags_tree_to_publish[NUM_NODES_STENCIL_SEED_TREE] = {0};
    compute_seeds_to_publish(flags_tree_to_publish, indices_to_publish);
+   
+   unsigned char csprng_inputs[PAR_DEGREE][CSPRNG_INPUT_LEN];
 
-   unsigned char csprng_input_1[CSPRNG_INPUT_LEN];
-   unsigned char csprng_input_2[CSPRNG_INPUT_LEN];
-   unsigned char csprng_input_3[CSPRNG_INPUT_LEN];
-   unsigned char csprng_input_4[CSPRNG_INPUT_LEN];
+   PAR_CSPRNG_STATE_T tree_csprng_state;
 
-   CSPRNG_STATE_T tree_csprng_x1_state;
-   CSPRNG_X2_STATE_T tree_csprng_x2_state;
-   CSPRNG_X3_STATE_T tree_csprng_x3_state;
-   CSPRNG_X4_STATE_T tree_csprng_x4_state;
+   for(int i = 0; i < PAR_DEGREE; i++){
+      memcpy(csprng_inputs[i]+SEED_LENGTH_BYTES, salt, SALT_LENGTH_BYTES);
+   }
 
-   memcpy(csprng_input_1+SEED_LENGTH_BYTES, salt, SALT_LENGTH_BYTES);
-   memcpy(csprng_input_2+SEED_LENGTH_BYTES, salt, SALT_LENGTH_BYTES);
-   memcpy(csprng_input_3+SEED_LENGTH_BYTES, salt, SALT_LENGTH_BYTES);
-   memcpy(csprng_input_4+SEED_LENGTH_BYTES, salt, SALT_LENGTH_BYTES);
+   uint16_t father_node_idxs[PAR_DEGREE];
+   uint16_t father_node_storage_idxs[PAR_DEGREE];
+
+   unsigned char *left_children[PAR_DEGREE];
+   unsigned char *right_children[PAR_DEGREE];
 
    unsigned char discarded_seed[SEED_LENGTH_BYTES];
 
    int nodes_used = 0;
+
    /* missing_nodes_before[i] contains the total number of missing nodes before
     * level i. Level 0 is taken to be the tree root This constant vector is precomputed */
    const int missing_nodes_before[LOG2(T)+1] = MISSING_NODES_BEFORE_LEVEL_ARRAY;
@@ -580,12 +413,12 @@ int PQCLEAN_CROSSRSDP256SMALL_CLEAN_regenerate_round_seeds(unsigned char
     * disclosed */
    ancestors = 0;
 
-   for (int level = 0; level <= LOG2(T); level++){
+   for (int level = 0; level < LOG2(T); level++){
       
-      /* Apply the same parallel seed generation strategy used during signing
+      /* apply the same parallel seed generation strategy used during signing
        * see function generate_seed_tree_from_root for a full description */
       
-      /* The groups of nodes are smaller here wrt signing, because some of the nodes are not bublished */
+      /* the groups of nodes are less here wrt signing, because some of the nodes are not bublished */
       int published_nodes_in_level = 0;
       for (int node_in_level = 0; node_in_level < nodes_in_level[level]; node_in_level++) {
          if (flags_tree_to_publish[ancestors + node_in_level] == TO_PUBLISH) {
@@ -593,249 +426,48 @@ int PQCLEAN_CROSSRSDP256SMALL_CLEAN_regenerate_round_seeds(unsigned char
          }
       }
       
-      /* To divide the level-nodes in groups compute the number of nodes in each group */
-      int sets_of_nodes = published_nodes_in_level / 4;
-      int nodes_left = published_nodes_in_level % 4;
-      if(nodes_left) sets_of_nodes++;
+      if(published_nodes_in_level > 0) {
       
-      if(sets_of_nodes > 0) {
-      
+         /* to divide the published level-nodes in groups compute the number of nodes in each group */
+         int sets_of_nodes = published_nodes_in_level / 4;
+         int nodes_left = published_nodes_in_level % 4;
+         if(nodes_left) sets_of_nodes++;  
          int nodes_in_set[sets_of_nodes];
          for(int i = 0; i < sets_of_nodes; i++){
             nodes_in_set[i] = 4;
          }
          if(nodes_left) nodes_in_set[sets_of_nodes-1] = nodes_left;
 
-         /* For each group of published nodes in the level apply the correct parallelization strategy */
+         /* for each group of published nodes in the level apply the correct parallelization strategy */
          int nodes_in_level_used = 0;
          for(int set = 0; set < sets_of_nodes; set++) {
-
-            if(nodes_in_set[set] == 1) {            
-
-               /* Find the first published node in the group */
+            for(int i = 0; i < PAR_DEGREE; i++){
+               left_children[i] = discarded_seed;
+               right_children[i] = discarded_seed;
+            }
+            for(int i = 0; i < nodes_in_set[set]; i++){
+               /* find the next published node */
                while (flags_tree_to_publish[ancestors + nodes_in_level_used] == NOT_TO_PUBLISH) {
                   nodes_in_level_used++;
                }
+               /* prepare its childen to be expanded */
+               father_node_idxs[i] = ancestors + nodes_in_level_used;
+               father_node_storage_idxs[i] = father_node_idxs[i] - missing_nodes_before[level];
                nodes_in_level_used++;
-               uint16_t father_node_idx = ancestors - 1 + nodes_in_level_used;
-               uint16_t father_node_storage_idx = father_node_idx -missing_nodes_before[level];
-
-               /* if the current node is published and not a leaf, CSPRNG-expand its children */
-               if ( level < LOG2(T) ){
-                     /* prepare the CSPRNG input to expand the children of node father_node_idx */
-                     /* csprng_input[] = seed || salt || index_of_expanded_node */
-                     memcpy(csprng_input_1,
-                           seed_tree + (father_node_storage_idx)*SEED_LENGTH_BYTES,
-                           SEED_LENGTH_BYTES);
-                     *((uint16_t *)(csprng_input_1 + SALT_LENGTH_BYTES + SEED_LENGTH_BYTES)) = father_node_idx;
-                     /* expand the children (stored contiguously) */
-                     initialize_csprng(&tree_csprng_x1_state, csprng_input_1, CSPRNG_INPUT_LEN);
-                     csprng_randombytes(seed_tree + (LEFT_CHILD(father_node_idx)-missing_nodes_before[level+1])*SEED_LENGTH_BYTES,
-                                       SEED_LENGTH_BYTES,
-                                       &tree_csprng_x1_state);
-                     csprng_randombytes(seed_tree + (RIGHT_CHILD(father_node_idx)-missing_nodes_before[level+1])*SEED_LENGTH_BYTES,
-                                       SEED_LENGTH_BYTES,
-                                       &tree_csprng_x1_state);
-                     csprng_release(&tree_csprng_x1_state);
+               memcpy(csprng_inputs[i], seed_tree + father_node_storage_idxs[i]*SEED_LENGTH_BYTES, SEED_LENGTH_BYTES);
+               *((uint16_t *)(csprng_inputs[i] + SALT_LENGTH_BYTES + SEED_LENGTH_BYTES)) = father_node_idxs[i];
+               left_children[i] = seed_tree + (LEFT_CHILD(father_node_idxs[i]) - missing_nodes_before[level+1])*SEED_LENGTH_BYTES;
+               /* the last leaf might not be needed */
+               if ((RIGHT_CHILD(father_node_idxs[i]) - missing_nodes_before[level+1]) < NUM_NODES_SEED_TREE ) {
+                  right_children[i] = seed_tree + (RIGHT_CHILD(father_node_idxs[i]) - missing_nodes_before[level+1])*SEED_LENGTH_BYTES;
                }
             }
-
-            if(nodes_in_set[set] == 2) {
-               /* Find the first and second published nodes in the group */
-               while (flags_tree_to_publish[ancestors + nodes_in_level_used] == NOT_TO_PUBLISH) {
-                  nodes_in_level_used++;
-               }
-               nodes_in_level_used++;
-               uint16_t father_node_idx_1 = ancestors - 1 + nodes_in_level_used;
-               uint16_t father_node_storage_idx_1 = father_node_idx_1 -missing_nodes_before[level];
-               while (flags_tree_to_publish[ancestors + nodes_in_level_used] == NOT_TO_PUBLISH) {
-                     nodes_in_level_used++;
-               }
-               nodes_in_level_used++;
-               uint16_t father_node_idx_2 = ancestors - 1 + nodes_in_level_used;
-               uint16_t father_node_storage_idx_2 = father_node_idx_2 -missing_nodes_before[level];
-               /* If the nodes in the group are not leaves, expand their children */
-               if ( level < LOG2(T) ){
-                  memcpy(csprng_input_1,
-                     seed_tree + father_node_storage_idx_1*SEED_LENGTH_BYTES,
-                     SEED_LENGTH_BYTES);
-                  memcpy(csprng_input_2,
-                     seed_tree + father_node_storage_idx_2*SEED_LENGTH_BYTES,
-                     SEED_LENGTH_BYTES);
-               *((uint16_t *)(csprng_input_1 + SALT_LENGTH_BYTES + SEED_LENGTH_BYTES)) = father_node_idx_1;
-               *((uint16_t *)(csprng_input_2 + SALT_LENGTH_BYTES + SEED_LENGTH_BYTES)) = father_node_idx_2;
-               /* expand the 2 left children */
-               initialize_csprng_x2(&tree_csprng_x2_state, csprng_input_1, csprng_input_2, CSPRNG_INPUT_LEN);
-               unsigned char *left_child_1 = seed_tree + (LEFT_CHILD(father_node_idx_1) - missing_nodes_before[level+1])*SEED_LENGTH_BYTES;
-               unsigned char *left_child_2 = seed_tree + (LEFT_CHILD(father_node_idx_2) - missing_nodes_before[level+1])*SEED_LENGTH_BYTES;
-               csprng_randombytes_x2(left_child_1,
-                                    left_child_2,
-                                    SEED_LENGTH_BYTES,
-                                    &tree_csprng_x2_state);
-               /* expand the 2 right children */             
-               /* if the rightmost child is a leaf then it might not be needed */
-               unsigned char *right_child_1 = seed_tree + (RIGHT_CHILD(father_node_idx_1) - missing_nodes_before[level+1])*SEED_LENGTH_BYTES;
-               unsigned char *right_child_2;
-               if ((RIGHT_CHILD(father_node_idx_2) - missing_nodes_before[level+1]) < NUM_NODES_SEED_TREE ) {
-                  right_child_2 = seed_tree + (RIGHT_CHILD(father_node_idx_2) - missing_nodes_before[level+1])*SEED_LENGTH_BYTES;
-               }
-               else {
-                  right_child_2 = discarded_seed;
-               }
-               csprng_randombytes_x2(right_child_1,
-                                    right_child_2,
-                                    SEED_LENGTH_BYTES,
-                                    &tree_csprng_x2_state);
-               csprng_release_x2(&tree_csprng_x2_state);
-               }
-            }
-
-            if(nodes_in_set[set] == 3) {
-               /* Find the first, second and third published nodes in the group */
-               while (flags_tree_to_publish[ancestors + nodes_in_level_used] == NOT_TO_PUBLISH) {
-                  nodes_in_level_used++;
-               }
-               nodes_in_level_used++;
-               uint16_t father_node_idx_1 = ancestors - 1 + nodes_in_level_used;
-               uint16_t father_node_storage_idx_1 = father_node_idx_1 -missing_nodes_before[level];
-               while (flags_tree_to_publish[ancestors + nodes_in_level_used] == NOT_TO_PUBLISH) {
-                     nodes_in_level_used++;
-               }
-               nodes_in_level_used++;
-               uint16_t father_node_idx_2 = ancestors - 1 + nodes_in_level_used;
-               uint16_t father_node_storage_idx_2 = father_node_idx_2 -missing_nodes_before[level];
-               while (flags_tree_to_publish[ancestors + nodes_in_level_used] == NOT_TO_PUBLISH) {
-                     nodes_in_level_used++;
-               }
-               nodes_in_level_used++;
-               uint16_t father_node_idx_3 = ancestors - 1 + nodes_in_level_used;
-               uint16_t father_node_storage_idx_3 = father_node_idx_3 -missing_nodes_before[level];
-               /* If the nodes in the group are not leaves, expand their children */
-               if ( level < LOG2(T) ){
-                  memcpy(csprng_input_1,
-                        seed_tree + father_node_storage_idx_1*SEED_LENGTH_BYTES,
-                        SEED_LENGTH_BYTES);
-                  memcpy(csprng_input_2,
-                        seed_tree + father_node_storage_idx_2*SEED_LENGTH_BYTES,
-                        SEED_LENGTH_BYTES);
-                  memcpy(csprng_input_3,                
-                        seed_tree + father_node_storage_idx_3*SEED_LENGTH_BYTES,
-                        SEED_LENGTH_BYTES);
-                  *((uint16_t *)(csprng_input_1 + SALT_LENGTH_BYTES + SEED_LENGTH_BYTES)) = father_node_idx_1;
-                  *((uint16_t *)(csprng_input_2 + SALT_LENGTH_BYTES + SEED_LENGTH_BYTES)) = father_node_idx_2;
-                  *((uint16_t *)(csprng_input_3 + SALT_LENGTH_BYTES + SEED_LENGTH_BYTES)) = father_node_idx_3;
-                  /* expand the 3 left children */
-                  initialize_csprng_x3(&tree_csprng_x3_state, csprng_input_1, csprng_input_2, csprng_input_3, CSPRNG_INPUT_LEN);
-                  unsigned char *left_child_1 = seed_tree + (LEFT_CHILD(father_node_idx_1) - missing_nodes_before[level+1])*SEED_LENGTH_BYTES;
-                  unsigned char *left_child_2 = seed_tree + (LEFT_CHILD(father_node_idx_2) - missing_nodes_before[level+1])*SEED_LENGTH_BYTES;
-                  unsigned char *left_child_3 = seed_tree + (LEFT_CHILD(father_node_idx_3) - missing_nodes_before[level+1])*SEED_LENGTH_BYTES;
-                  csprng_randombytes_x3(left_child_1,
-                                       left_child_2,
-                                       left_child_3,
-                                       SEED_LENGTH_BYTES,
-                                       &tree_csprng_x3_state);
-                  /* expand the 3 right children */
-                  /* if the rightmost child is a leaf then it might not be needed */
-                  unsigned char *right_child_1 = seed_tree + (RIGHT_CHILD(father_node_idx_1) - missing_nodes_before[level+1])*SEED_LENGTH_BYTES;
-                  unsigned char *right_child_2 = seed_tree + (RIGHT_CHILD(father_node_idx_2) - missing_nodes_before[level+1])*SEED_LENGTH_BYTES;
-                  unsigned char *right_child_3;
-                  if ((RIGHT_CHILD(father_node_idx_3) - missing_nodes_before[level+1]) < NUM_NODES_SEED_TREE ) {
-                     right_child_3 = seed_tree + (RIGHT_CHILD(father_node_idx_3) - missing_nodes_before[level+1])*SEED_LENGTH_BYTES;
-                  }
-                  else {
-                     right_child_3 = discarded_seed;
-                  }
-                  csprng_randombytes_x3(right_child_1,
-                                       right_child_2,
-                                       right_child_3,
-                                       SEED_LENGTH_BYTES,
-                                       &tree_csprng_x3_state);
-                  csprng_release_x3(&tree_csprng_x3_state);
-               }
-
-            }
-
-            if(nodes_in_set[set] == 4) {
-               /* Find the first, second, third and fourth published nodes in the group */
-               while (flags_tree_to_publish[ancestors + nodes_in_level_used] == NOT_TO_PUBLISH) {
-                  nodes_in_level_used++;
-               }
-               nodes_in_level_used++;
-               uint16_t father_node_idx_1 = ancestors - 1 + nodes_in_level_used;
-               uint16_t father_node_storage_idx_1 = father_node_idx_1 -missing_nodes_before[level];
-               while (flags_tree_to_publish[ancestors + nodes_in_level_used] == NOT_TO_PUBLISH) {
-                     nodes_in_level_used++;
-               }
-               nodes_in_level_used++;
-               uint16_t father_node_idx_2 = ancestors - 1 + nodes_in_level_used;
-               uint16_t father_node_storage_idx_2 = father_node_idx_2 -missing_nodes_before[level];
-               while (flags_tree_to_publish[ancestors + nodes_in_level_used] == NOT_TO_PUBLISH) {
-                     nodes_in_level_used++;
-               }
-               nodes_in_level_used++;
-               uint16_t father_node_idx_3 = ancestors - 1 + nodes_in_level_used;
-               uint16_t father_node_storage_idx_3 = father_node_idx_3 -missing_nodes_before[level];
-               while (flags_tree_to_publish[ancestors + nodes_in_level_used] == NOT_TO_PUBLISH) {
-                     nodes_in_level_used++;
-               }
-               nodes_in_level_used++;
-               uint16_t father_node_idx_4 = ancestors - 1 + nodes_in_level_used;
-               uint16_t father_node_storage_idx_4 = father_node_idx_4 -missing_nodes_before[level];
-               /* If the nodes in the group are not leaves, expand their children */
-               if ( level < LOG2(T) ){
-                  memcpy(csprng_input_1,
-                        seed_tree + father_node_storage_idx_1*SEED_LENGTH_BYTES,
-                        SEED_LENGTH_BYTES);
-                  memcpy(csprng_input_2,
-                        seed_tree + father_node_storage_idx_2*SEED_LENGTH_BYTES,
-                        SEED_LENGTH_BYTES);
-                  memcpy(csprng_input_3,
-                        seed_tree + father_node_storage_idx_3*SEED_LENGTH_BYTES,
-                        SEED_LENGTH_BYTES);
-                  memcpy(csprng_input_4,
-                        seed_tree + father_node_storage_idx_4*SEED_LENGTH_BYTES,
-                        SEED_LENGTH_BYTES);
-                  *((uint16_t *)(csprng_input_1 + SALT_LENGTH_BYTES + SEED_LENGTH_BYTES)) = father_node_idx_1;
-                  *((uint16_t *)(csprng_input_2 + SALT_LENGTH_BYTES + SEED_LENGTH_BYTES)) = father_node_idx_2;
-                  *((uint16_t *)(csprng_input_3 + SALT_LENGTH_BYTES + SEED_LENGTH_BYTES)) = father_node_idx_3;
-                  *((uint16_t *)(csprng_input_4 + SALT_LENGTH_BYTES + SEED_LENGTH_BYTES)) = father_node_idx_4;
-                  /* expand the 4 left children */
-                  initialize_csprng_x4(&tree_csprng_x4_state, csprng_input_1, csprng_input_2, csprng_input_3, csprng_input_4, CSPRNG_INPUT_LEN);
-                  unsigned char *left_child_1 = seed_tree + (LEFT_CHILD(father_node_idx_1) - missing_nodes_before[level+1])*SEED_LENGTH_BYTES;
-                  unsigned char *left_child_2 = seed_tree + (LEFT_CHILD(father_node_idx_2) - missing_nodes_before[level+1])*SEED_LENGTH_BYTES;
-                  unsigned char *left_child_3 = seed_tree + (LEFT_CHILD(father_node_idx_3) - missing_nodes_before[level+1])*SEED_LENGTH_BYTES;
-                  unsigned char *left_child_4 = seed_tree + (LEFT_CHILD(father_node_idx_4) - missing_nodes_before[level+1])*SEED_LENGTH_BYTES;
-                  csprng_randombytes_x4(left_child_1,
-                                       left_child_2,
-                                       left_child_3,
-                                       left_child_4,
-                                       SEED_LENGTH_BYTES,
-                                       &tree_csprng_x4_state);
-                  /* expand the 4 right children */
-                  /* if the rightmost child is a leaf then it might not be needed */
-                  unsigned char *right_child_1 = seed_tree + (RIGHT_CHILD(father_node_idx_1) - missing_nodes_before[level+1])*SEED_LENGTH_BYTES;
-                  unsigned char *right_child_2 = seed_tree + (RIGHT_CHILD(father_node_idx_2) - missing_nodes_before[level+1])*SEED_LENGTH_BYTES;
-                  unsigned char *right_child_3 = seed_tree + (RIGHT_CHILD(father_node_idx_3) - missing_nodes_before[level+1])*SEED_LENGTH_BYTES;
-                  unsigned char *right_child_4;
-                  if ((RIGHT_CHILD(father_node_idx_4) - missing_nodes_before[level+1]) < NUM_NODES_SEED_TREE ) {
-                     right_child_4 = seed_tree + (RIGHT_CHILD(father_node_idx_4) - missing_nodes_before[level+1])*SEED_LENGTH_BYTES;
-                  }
-                  else {
-                     right_child_4 = discarded_seed;
-                  }
-                  csprng_randombytes_x4(right_child_1,
-                                       right_child_2,
-                                       right_child_3,
-                                       right_child_4,
-                                       SEED_LENGTH_BYTES,
-                                       &tree_csprng_x4_state);
-                  csprng_release_x4(&tree_csprng_x4_state);
-               }
-            }
-
+            par_initialize_csprng(nodes_in_set[set], &tree_csprng_state, csprng_inputs[0], csprng_inputs[1], csprng_inputs[2], csprng_inputs[3], CSPRNG_INPUT_LEN);
+            par_csprng_randombytes(nodes_in_set[set], &tree_csprng_state, left_children[0], left_children[1], left_children[2], left_children[3], SEED_LENGTH_BYTES);
+            par_csprng_randombytes(nodes_in_set[set], &tree_csprng_state, right_children[0], right_children[1], right_children[2], right_children[3], SEED_LENGTH_BYTES);
+            par_csprng_release(nodes_in_set[set], &tree_csprng_state);
          }
       }
-
       ancestors += (1L << level);
    }
    return nodes_used;

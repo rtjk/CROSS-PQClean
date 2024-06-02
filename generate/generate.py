@@ -8,6 +8,7 @@ import fileinput
 import re
 import csv
 import shutil
+import datetime
 
 def replace_in_file(path, text_to_search, replacement_text):
   with fileinput.FileInput(path, inplace=True) as file:
@@ -72,4 +73,5 @@ with open(csv_filename, 'r') as csvfile:
             column_value = row[column_name]
             replace_in_dir(dir, column_name, column_value)
 
-print("Implementations placed in", TARGET_DIR)
+current_time = datetime.datetime.now().strftime("%H:%M")
+print("Implementations placed in", TARGET_DIR, "@", current_time)

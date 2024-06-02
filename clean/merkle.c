@@ -192,10 +192,9 @@ void __namespace__generate_merkle_tree(unsigned char merkle_tree[NUM_NODES_MERKL
                HASH_DIGEST_LENGTH);
     }
 
+    /* enqueue the the hash calls */
     unsigned char hash_inputs[PAR_DEGREE][2*HASH_DIGEST_LENGTH];
     unsigned char *hash_outputs[PAR_DEGREE];
-
-    /* enqueue the the hash calls */
     uint16_t to_hash = 0;
     
     /* Hash the child nodes */
@@ -203,7 +202,7 @@ void __namespace__generate_merkle_tree(unsigned char merkle_tree[NUM_NODES_MERKL
     parent_layer = LOG2(T)-1;
     for (i=NUM_NODES_MERKLE_TREE-1; i>0; i -= 2) {
         to_hash++;
-        /* prepare tha hash input (2 children) */
+        /* prepare the hash input (2 children) */
         memcpy(hash_inputs[to_hash-1], merkle_tree + OFFSET(SIBLING(i)), 2*HASH_DIGEST_LENGTH);
         /* prepare the hash output (parent) */
         hash_outputs[to_hash-1] = merkle_tree + OFFSET(PARENT(i) + layer_offsets[parent_layer]);
@@ -306,7 +305,7 @@ void __namespace__rebuild_merkle_tree(unsigned char merkle_tree[NUM_NODES_MERKLE
     size_t i;
 
     /* Input consists of hash digests stored at child nodes and the index of the parent node for domain separation */
-    unsigned char hash_input[2*HASH_DIGEST_LENGTH];
+    //unsigned char hash_input[2*HASH_DIGEST_LENGTH];
 
     /* Move leafs in correct positions of binary merkle tree */
     /* Setup the tree again, computing the offsets and from that, the leaf indices */
@@ -320,6 +319,12 @@ void __namespace__rebuild_merkle_tree(unsigned char merkle_tree[NUM_NODES_MERKLE
             memcpy(merkle_tree + merkle_leaf_indices[i]*HASH_DIGEST_LENGTH, commitments + i, HASH_DIGEST_LENGTH);
         }
     }
+
+    /* enqueue the the hash calls */
+    unsigned char hash_inputs[PAR_DEGREE][2*HASH_DIGEST_LENGTH];
+    unsigned char *hash_outputs[PAR_DEGREE];
+    uint16_t to_hash = 0;
+
     /* Create hash tree by hashing valid leaf nodes */
     ctr = 0;
     node_ctr = 0;
@@ -337,27 +342,38 @@ void __namespace__rebuild_merkle_tree(unsigned char merkle_tree[NUM_NODES_MERKLE
             continue;
         }
 
+        /* the siblings are valid: there is a hash to compute */
+        to_hash++;
+
         /* Prepare input to hash */
         /* Process right sibling from the tree if valid, otherwise take it from the merkle proof */
         if (flag_tree_valid[i] == VALID_MERKLE_NODE) {
-            memcpy(hash_input + HASH_DIGEST_LENGTH, merkle_tree + OFFSET(i), HASH_DIGEST_LENGTH);
+            memcpy(hash_inputs[to_hash-1] + HASH_DIGEST_LENGTH, merkle_tree + OFFSET(i), HASH_DIGEST_LENGTH);
         } else {
-            memcpy(hash_input + HASH_DIGEST_LENGTH, merkle_proof + OFFSET(ctr), HASH_DIGEST_LENGTH);
+            memcpy(hash_inputs[to_hash-1] + HASH_DIGEST_LENGTH, merkle_proof + OFFSET(ctr), HASH_DIGEST_LENGTH);
             ctr++;
         }
 
         /* Process left sibling from the tree if valid, otherwise take it from the merkle proof */
         if (flag_tree_valid[SIBLING(i)] == VALID_MERKLE_NODE) {
-            memcpy(hash_input, merkle_tree + OFFSET(SIBLING(i)), HASH_DIGEST_LENGTH);
+            memcpy(hash_inputs[to_hash-1], merkle_tree + OFFSET(SIBLING(i)), HASH_DIGEST_LENGTH);
         } else {
-            memcpy(hash_input, merkle_proof + OFFSET(ctr), HASH_DIGEST_LENGTH);
+            memcpy(hash_inputs[to_hash-1], merkle_proof + OFFSET(ctr), HASH_DIGEST_LENGTH);
             ctr++;
         }
 
-        /* Hash it and store the digest at the parent node */
-        hash(merkle_tree + OFFSET(PARENT(i) + layer_offsets[parent_layer]), hash_input, 2*HASH_DIGEST_LENGTH);
+        /* prepare the hash output (parent) */
+        hash_outputs[to_hash-1] = merkle_tree + OFFSET(PARENT(i) + layer_offsets[parent_layer]);
         flag_tree_valid[PARENT(i) + layer_offsets[parent_layer]] = VALID_MERKLE_NODE;
 
+        /* hash in batches of 4 (or less on the last few batches) */
+        if(to_hash == 4 || i<9) {
+            printf("[%d]", to_hash);fflush(stdout);
+            par_hash(to_hash, hash_outputs[0], hash_outputs[1], hash_outputs[2], hash_outputs[3], hash_inputs[0], hash_inputs[1], hash_inputs[2], hash_inputs[3], 2*HASH_DIGEST_LENGTH);
+            to_hash = 0;
+        }
+
+        /* jump one layer up */
         if (node_ctr >= (uint32_t) nodes_per_layer[parent_layer+1] - 2) {
             parent_layer--;
             node_ctr = 0;

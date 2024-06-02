@@ -1,0 +1,30 @@
+name: cross-rsdpg-192-balanced
+type: signature
+claimed-nist-level: 3
+length-public-key: 83
+length-secret-key: 48
+length-signature: 23380
+nistkat-sha256: e829f2c411e8bfe5684d6c917bb1fe937c80467a8df8d5e4081afef7e646c17e
+testvectors-sha256: c54342f34b1458ba20d809695763654b7d693d69432d28af7fdf3f9d1486e1e9
+principal-submitters: #TODO: check submitters
+  - Marco Baldi
+  - Alessandro Barenghi
+  - Sebastian Bitzer
+  - Patrick Karl
+  - Felice Manganiello
+  - Alessio Pavoni
+  - Gerardo Pelosi
+  - Paolo Santini
+  - Jonas Schupp
+  - Freeman Slaughter
+  - Antonia Wachter-Zeh
+  - Violetta Weger
+implementations:
+  - name: clean
+    version: 1.2
+  - name: avx2
+    version: 1.2
+    supported_platforms:
+      - architecture: x86_64
+        required_flags:
+          - avx2

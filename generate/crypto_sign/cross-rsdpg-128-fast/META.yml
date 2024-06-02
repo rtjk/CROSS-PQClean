@@ -1,0 +1,30 @@
+name: cross-rsdpg-128-fast
+type: signature
+claimed-nist-level: 1
+length-public-key: 54
+length-secret-key: 32
+length-signature: 12472
+nistkat-sha256: eb6b0fecc3af0dbc92653b766db3466714ba3bc75d461e7c3adae82d5838bdd9
+testvectors-sha256: d18fa79ecc59a84c2f6cdec097d41c5ac720896835c54f243157e6354d0dcba4
+principal-submitters: #TODO: check submitters
+  - Marco Baldi
+  - Alessandro Barenghi
+  - Sebastian Bitzer
+  - Patrick Karl
+  - Felice Manganiello
+  - Alessio Pavoni
+  - Gerardo Pelosi
+  - Paolo Santini
+  - Jonas Schupp
+  - Freeman Slaughter
+  - Antonia Wachter-Zeh
+  - Violetta Weger
+implementations:
+  - name: clean
+    version: 1.2
+  - name: avx2
+    version: 1.2
+    supported_platforms:
+      - architecture: x86_64
+        required_flags:
+          - avx2

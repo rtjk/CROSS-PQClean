@@ -43,7 +43,7 @@
 #define NOT_COMPUTED 0
 #define COMPUTED 1
 
-/* maximum number of parallel executions of the CSPRNG */
+/* maximum number of parallel executions of the hash function */
 #define PAR_DEGREE 4
 
 /*
@@ -206,11 +206,6 @@ void PQCLEAN_CROSSRSDPG128BALANCED_AVX2_generate_merkle_tree(unsigned char merkl
         memcpy(hash_inputs[to_hash-1], merkle_tree + OFFSET(SIBLING(i)), 2*HASH_DIGEST_LENGTH);
         /* prepare the hash output (parent) */
         hash_outputs[to_hash-1] = merkle_tree + OFFSET(PARENT(i) + layer_offsets[parent_layer]);
-        /* hash in batches of 4 (or less on the last few batches) */
-        if(to_hash == 4 || i<8) {
-            par_hash(to_hash, hash_outputs[0], hash_outputs[1], hash_outputs[2], hash_outputs[3], hash_inputs[0], hash_inputs[1], hash_inputs[2], hash_inputs[3], 2*HASH_DIGEST_LENGTH);
-            to_hash = 0;
-        }
         /* jump one layer up */
         if (node_ctr >= (uint32_t) nodes_per_layer[parent_layer+1] - 2) {
             parent_layer--;
@@ -218,9 +213,13 @@ void PQCLEAN_CROSSRSDPG128BALANCED_AVX2_generate_merkle_tree(unsigned char merkl
         } else {
             node_ctr += 2;
         }
+        /* hash in batches of 4 (or less when jumping layers) */
+        if(to_hash == 4 || node_ctr == 0) {
+            par_hash(to_hash, hash_outputs[0], hash_outputs[1], hash_outputs[2], hash_outputs[3], hash_inputs[0], hash_inputs[1], hash_inputs[2], hash_inputs[3], 2*HASH_DIGEST_LENGTH);
+            to_hash = 0;
+        }
     }
 }
-
 
 /* PQCLEAN_CROSSRSDPG128BALANCED_AVX2_generate_merkle_proof()
  *
@@ -366,19 +365,18 @@ void PQCLEAN_CROSSRSDPG128BALANCED_AVX2_rebuild_merkle_tree(unsigned char merkle
         hash_outputs[to_hash-1] = merkle_tree + OFFSET(PARENT(i) + layer_offsets[parent_layer]);
         flag_tree_valid[PARENT(i) + layer_offsets[parent_layer]] = VALID_MERKLE_NODE;
 
-        /* hash in batches of 4 (or less on the last few batches) */
-        if(to_hash == 4 || i<9) {
-            printf("[%d]", to_hash);fflush(stdout);
-            par_hash(to_hash, hash_outputs[0], hash_outputs[1], hash_outputs[2], hash_outputs[3], hash_inputs[0], hash_inputs[1], hash_inputs[2], hash_inputs[3], 2*HASH_DIGEST_LENGTH);
-            to_hash = 0;
-        }
-
         /* jump one layer up */
         if (node_ctr >= (uint32_t) nodes_per_layer[parent_layer+1] - 2) {
             parent_layer--;
             node_ctr = 0;
         } else {
             node_ctr += 2;
+        }
+
+        /* hash in batches of 4 (or less when jumping layers) */
+        if(to_hash == 4 || node_ctr == 0) {
+            par_hash(to_hash, hash_outputs[0], hash_outputs[1], hash_outputs[2], hash_outputs[3], hash_inputs[0], hash_inputs[1], hash_inputs[2], hash_inputs[3], 2*HASH_DIGEST_LENGTH);
+            to_hash = 0;
         }
     }
 }

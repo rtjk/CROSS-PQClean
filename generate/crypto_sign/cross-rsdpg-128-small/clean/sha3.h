@@ -149,6 +149,12 @@ void xof_shake_release(SHAKE_STATE_STRUCT *state)
 //                    SHAKE x4 wrappers                      //
 ///////////////////////////////////////////////////////////////
 
+#define USE_LIBOQS_SHAKE_1
+
+#ifdef USE_LIBOQS_SHAKE
+#include "fips202x4.h"
+#endif
+
 typedef struct {
    SHAKE_STATE_STRUCT state1;
    SHAKE_STATE_STRUCT state2;
@@ -156,15 +162,23 @@ typedef struct {
    SHAKE_STATE_STRUCT state4;
 } shake_x4_ctx;
 
+#ifdef USE_LIBOQS_SHAKE
+#define SHAKE_X4_STATE_STRUCT OQS_SHA3_shake256_x4_inc_ctx
+#else
 #define SHAKE_X4_STATE_STRUCT shake_x4_ctx
+#endif
 
 static inline
 void xof_shake_x4_init(SHAKE_X4_STATE_STRUCT *states)
 {
+#ifdef USE_LIBOQS_SHAKE
+   OQS_SHA3_shake256_x4_inc_init(states);
+#else
    xof_shake_init(&(states->state4), 0);  // change order to simulate parallelism
    xof_shake_init(&(states->state1), 0);
    xof_shake_init(&(states->state2), 0);
    xof_shake_init(&(states->state3), 0);
+#endif
 }
 
 static inline
@@ -175,19 +189,27 @@ void xof_shake_x4_update(SHAKE_X4_STATE_STRUCT *states,
                       const unsigned char *in4,
                       uint32_t singleInputByteLen)
 {
+#ifdef USE_LIBOQS_SHAKE
+   OQS_SHA3_shake256_x4_inc_absorb(states, in1, in2, in3, in4, singleInputByteLen);
+#else
    xof_shake_update(&(states->state4), (const uint8_t *)in4, singleInputByteLen); // change order to simulate parallelism
    xof_shake_update(&(states->state1), (const uint8_t *)in1, singleInputByteLen);
    xof_shake_update(&(states->state2), (const uint8_t *)in2, singleInputByteLen);
    xof_shake_update(&(states->state3), (const uint8_t *)in3, singleInputByteLen);
+#endif
 }
 
 static inline
 void xof_shake_x4_final(SHAKE_X4_STATE_STRUCT *states)
 {
+#ifdef USE_LIBOQS_SHAKE
+   OQS_SHA3_shake256_x4_inc_finalize(states);
+#else
    xof_shake_final(&(states->state1));
    xof_shake_final(&(states->state2));
    xof_shake_final(&(states->state4));  // change order to simulate parallelism
    xof_shake_final(&(states->state3));
+#endif
 }
 
 static inline
@@ -197,19 +219,27 @@ void xof_shake_x4_extract(SHAKE_X4_STATE_STRUCT *states,
                        unsigned char *out3,
                        unsigned char *out4,
                        uint32_t singleOutputByteLen){
+#ifdef USE_LIBOQS_SHAKE
+   OQS_SHA3_shake256_x4_inc_squeeze(out1, out2, out3, out4, singleOutputByteLen, states);
+#else
    xof_shake_extract(&(states->state1), out1, singleOutputByteLen);
    xof_shake_extract(&(states->state2), out2, singleOutputByteLen);
    xof_shake_extract(&(states->state4), out4, singleOutputByteLen); // change order to simulate parallelism
    xof_shake_extract(&(states->state3), out3, singleOutputByteLen);
+#endif
 }
 
 static inline
 void xof_shake_x4_release(SHAKE_X4_STATE_STRUCT *states)
 {
+#ifdef USE_LIBOQS_SHAKE
+   OQS_SHA3_shake256_x4_inc_ctx_release(states);
+#else
    xof_shake_release(&(states->state1));
    xof_shake_release(&(states->state4)); // change order to simulate parallelism
    xof_shake_release(&(states->state2));
    xof_shake_release(&(states->state3));
+#endif
 }
 
 ///////////////////////////////////////////////////////////////

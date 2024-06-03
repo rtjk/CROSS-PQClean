@@ -119,7 +119,7 @@ void csprng_release_x4(CSPRNG_X4_STATE_T * const csprng_state){
 //  SINGLE INTERFACE FOR ALL SHAKE VERSIONS (x1 x2 x3 x4)    //
 ///////////////////////////////////////////////////////////////
 
-#define PAR_CSPRNG_STATE_T par_shake128_ctx
+#define PAR_CSPRNG_STATE_T par_shake_ctx
 
 static inline
 void par_initialize_csprng(int par_level, PAR_CSPRNG_STATE_T * const states, const unsigned char * const seed1, const unsigned char * const seed2,const unsigned char * const seed3,const unsigned char * const seed4,const uint32_t seed_len_bytes) {

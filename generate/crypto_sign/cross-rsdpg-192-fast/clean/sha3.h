@@ -154,17 +154,17 @@ typedef struct {
    SHAKE_STATE_STRUCT state2;
    SHAKE_STATE_STRUCT state3;
    SHAKE_STATE_STRUCT state4;
-} shake128_x4_ctx;
+} shake_x4_ctx;
 
-#define SHAKE_X4_STATE_STRUCT shake128_x4_ctx
+#define SHAKE_X4_STATE_STRUCT shake_x4_ctx
 
 static inline
 void xof_shake_x4_init(SHAKE_X4_STATE_STRUCT *states)
 {
-   shake128_inc_init(&(states->state4));  // change order to simulate parallelism
-   shake128_inc_init(&(states->state1));
-   shake128_inc_init(&(states->state2));
-   shake128_inc_init(&(states->state3));
+   xof_shake_init(&(states->state4), 0);  // change order to simulate parallelism
+   xof_shake_init(&(states->state1), 0);
+   xof_shake_init(&(states->state2), 0);
+   xof_shake_init(&(states->state3), 0);
 }
 
 static inline
@@ -175,19 +175,19 @@ void xof_shake_x4_update(SHAKE_X4_STATE_STRUCT *states,
                       const unsigned char *in4,
                       uint32_t singleInputByteLen)
 {
-   shake128_inc_absorb(&(states->state4), (const uint8_t *)in4, singleInputByteLen); // change order to simulate parallelism
-   shake128_inc_absorb(&(states->state1), (const uint8_t *)in1, singleInputByteLen);
-   shake128_inc_absorb(&(states->state2), (const uint8_t *)in2, singleInputByteLen);
-   shake128_inc_absorb(&(states->state3), (const uint8_t *)in3, singleInputByteLen);
+   xof_shake_update(&(states->state4), (const uint8_t *)in4, singleInputByteLen); // change order to simulate parallelism
+   xof_shake_update(&(states->state1), (const uint8_t *)in1, singleInputByteLen);
+   xof_shake_update(&(states->state2), (const uint8_t *)in2, singleInputByteLen);
+   xof_shake_update(&(states->state3), (const uint8_t *)in3, singleInputByteLen);
 }
 
 static inline
 void xof_shake_x4_final(SHAKE_X4_STATE_STRUCT *states)
 {
-   shake128_inc_finalize(&(states->state1));
-   shake128_inc_finalize(&(states->state2));
-   shake128_inc_finalize(&(states->state4));  // change order to simulate parallelism
-   shake128_inc_finalize(&(states->state3));
+   xof_shake_final(&(states->state1));
+   xof_shake_final(&(states->state2));
+   xof_shake_final(&(states->state4));  // change order to simulate parallelism
+   xof_shake_final(&(states->state3));
 }
 
 static inline
@@ -197,19 +197,19 @@ void xof_shake_x4_extract(SHAKE_X4_STATE_STRUCT *states,
                        unsigned char *out3,
                        unsigned char *out4,
                        uint32_t singleOutputByteLen){
-   shake128_inc_squeeze(out1, singleOutputByteLen, &(states->state1));
-   shake128_inc_squeeze(out2, singleOutputByteLen, &(states->state2));
-   shake128_inc_squeeze(out4, singleOutputByteLen, &(states->state4)); // change order to simulate parallelism
-   shake128_inc_squeeze(out3, singleOutputByteLen, &(states->state3));
+   xof_shake_extract(&(states->state1), out1, singleOutputByteLen);
+   xof_shake_extract(&(states->state2), out2, singleOutputByteLen);
+   xof_shake_extract(&(states->state4), out4, singleOutputByteLen); // change order to simulate parallelism
+   xof_shake_extract(&(states->state3), out3, singleOutputByteLen);
 }
 
 static inline
 void xof_shake_x4_release(SHAKE_X4_STATE_STRUCT *states)
 {
-   shake128_inc_ctx_release(&(states->state1));
-   shake128_inc_ctx_release(&(states->state4)); // change order to simulate parallelism
-   shake128_inc_ctx_release(&(states->state2));
-   shake128_inc_ctx_release(&(states->state3));
+   xof_shake_release(&(states->state1));
+   xof_shake_release(&(states->state4)); // change order to simulate parallelism
+   xof_shake_release(&(states->state2));
+   xof_shake_release(&(states->state3));
 }
 
 ///////////////////////////////////////////////////////////////
@@ -219,15 +219,16 @@ void xof_shake_x4_release(SHAKE_X4_STATE_STRUCT *states)
 typedef struct {
    SHAKE_STATE_STRUCT state1;
    SHAKE_STATE_STRUCT state2;
-} shake128_x2_ctx;
+} shake_x2_ctx;
 
-#define SHAKE_X2_STATE_STRUCT shake128_x2_ctx
+
+#define SHAKE_X2_STATE_STRUCT shake_x2_ctx
 
 static inline
 void xof_shake_x2_init(SHAKE_X2_STATE_STRUCT *states)
 {
-   shake128_inc_init(&(states->state1));
-   shake128_inc_init(&(states->state2));
+   xof_shake_init(&(states->state1), 0);
+   xof_shake_init(&(states->state2), 0);
 }
 
 static inline
@@ -236,15 +237,15 @@ void xof_shake_x2_update(SHAKE_X2_STATE_STRUCT *states,
                       const unsigned char *in2,
                       uint32_t singleInputByteLen)
 {
-   shake128_inc_absorb(&(states->state1), (const uint8_t *)in1, singleInputByteLen);
-   shake128_inc_absorb(&(states->state2), (const uint8_t *)in2, singleInputByteLen);
+   xof_shake_update(&(states->state1), (const uint8_t *)in1, singleInputByteLen);
+   xof_shake_update(&(states->state2), (const uint8_t *)in2, singleInputByteLen);
 }
 
 static inline
 void xof_shake_x2_final(SHAKE_X2_STATE_STRUCT *states)
 {
-   shake128_inc_finalize(&(states->state1));
-   shake128_inc_finalize(&(states->state2));
+   xof_shake_final(&(states->state1));
+   xof_shake_final(&(states->state2));
 }
 
 static inline
@@ -252,15 +253,15 @@ void xof_shake_x2_extract(SHAKE_X2_STATE_STRUCT *states,
                        unsigned char *out1,
                        unsigned char *out2,
                        uint32_t singleOutputByteLen){
-   shake128_inc_squeeze(out1, singleOutputByteLen, &(states->state1));
-   shake128_inc_squeeze(out2, singleOutputByteLen, &(states->state2));
+   xof_shake_extract(&(states->state1), out1, singleOutputByteLen);
+   xof_shake_extract(&(states->state2), out2, singleOutputByteLen);
 }
 
 static inline
 void xof_shake_x2_release(SHAKE_X2_STATE_STRUCT *states)
 {
-   shake128_inc_ctx_release(&(states->state1));
-   shake128_inc_ctx_release(&(states->state2));
+   xof_shake_release(&(states->state1));
+   xof_shake_release(&(states->state2));
 }
 
 ///////////////////////////////////////////////////////////////
@@ -270,4 +271,4 @@ typedef struct {
    SHAKE_STATE_STRUCT state1;
    SHAKE_X2_STATE_STRUCT state2;
    SHAKE_X4_STATE_STRUCT state4;
-} par_shake128_ctx;
+} par_shake_ctx;

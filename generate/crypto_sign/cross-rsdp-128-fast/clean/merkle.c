@@ -23,6 +23,8 @@
 #include <stdint.h>
 #include <string.h>
 
+#include <stdio.h>
+
 #include "merkle.h"
 
 #define LEAVES_FULL_TREE(L) ( (1UL << LOG2(L) ) )
@@ -170,8 +172,9 @@ void get_leaf_indices(uint16_t merkle_leaf_indices[T],
  * const unsigned char commitments[T][HASH_DIGEST_LENGTH]    : Contains the
  * hashed commitments that build the tree.
  */
-void PQCLEAN_CROSSRSDP128FAST_CLEAN_generate_merkle_tree(unsigned char merkle_tree[NUM_NODES_MERKLE_TREE * HASH_DIGEST_LENGTH],
-                                       unsigned char commitments[T][HASH_DIGEST_LENGTH])
+void PQCLEAN_CROSSRSDP128FAST_CLEAN_generate_merkle_tree(unsigned char merkle_tree[NUM_NODES_MERKLE_TREE *
+                                                    HASH_DIGEST_LENGTH],
+                          unsigned char commitments[T][HASH_DIGEST_LENGTH])
 {
     size_t i;
     uint32_t node_ctr, parent_layer;
@@ -192,33 +195,44 @@ void PQCLEAN_CROSSRSDP128FAST_CLEAN_generate_merkle_tree(unsigned char merkle_tr
                HASH_DIGEST_LENGTH);
     }
 
-    /* enqueue the the hash calls */
-    unsigned char hash_inputs[PAR_DEGREE][2*HASH_DIGEST_LENGTH];
-    unsigned char *hash_outputs[PAR_DEGREE];
-    uint16_t to_hash = 0;
-    
-    /* Hash the child nodes */
+    /* enqueue the calls to hash */
+    int to_hash = 0;
+    int out_pos_queue[4] = {0};
+    int in_pos_queue[4] = {0};
+
+    /* create the hash tree starting from the leaves */
     node_ctr = 0;
     parent_layer = LOG2(T)-1;
     for (i=NUM_NODES_MERKLE_TREE-1; i>0; i -= 2) {
+        /* save the position of the hash inputs and outputs */
         to_hash++;
-        /* prepare the hash input (2 children) */
-        memcpy(hash_inputs[to_hash-1], merkle_tree + OFFSET(SIBLING(i)), 2*HASH_DIGEST_LENGTH);
-        /* prepare the hash output (parent) */
-        hash_outputs[to_hash-1] = merkle_tree + OFFSET(PARENT(i) + layer_offsets[parent_layer]);
-        /* jump one layer up */
+        out_pos_queue[to_hash-1] = OFFSET(PARENT(i) + layer_offsets[parent_layer]);
+        in_pos_queue[to_hash-1] = OFFSET(SIBLING(i));
+        /* go up to the next tree level */
         if (node_ctr >= (uint32_t) nodes_per_layer[parent_layer+1] - 2) {
             parent_layer--;
             node_ctr = 0;
         } else {
             node_ctr += 2;
         }
-        /* hash in batches of 4 (or less when jumping layers) */
+        /* hash in batches of 4 (or less when changing tree level) */
         if(to_hash == 4 || node_ctr == 0) {
-            par_hash(to_hash, hash_outputs[0], hash_outputs[1], hash_outputs[2], hash_outputs[3], hash_inputs[0], hash_inputs[1], hash_inputs[2], hash_inputs[3], 2*HASH_DIGEST_LENGTH);
+            par_hash(
+                to_hash,
+                merkle_tree + out_pos_queue[0],
+                merkle_tree + out_pos_queue[1],
+                merkle_tree + out_pos_queue[2],
+                merkle_tree + out_pos_queue[3],
+                merkle_tree + in_pos_queue[0],
+                merkle_tree + in_pos_queue[1],
+                merkle_tree + in_pos_queue[2],
+                merkle_tree + in_pos_queue[3],
+                2*HASH_DIGEST_LENGTH);
             to_hash = 0;
         }
+
     }
+    
 }
 
 /* PQCLEAN_CROSSRSDP128FAST_CLEAN_generate_merkle_proof()
@@ -288,6 +302,7 @@ void PQCLEAN_CROSSRSDP128FAST_CLEAN_generate_merkle_proof(uint16_t merkle_proof_
  * const unsigned char commitments[T][HASH_DIGEST_LENGTH]              : Stores the commitments.
  * const unsigned char challenge[T]                                    : Challenge vector to indicate the computed commitments.
  */
+
 void PQCLEAN_CROSSRSDP128FAST_CLEAN_rebuild_merkle_tree(unsigned char merkle_tree[NUM_NODES_MERKLE_TREE * HASH_DIGEST_LENGTH],
                          const unsigned char merkle_proof[TREE_NODES_TO_STORE * HASH_DIGEST_LENGTH],
                          unsigned char commitments[T][HASH_DIGEST_LENGTH],
@@ -303,9 +318,6 @@ void PQCLEAN_CROSSRSDP128FAST_CLEAN_rebuild_merkle_tree(unsigned char merkle_tre
     uint32_t node_ctr, parent_layer;
     size_t i;
 
-    /* Input consists of hash digests stored at child nodes and the index of the parent node for domain separation */
-    //unsigned char hash_input[2*HASH_DIGEST_LENGTH];
-
     /* Move leafs in correct positions of binary merkle tree */
     /* Setup the tree again, computing the offsets and from that, the leaf indices */
     setup_tree(layer_offsets, nodes_per_layer);
@@ -319,10 +331,10 @@ void PQCLEAN_CROSSRSDP128FAST_CLEAN_rebuild_merkle_tree(unsigned char merkle_tre
         }
     }
 
-    /* enqueue the the hash calls */
-    unsigned char hash_inputs[PAR_DEGREE][2*HASH_DIGEST_LENGTH];
-    unsigned char *hash_outputs[PAR_DEGREE];
-    uint16_t to_hash = 0;
+    /* enqueue the calls to hash */
+    int to_hash = 0;
+    int out_pos_queue[4] = {0};
+    int in_pos_queue[4] = {0};
 
     /* Create hash tree by hashing valid leaf nodes */
     ctr = 0;
@@ -341,31 +353,34 @@ void PQCLEAN_CROSSRSDP128FAST_CLEAN_rebuild_merkle_tree(unsigned char merkle_tre
             continue;
         }
 
-        /* the siblings are valid: there is a hash to compute */
+        /* at least one of the siblings is valid: there is a hash to compute */
         to_hash++;
+        /* save the position of the hash inputs and outputs */
+        out_pos_queue[to_hash-1] = OFFSET(PARENT(i) + layer_offsets[parent_layer]);
+        in_pos_queue[to_hash-1] = OFFSET(SIBLING(i));
 
-        /* Prepare input to hash */
-        /* Process right sibling from the tree if valid, otherwise take it from the merkle proof */
-        if (flag_tree_valid[i] == VALID_MERKLE_NODE) {
-            memcpy(hash_inputs[to_hash-1] + HASH_DIGEST_LENGTH, merkle_tree + OFFSET(i), HASH_DIGEST_LENGTH);
-        } else {
-            memcpy(hash_inputs[to_hash-1] + HASH_DIGEST_LENGTH, merkle_proof + OFFSET(ctr), HASH_DIGEST_LENGTH);
+        /* if the right sibling is invalid, copy it from the merkle proof */
+        if (flag_tree_valid[i] == INVALID_MERKLE_NODE) {
+            memcpy(
+                merkle_tree + OFFSET(i),
+                merkle_proof + OFFSET(ctr),
+                HASH_DIGEST_LENGTH);
             ctr++;
         }
 
-        /* Process left sibling from the tree if valid, otherwise take it from the merkle proof */
-        if (flag_tree_valid[SIBLING(i)] == VALID_MERKLE_NODE) {
-            memcpy(hash_inputs[to_hash-1], merkle_tree + OFFSET(SIBLING(i)), HASH_DIGEST_LENGTH);
-        } else {
-            memcpy(hash_inputs[to_hash-1], merkle_proof + OFFSET(ctr), HASH_DIGEST_LENGTH);
+        /* if the right sibling is invalid, copy it from the merkle proof */
+        if (flag_tree_valid[SIBLING(i)] == INVALID_MERKLE_NODE) {
+            memcpy(
+                merkle_tree + OFFSET(SIBLING(i)), 
+                merkle_proof + OFFSET(ctr), 
+                HASH_DIGEST_LENGTH);
             ctr++;
         }
 
-        /* prepare the hash output (parent) */
-        hash_outputs[to_hash-1] = merkle_tree + OFFSET(PARENT(i) + layer_offsets[parent_layer]);
+        /* set the parent node as valid */
         flag_tree_valid[PARENT(i) + layer_offsets[parent_layer]] = VALID_MERKLE_NODE;
 
-        /* jump one layer up */
+        /* go up to the next tree level */
         if (node_ctr >= (uint32_t) nodes_per_layer[parent_layer+1] - 2) {
             parent_layer--;
             node_ctr = 0;
@@ -373,10 +388,21 @@ void PQCLEAN_CROSSRSDP128FAST_CLEAN_rebuild_merkle_tree(unsigned char merkle_tre
             node_ctr += 2;
         }
 
-        /* hash in batches of 4 (or less when jumping layers) */
+        /* hash in batches of 4 (or less when changing tree level) */
         if(to_hash == 4 || node_ctr == 0) {
-            par_hash(to_hash, hash_outputs[0], hash_outputs[1], hash_outputs[2], hash_outputs[3], hash_inputs[0], hash_inputs[1], hash_inputs[2], hash_inputs[3], 2*HASH_DIGEST_LENGTH);
+            par_hash(
+                to_hash,
+                merkle_tree + out_pos_queue[0],
+                merkle_tree + out_pos_queue[1],
+                merkle_tree + out_pos_queue[2],
+                merkle_tree + out_pos_queue[3],
+                merkle_tree + in_pos_queue[0],
+                merkle_tree + in_pos_queue[1],
+                merkle_tree + in_pos_queue[2],
+                merkle_tree + in_pos_queue[3],
+                2*HASH_DIGEST_LENGTH);
             to_hash = 0;
         }
+
     }
 }

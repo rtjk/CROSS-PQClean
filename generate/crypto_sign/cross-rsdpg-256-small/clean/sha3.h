@@ -161,10 +161,10 @@ typedef struct {
 static inline
 void xof_shake_x4_init(SHAKE_X4_STATE_STRUCT *states)
 {
+   shake128_inc_init(&(states->state4));  // change order to simulate parallelism
    shake128_inc_init(&(states->state1));
    shake128_inc_init(&(states->state2));
    shake128_inc_init(&(states->state3));
-   shake128_inc_init(&(states->state4));
 }
 
 static inline
@@ -175,10 +175,10 @@ void xof_shake_x4_update(SHAKE_X4_STATE_STRUCT *states,
                       const unsigned char *in4,
                       uint32_t singleInputByteLen)
 {
+   shake128_inc_absorb(&(states->state4), (const uint8_t *)in4, singleInputByteLen); // change order to simulate parallelism
    shake128_inc_absorb(&(states->state1), (const uint8_t *)in1, singleInputByteLen);
    shake128_inc_absorb(&(states->state2), (const uint8_t *)in2, singleInputByteLen);
    shake128_inc_absorb(&(states->state3), (const uint8_t *)in3, singleInputByteLen);
-   shake128_inc_absorb(&(states->state4), (const uint8_t *)in4, singleInputByteLen);
 }
 
 static inline
@@ -186,8 +186,8 @@ void xof_shake_x4_final(SHAKE_X4_STATE_STRUCT *states)
 {
    shake128_inc_finalize(&(states->state1));
    shake128_inc_finalize(&(states->state2));
+   shake128_inc_finalize(&(states->state4));  // change order to simulate parallelism
    shake128_inc_finalize(&(states->state3));
-   shake128_inc_finalize(&(states->state4));
 }
 
 static inline
@@ -199,17 +199,17 @@ void xof_shake_x4_extract(SHAKE_X4_STATE_STRUCT *states,
                        uint32_t singleOutputByteLen){
    shake128_inc_squeeze(out1, singleOutputByteLen, &(states->state1));
    shake128_inc_squeeze(out2, singleOutputByteLen, &(states->state2));
+   shake128_inc_squeeze(out4, singleOutputByteLen, &(states->state4)); // change order to simulate parallelism
    shake128_inc_squeeze(out3, singleOutputByteLen, &(states->state3));
-   shake128_inc_squeeze(out4, singleOutputByteLen, &(states->state4));
 }
 
 static inline
 void xof_shake_x4_release(SHAKE_X4_STATE_STRUCT *states)
 {
    shake128_inc_ctx_release(&(states->state1));
+   shake128_inc_ctx_release(&(states->state4)); // change order to simulate parallelism
    shake128_inc_ctx_release(&(states->state2));
    shake128_inc_ctx_release(&(states->state3));
-   shake128_inc_ctx_release(&(states->state4));
 }
 
 ///////////////////////////////////////////////////////////////

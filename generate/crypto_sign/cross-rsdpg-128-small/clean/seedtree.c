@@ -88,24 +88,27 @@ int PQCLEAN_CROSSRSDPG128SMALL_CLEAN_compute_round_seeds(unsigned char rounds_se
    unsigned char csprng_inputs[4][CSPRNG_INPUT_LEN];
    unsigned char csprng_outputs[4][(T/4 + 1)*SEED_LENGTH_BYTES];
 
+   /* prepare the input buffer for the CSPRNG as the concatenation of:
+    * root_seed || salt || domain_separation_counter */
    memcpy(csprng_inputs[0],root_seed,SEED_LENGTH_BYTES);   
    memcpy(csprng_inputs[0]+SEED_LENGTH_BYTES,salt,SALT_LENGTH_BYTES);
-
    /* set counter for domain separation to 1 */
    csprng_inputs[0][SEED_LENGTH_BYTES+SALT_LENGTH_BYTES] = 0;
    csprng_inputs[0][SEED_LENGTH_BYTES+SALT_LENGTH_BYTES+1] = 1;
 
+   /* call the CSPRNG once to generate 4 seeds */
    unsigned char quad_seed[4*SEED_LENGTH_BYTES];
-
    initialize_csprng(&single_csprng_state, csprng_inputs[0], CSPRNG_INPUT_LEN);
    csprng_randombytes(quad_seed,4*SEED_LENGTH_BYTES,&single_csprng_state);
    csprng_release(&single_csprng_state);
 
+   /* from the 4 seeds generale all T leaves */
    for (int i = 0; i < 4; i++){
       memcpy(csprng_inputs[i],&quad_seed[i*SEED_LENGTH_BYTES],SEED_LENGTH_BYTES);
+      /* increment the domain separation counter */
+      csprng_inputs[i][SEED_LENGTH_BYTES+SALT_LENGTH_BYTES] = 0;
       csprng_inputs[i][SEED_LENGTH_BYTES+SALT_LENGTH_BYTES+1] = i+2;
    }
-
    par_initialize_csprng(4, &par_csprng_state, csprng_inputs[0], csprng_inputs[1], csprng_inputs[2], csprng_inputs[3], CSPRNG_INPUT_LEN);
    par_csprng_randombytes(4, &par_csprng_state, csprng_outputs[0], csprng_outputs[1], csprng_outputs[2], csprng_outputs[3], (T/4 + 1)*SEED_LENGTH_BYTES);
    par_csprng_release(4, &par_csprng_state);
@@ -114,7 +117,7 @@ int PQCLEAN_CROSSRSDPG128SMALL_CLEAN_compute_round_seeds(unsigned char rounds_se
    if(T%4 > 0){ remainders[0] = 1; } 
    if(T%4 > 1){ remainders[1] = 1; } 
    if(T%4 > 2){ remainders[2] = 1; } 
-   
+
    int offset = 0;
    for (int i = 0; i < 4; i++){       
        memcpy(&rounds_seeds[((T/4)*i+offset)*SEED_LENGTH_BYTES], csprng_outputs[i], (T/4+remainders[i])*SEED_LENGTH_BYTES );

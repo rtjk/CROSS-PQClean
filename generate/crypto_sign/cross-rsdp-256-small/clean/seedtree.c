@@ -81,23 +81,34 @@ void PQCLEAN_CROSSRSDP256SMALL_CLEAN_ptree(unsigned char seed_tree[NUM_NODES_SEE
 int PQCLEAN_CROSSRSDP256SMALL_CLEAN_compute_round_seeds(unsigned char rounds_seeds[T*SEED_LENGTH_BYTES],
                   const unsigned char root_seed[SEED_LENGTH_BYTES],
                   const unsigned char salt[SALT_LENGTH_BYTES]){
-   const uint32_t csprng_input_len = SALT_LENGTH_BYTES +
-                                     SEED_LENGTH_BYTES +
-                                     sizeof(uint16_t);
-   unsigned char csprng_input[CSPRNG_INPUT_LEN];
-   memcpy(csprng_input,root_seed,SEED_LENGTH_BYTES);   
-   memcpy(csprng_input+SEED_LENGTH_BYTES,salt,SALT_LENGTH_BYTES);
-   /* set counter for domain separation to 1 */
-   csprng_input[SEED_LENGTH_BYTES+SALT_LENGTH_BYTES] = 0;
-   csprng_input[SEED_LENGTH_BYTES+SALT_LENGTH_BYTES+1] = 1;
-   
-   unsigned char quad_seed[4*SEED_LENGTH_BYTES];
-   CSPRNG_STATE_T csprng_states[4];
-   initialize_csprng(&csprng_states[0], csprng_input, csprng_input_len);
-   csprng_randombytes(quad_seed,4*SEED_LENGTH_BYTES,&csprng_states[0]);
 
-   /* PQClean-edit: CSPRNG release context */
-   csprng_release(&csprng_states[0]);
+   PAR_CSPRNG_STATE_T par_csprng_state;
+   CSPRNG_STATE_T single_csprng_state;
+   
+   unsigned char csprng_inputs[4][CSPRNG_INPUT_LEN];
+   unsigned char csprng_outputs[4][(T/4 + 1)*SEED_LENGTH_BYTES];
+
+   memcpy(csprng_inputs[0],root_seed,SEED_LENGTH_BYTES);   
+   memcpy(csprng_inputs[0]+SEED_LENGTH_BYTES,salt,SALT_LENGTH_BYTES);
+
+   /* set counter for domain separation to 1 */
+   csprng_inputs[0][SEED_LENGTH_BYTES+SALT_LENGTH_BYTES] = 0;
+   csprng_inputs[0][SEED_LENGTH_BYTES+SALT_LENGTH_BYTES+1] = 1;
+
+   unsigned char quad_seed[4*SEED_LENGTH_BYTES];
+
+   initialize_csprng(&single_csprng_state, csprng_inputs[0], CSPRNG_INPUT_LEN);
+   csprng_randombytes(quad_seed,4*SEED_LENGTH_BYTES,&single_csprng_state);
+   csprng_release(&single_csprng_state);
+
+   for (int i = 0; i < 4; i++){
+      memcpy(csprng_inputs[i],&quad_seed[i*SEED_LENGTH_BYTES],SEED_LENGTH_BYTES);
+      csprng_inputs[i][SEED_LENGTH_BYTES+SALT_LENGTH_BYTES+1] = i+2;
+   }
+
+   par_initialize_csprng(4, &par_csprng_state, csprng_inputs[0], csprng_inputs[1], csprng_inputs[2], csprng_inputs[3], CSPRNG_INPUT_LEN);
+   par_csprng_randombytes(4, &par_csprng_state, csprng_outputs[0], csprng_outputs[1], csprng_outputs[2], csprng_outputs[3], (T/4 + 1)*SEED_LENGTH_BYTES);
+   par_csprng_release(4, &par_csprng_state);
 
    int remainders[4] = {0};
    if(T%4 > 0){ remainders[0] = 1; } 
@@ -105,20 +116,11 @@ int PQCLEAN_CROSSRSDP256SMALL_CLEAN_compute_round_seeds(unsigned char rounds_see
    if(T%4 > 2){ remainders[2] = 1; } 
    
    int offset = 0;
-   for (int i = 0; i < 4; i++){
-       memcpy(csprng_input,&quad_seed[i*SEED_LENGTH_BYTES],SEED_LENGTH_BYTES);   
-       csprng_input[SEED_LENGTH_BYTES+SALT_LENGTH_BYTES+1] += 1;
-       initialize_csprng(&csprng_states[i], csprng_input, csprng_input_len);
-       
-       csprng_randombytes(&rounds_seeds[((T/4)*i+offset)*SEED_LENGTH_BYTES],
-                          (T/4+remainders[i])*SEED_LENGTH_BYTES,
-                          &csprng_states[i]);
-
-       /* PQClean-edit: CSPRNG release context */
-       csprng_release(&csprng_states[i]);
-
+   for (int i = 0; i < 4; i++){       
+       memcpy(&rounds_seeds[((T/4)*i+offset)*SEED_LENGTH_BYTES], csprng_outputs[i], (T/4+remainders[i])*SEED_LENGTH_BYTES );
        offset += remainders[i];
    }
+
    return T;
 }
 

@@ -222,9 +222,6 @@ static void compute_seeds_to_publish(
  *             from roots to leaves layer-by-layer from left to right,
  *             counting from 0 (the integer bound with the root node)"
  */
-/////////////////////////////////////////
-#include <stdio.h>
-/////////////////////////////////////////
 void PQCLEAN_CROSSRSDPG128BALANCED_CLEAN_generate_seed_tree_from_root(unsigned char
                                   seed_tree[NUM_NODES_SEED_TREE * SEED_LENGTH_BYTES],
                                   const unsigned char root_seed[SEED_LENGTH_BYTES],
@@ -383,34 +380,12 @@ int PQCLEAN_CROSSRSDPG128BALANCED_CLEAN_regenerate_round_seeds(unsigned char
     * level i. Level 0 is taken to be the tree root This constant vector is precomputed */
    const int missing_nodes_before[LOG2(T)+1] = MISSING_NODES_BEFORE_LEVEL_ARRAY;
 
-   /* Two passes over the binary tree */
-
    int ancestors = 0;
    const int nodes_in_level[LOG2(T)+1] = NODES_PER_LEVEL_ARRAY;
-
-   /* First pass: add to the tree all the published nodes with no published ancestors */
-   /*
-   for (int level = 0; level <= LOG2(T); level++){
-      for (int node_in_level = 0; node_in_level < nodes_in_level[level]; node_in_level++ ) {
-         uint16_t father_node_idx = ancestors + node_in_level;
-         uint16_t father_node_storage_idx = father_node_idx -missing_nodes_before[level];
-         if ( flags_tree_to_publish[father_node_idx] == TO_PUBLISH ) {
-            if ( flags_tree_to_publish[PARENT(father_node_idx)] == NOT_TO_PUBLISH ) {               
-               memcpy(seed_tree + SEED_LENGTH_BYTES*(father_node_storage_idx),
-                     stored_seeds + SEED_LENGTH_BYTES*nodes_used,
-                     SEED_LENGTH_BYTES );
-               nodes_used++;
-            }
-         }
-      }
-      ancestors += (1L << level);
-   }
-   */
 
    /* enqueue the calls to the CSPRNG */
    int to_expand = 0;
 
-   /* Second pass: regenerate the seed tree */
    /* regenerating the seed tree never starts from the root, as it is never
     * disclosed */
    ancestors = 0;
@@ -419,12 +394,13 @@ int PQCLEAN_CROSSRSDPG128BALANCED_CLEAN_regenerate_round_seeds(unsigned char
 
       for (int node_in_level = 0; node_in_level < nodes_in_level[level]; node_in_level++ ) {
 
+         /* skip unpublished nodes */
          if (flags_tree_to_publish[ancestors + node_in_level] == TO_PUBLISH){
 
             uint16_t father_node_idx = ancestors + node_in_level;
             uint16_t father_node_storage_idx = father_node_idx - missing_nodes_before[level];
 
-            /*  */
+            /* if the node is published and an orphan then memcpy it from the proof */
             if ( flags_tree_to_publish[PARENT(father_node_idx)] == NOT_TO_PUBLISH ) {
                memcpy(seed_tree + SEED_LENGTH_BYTES*(father_node_storage_idx),
                      stored_seeds + SEED_LENGTH_BYTES*nodes_used,
@@ -432,10 +408,10 @@ int PQCLEAN_CROSSRSDPG128BALANCED_CLEAN_regenerate_round_seeds(unsigned char
                nodes_used++;
             }
 
-            /*  */
+            /* if the node is published and not a leaf then its children need to be expanded  */
             if(level < LOG2(T)) {
                to_expand++;
-               /* prepare its childen to be expanded */
+               /* prepare the childen to be expanded */
                father_node_idxs[to_expand-1] = father_node_idx;
                father_node_storage_idxs[to_expand-1] = father_node_storage_idx;
                memcpy(csprng_inputs[to_expand-1], seed_tree + father_node_storage_idxs[to_expand-1]*SEED_LENGTH_BYTES, SEED_LENGTH_BYTES);

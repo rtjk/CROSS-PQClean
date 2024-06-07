@@ -222,9 +222,6 @@ static void compute_seeds_to_publish(
  *             from roots to leaves layer-by-layer from left to right,
  *             counting from 0 (the integer bound with the root node)"
  */
-/////////////////////////////////////////
-#include <stdio.h>
-/////////////////////////////////////////
 void __namespace__generate_seed_tree_from_root(unsigned char
                                   seed_tree[NUM_NODES_SEED_TREE * SEED_LENGTH_BYTES],
                                   const unsigned char root_seed[SEED_LENGTH_BYTES],
@@ -411,10 +408,10 @@ int __namespace__regenerate_round_seeds(unsigned char
                nodes_used++;
             }
 
-            /* if the node is published and not a leaf then prepare its children to be expanded  */
+            /* if the node is published and not a leaf then its children need to be expanded  */
             if(level < LOG2(T)) {
                to_expand++;
-               /* prepare its childen to be expanded */
+               /* prepare the childen to be expanded */
                father_node_idxs[to_expand-1] = father_node_idx;
                father_node_storage_idxs[to_expand-1] = father_node_storage_idx;
                memcpy(csprng_inputs[to_expand-1], seed_tree + father_node_storage_idxs[to_expand-1]*SEED_LENGTH_BYTES, SEED_LENGTH_BYTES);

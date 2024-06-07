@@ -222,7 +222,9 @@ static void compute_seeds_to_publish(
  *             from roots to leaves layer-by-layer from left to right,
  *             counting from 0 (the integer bound with the root node)"
  */
-
+/////////////////////////////////////////
+#include <stdio.h>
+/////////////////////////////////////////
 void PQCLEAN_CROSSRSDPG192SMALL_CLEAN_generate_seed_tree_from_root(unsigned char
                                   seed_tree[NUM_NODES_SEED_TREE * SEED_LENGTH_BYTES],
                                   const unsigned char root_seed[SEED_LENGTH_BYTES],
@@ -249,6 +251,17 @@ void PQCLEAN_CROSSRSDPG192SMALL_CLEAN_generate_seed_tree_from_root(unsigned char
    /* Set the root seed in the tree from the received parameter */
    memcpy(seed_tree,root_seed,SEED_LENGTH_BYTES);
 
+   /* enqueue the calls to the CSPRNG */
+    int to_expand = 0;
+
+   /* reset left and right children */
+   /*
+   for(int i = 0; i < PAR_DEGREE; i++){
+      left_children[i] = discarded_seed;
+      right_children[i] = discarded_seed;
+   }
+   */
+
    /* missing_nodes_before[i] contains the total number of missing nodes before
     * level i (the root is level 0). This constant vector is precomputed */
    const int missing_nodes_before[LOG2(T)+1] = MISSING_NODES_BEFORE_LEVEL_ARRAY;
@@ -257,56 +270,35 @@ void PQCLEAN_CROSSRSDPG192SMALL_CLEAN_generate_seed_tree_from_root(unsigned char
    const int nodes_in_level[LOG2(T)+1] = NODES_PER_LEVEL_ARRAY;
    int ancestors = 0;
    for (int level = 0; level < LOG2(T); level++){
-      /*
-       * Parallelize the random seed generation process.
-       * The parallelization strategy depends on the number of nodes in the level:
-       * - 1 node   >> call shake    >> generate 2 children
-       * - 2 nodes  >> call shake_x2 >> generate 2 left children
-       *            >> call shake_x2 >> generate 2 right children
-       * - 3 nodes  >> call shake_x4 >> generate 4 left children >> ignore the 4th
-       *            >> call shake_x4 >> generate 4 right children >> ignore the 4th
-       * - 4 nodes  >> call shake_x4 >> generate 4 left children
-       *            >> call shake_x4 >> generate 4 right children
-       * - >4 nodes >> divide the nodes in groups of the largest size possible (4, 3, 2, or single node)
-       *            >> apply one of the strategies above (1 to 4) to each group
-       */
+      for (int node_in_level = 0; node_in_level < nodes_in_level[level]; node_in_level++ ) {
 
-      /* to divide the level-nodes in groups compute the number of nodes in each group */
-      int sets_of_nodes = nodes_in_level[level] / 4;
-      int nodes_left = nodes_in_level[level] % 4;
-      if(nodes_left) sets_of_nodes++;
-      int nodes_in_set[sets_of_nodes];
-      for(int i = 0; i < sets_of_nodes; i++){
-         nodes_in_set[i] = 4;
-      }
-      if(nodes_left) nodes_in_set[sets_of_nodes-1] = nodes_left;
+         to_expand++;
 
-      /* for each group of nodes in the level apply the correct parallelization strategy */
-      int nodes_in_level_used = 0;
-      for(int set = 0; set < sets_of_nodes; set++) {
-         for(int i = 0; i < PAR_DEGREE; i++){
-            left_children[i] = discarded_seed;
-            right_children[i] = discarded_seed;
+         father_node_idxs[to_expand-1] = ancestors + node_in_level;
+         father_node_storage_idxs[to_expand-1] = father_node_idxs[to_expand-1] - missing_nodes_before[level];
+
+         /* prepare the children of node i to be expanded */
+         memcpy(csprng_inputs[to_expand-1], seed_tree + father_node_storage_idxs[to_expand-1]*SEED_LENGTH_BYTES, SEED_LENGTH_BYTES);
+         *((uint16_t *)(csprng_inputs[to_expand-1] + SALT_LENGTH_BYTES + SEED_LENGTH_BYTES)) = father_node_idxs[to_expand-1];
+         left_children[to_expand-1] = seed_tree + (LEFT_CHILD(father_node_idxs[to_expand-1]) - missing_nodes_before[level+1])*SEED_LENGTH_BYTES;
+         /* the last leaf might not be needed */
+         if ((RIGHT_CHILD(father_node_idxs[to_expand-1]) - missing_nodes_before[level+1]) < NUM_NODES_SEED_TREE ) {
+            right_children[to_expand-1] = seed_tree + (RIGHT_CHILD(father_node_idxs[to_expand-1]) - missing_nodes_before[level+1])*SEED_LENGTH_BYTES;
          }
-         for(int i = 0; i < nodes_in_set[set]; i++){
-            father_node_idxs[i] = ancestors + nodes_in_level_used;
-            father_node_storage_idxs[i] = father_node_idxs[i] - missing_nodes_before[level];
-            nodes_in_level_used++;
-            /* prepare the children of node i to be expanded */
-            memcpy(csprng_inputs[i], seed_tree + father_node_storage_idxs[i]*SEED_LENGTH_BYTES, SEED_LENGTH_BYTES);
-            *((uint16_t *)(csprng_inputs[i] + SALT_LENGTH_BYTES + SEED_LENGTH_BYTES)) = father_node_idxs[i];
-            left_children[i] = seed_tree + (LEFT_CHILD(father_node_idxs[i]) - missing_nodes_before[level+1])*SEED_LENGTH_BYTES;
-            /* the last leaf might not be needed */
-            if ((RIGHT_CHILD(father_node_idxs[i]) - missing_nodes_before[level+1]) < NUM_NODES_SEED_TREE ) {
-               right_children[i] = seed_tree + (RIGHT_CHILD(father_node_idxs[i]) - missing_nodes_before[level+1])*SEED_LENGTH_BYTES;
-            }
+         else {
+            right_children[to_expand-1] = discarded_seed;
          }
-         par_initialize_csprng(nodes_in_set[set], &tree_csprng_state, csprng_inputs[0], csprng_inputs[1], csprng_inputs[2], csprng_inputs[3], CSPRNG_INPUT_LEN);
-         par_csprng_randombytes(nodes_in_set[set], &tree_csprng_state, left_children[0], left_children[1], left_children[2], left_children[3], SEED_LENGTH_BYTES);
-         par_csprng_randombytes(nodes_in_set[set], &tree_csprng_state, right_children[0], right_children[1], right_children[2], right_children[3], SEED_LENGTH_BYTES);
-         par_csprng_release(nodes_in_set[set], &tree_csprng_state);
-      }
 
+         /* call CSPRNG in batches of 4 (or less when changing tree level) */
+         if(to_expand == PAR_DEGREE || (node_in_level == nodes_in_level[level]-1)) {
+            par_initialize_csprng(to_expand, &tree_csprng_state, csprng_inputs[0], csprng_inputs[1], csprng_inputs[2], csprng_inputs[3], CSPRNG_INPUT_LEN);
+            par_csprng_randombytes(to_expand, &tree_csprng_state, left_children[0], left_children[1], left_children[2], left_children[3], SEED_LENGTH_BYTES);
+            par_csprng_randombytes(to_expand, &tree_csprng_state, right_children[0], right_children[1], right_children[2], right_children[3], SEED_LENGTH_BYTES);
+            par_csprng_release(to_expand, &tree_csprng_state);
+            to_expand = 0;
+         }
+
+      }
     ancestors += (1L << level);
    }
 } /* end generate_seed_tree */
@@ -397,6 +389,7 @@ int PQCLEAN_CROSSRSDPG192SMALL_CLEAN_regenerate_round_seeds(unsigned char
    const int nodes_in_level[LOG2(T)+1] = NODES_PER_LEVEL_ARRAY;
 
    /* First pass: add to the tree all the published nodes with no published ancestors */
+   /*
    for (int level = 0; level <= LOG2(T); level++){
       for (int node_in_level = 0; node_in_level < nodes_in_level[level]; node_in_level++ ) {
          uint16_t father_node_idx = ancestors + node_in_level;
@@ -412,65 +405,61 @@ int PQCLEAN_CROSSRSDPG192SMALL_CLEAN_regenerate_round_seeds(unsigned char
       }
       ancestors += (1L << level);
    }
+   */
+
+   /* enqueue the calls to the CSPRNG */
+   int to_expand = 0;
 
    /* Second pass: regenerate the seed tree */
    /* regenerating the seed tree never starts from the root, as it is never
     * disclosed */
    ancestors = 0;
 
-   for (int level = 0; level < LOG2(T); level++){
-      
-      /* apply the same parallel seed generation strategy used during signing
-       * see function generate_seed_tree_from_root for a full description */
-      
-      /* the groups of nodes are less here wrt signing, because some of the nodes are not bublished */
-      int published_nodes_in_level = 0;
-      for (int node_in_level = 0; node_in_level < nodes_in_level[level]; node_in_level++) {
-         if (flags_tree_to_publish[ancestors + node_in_level] == TO_PUBLISH) {
-            published_nodes_in_level++;
-         }
-      }
-      
-      if(published_nodes_in_level > 0) {
-      
-         /* to divide the published level-nodes in groups compute the number of nodes in each group */
-         int sets_of_nodes = published_nodes_in_level / 4;
-         int nodes_left = published_nodes_in_level % 4;
-         if(nodes_left) sets_of_nodes++;  
-         int nodes_in_set[sets_of_nodes];
-         for(int i = 0; i < sets_of_nodes; i++){
-            nodes_in_set[i] = 4;
-         }
-         if(nodes_left) nodes_in_set[sets_of_nodes-1] = nodes_left;
+   for (int level = 0; level <= LOG2(T); level++){
 
-         /* for each group of published nodes in the level apply the correct parallelization strategy */
-         int nodes_in_level_used = 0;
-         for(int set = 0; set < sets_of_nodes; set++) {
-            for(int i = 0; i < PAR_DEGREE; i++){
-               left_children[i] = discarded_seed;
-               right_children[i] = discarded_seed;
+      for (int node_in_level = 0; node_in_level < nodes_in_level[level]; node_in_level++ ) {
+
+         if (flags_tree_to_publish[ancestors + node_in_level] == TO_PUBLISH){
+
+            uint16_t father_node_idx = ancestors + node_in_level;
+            uint16_t father_node_storage_idx = father_node_idx - missing_nodes_before[level];
+
+            /*  */
+            if ( flags_tree_to_publish[PARENT(father_node_idx)] == NOT_TO_PUBLISH ) {
+               memcpy(seed_tree + SEED_LENGTH_BYTES*(father_node_storage_idx),
+                     stored_seeds + SEED_LENGTH_BYTES*nodes_used,
+                     SEED_LENGTH_BYTES );
+               nodes_used++;
             }
-            for(int i = 0; i < nodes_in_set[set]; i++){
-               /* find the next published node */
-               while (flags_tree_to_publish[ancestors + nodes_in_level_used] == NOT_TO_PUBLISH) {
-                  nodes_in_level_used++;
-               }
+
+            /*  */
+            if(level < LOG2(T)) {
+               to_expand++;
                /* prepare its childen to be expanded */
-               father_node_idxs[i] = ancestors + nodes_in_level_used;
-               father_node_storage_idxs[i] = father_node_idxs[i] - missing_nodes_before[level];
-               nodes_in_level_used++;
-               memcpy(csprng_inputs[i], seed_tree + father_node_storage_idxs[i]*SEED_LENGTH_BYTES, SEED_LENGTH_BYTES);
-               *((uint16_t *)(csprng_inputs[i] + SALT_LENGTH_BYTES + SEED_LENGTH_BYTES)) = father_node_idxs[i];
-               left_children[i] = seed_tree + (LEFT_CHILD(father_node_idxs[i]) - missing_nodes_before[level+1])*SEED_LENGTH_BYTES;
+               father_node_idxs[to_expand-1] = father_node_idx;
+               father_node_storage_idxs[to_expand-1] = father_node_storage_idx;
+               memcpy(csprng_inputs[to_expand-1], seed_tree + father_node_storage_idxs[to_expand-1]*SEED_LENGTH_BYTES, SEED_LENGTH_BYTES);
+               *((uint16_t *)(csprng_inputs[to_expand-1] + SALT_LENGTH_BYTES + SEED_LENGTH_BYTES)) = father_node_idxs[to_expand-1];
+               left_children[to_expand-1] = seed_tree + (LEFT_CHILD(father_node_idxs[to_expand-1]) - missing_nodes_before[level+1])*SEED_LENGTH_BYTES;
                /* the last leaf might not be needed */
-               if ((RIGHT_CHILD(father_node_idxs[i]) - missing_nodes_before[level+1]) < NUM_NODES_SEED_TREE ) {
-                  right_children[i] = seed_tree + (RIGHT_CHILD(father_node_idxs[i]) - missing_nodes_before[level+1])*SEED_LENGTH_BYTES;
+               if ((RIGHT_CHILD(father_node_idxs[to_expand-1]) - missing_nodes_before[level+1]) < NUM_NODES_SEED_TREE ) {
+                  right_children[to_expand-1] = seed_tree + (RIGHT_CHILD(father_node_idxs[to_expand-1]) - missing_nodes_before[level+1])*SEED_LENGTH_BYTES;
+               }
+               else {
+                  right_children[to_expand-1] = discarded_seed;
                }
             }
-            par_initialize_csprng(nodes_in_set[set], &tree_csprng_state, csprng_inputs[0], csprng_inputs[1], csprng_inputs[2], csprng_inputs[3], CSPRNG_INPUT_LEN);
-            par_csprng_randombytes(nodes_in_set[set], &tree_csprng_state, left_children[0], left_children[1], left_children[2], left_children[3], SEED_LENGTH_BYTES);
-            par_csprng_randombytes(nodes_in_set[set], &tree_csprng_state, right_children[0], right_children[1], right_children[2], right_children[3], SEED_LENGTH_BYTES);
-            par_csprng_release(nodes_in_set[set], &tree_csprng_state);
+         }
+         
+         /* call CSPRNG in batches of 4 (or less when changing tree level) */
+         if(level < LOG2(T)) {
+            if(to_expand == PAR_DEGREE || (node_in_level == nodes_in_level[level]-1)) {
+               par_initialize_csprng(to_expand, &tree_csprng_state, csprng_inputs[0], csprng_inputs[1], csprng_inputs[2], csprng_inputs[3], CSPRNG_INPUT_LEN);
+               par_csprng_randombytes(to_expand, &tree_csprng_state, left_children[0], left_children[1], left_children[2], left_children[3], SEED_LENGTH_BYTES);
+               par_csprng_randombytes(to_expand, &tree_csprng_state, right_children[0], right_children[1], right_children[2], right_children[3], SEED_LENGTH_BYTES);
+               par_csprng_release(to_expand, &tree_csprng_state);
+               to_expand = 0;
+            }
          }
       }
       ancestors += (1L << level);

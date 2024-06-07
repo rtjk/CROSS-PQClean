@@ -296,7 +296,7 @@ void CSPRNG_fq_vec_beta(FQ_ELEM res[T],
     }
 }
 
-#include <stdio.h>
+//#include <stdio.h>
 static inline
 void CSPRNG_fq_mat(FQ_ELEM res[K][N-K],
                    CSPRNG_STATE_T * const csprng_state){

@@ -23,8 +23,6 @@
 #include <stdint.h>
 #include <string.h>
 
-#include <stdio.h>
-
 #include "merkle.h"
 
 #define LEAVES_FULL_TREE(L) ( (1UL << LOG2(L) ) )

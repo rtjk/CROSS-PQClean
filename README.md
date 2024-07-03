@@ -28,6 +28,7 @@ This is a recipe for adding the CROSS signature algorithm to post-quantum librar
    * [META.yml](#metayml)
    * [KATs and test vectors](#kats-and-test-vectors)
    * [Parameter file](#parameter-file)
+   * [Dead code removal](#dead-code-removal)
    * [No external includes in `api.h`](#no-external-includes-in-apih)
    * [Astyle](#astyle)
 - [PQClean](#pqclean)
@@ -123,7 +124,17 @@ Every parameter set in PQClean also needs a file listing its parameters, the has
 ### Parameter file
 Create a new file `set.h` with placeholders for the parameters in a set, the definitions in here were previously done externally like in `Benchmarking/CMakeLists.txt`. Include `set.h` in `parameters.h` and in the makefiles.
 
+`set.h` also undefines macros that are unused for a specific parameter set, this helps when removing dead code with `generate.py`.
+
 `TODO: set.h also has defines for avx2`
+
+### Dead code removal
+
+CROSS' source code makes heavy use of `#ifdef` and similar preprocessor macros, for example to assign different values to constants in `parameters.h` based on the security level. This behaviour is prohibited in PQClean, therefore when generating parameter sets `generate.py` will remove lines of code corresponding to the dead branches of an `#if`. This is achieved by calling the `unifdef` utility, wich should be installed on the system. On a Debian-based system it's as simple as:
+
+```
+sudo apt install unifdef
+```
 
 ### No external includes in `api.h`
 PQClean requires that the api file does not include any external file. Define parameters such as the length of the public key as placeholders, which will be substituted by actual values by `generate.py`.

@@ -12,12 +12,12 @@
 
 /* Undefine unused macros to facilitate dead code removal using unifdef */
 
-/* VARIANT */
+/* Variant */
     #undef RSDPG
-/* CATEGORY */
+/* Category */
     #undef CATEGORY_1
     #undef CATEGORY_2
     #undef CATEGORY_3
-/* TARGET */
+/* Target */
     #undef BALANCED
     #undef SIG_SIZE

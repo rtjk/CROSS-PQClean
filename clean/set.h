@@ -18,13 +18,13 @@
 
 /* Undefine unused macros to facilitate dead code removal using unifdef */
 
-/* VARIANT */
+/* Variant */
 #if defined(RSDP)
     #undef RSDPG
 #else
     #undef RSDP
 #endif
-/* CATEGORY */
+/* Category */
 #ifndef CATEGORY_1
     #undef CATEGORY_1
 #endif
@@ -34,7 +34,7 @@
 #ifndef CATEGORY_3
     #undef CATEGORY_3
 #endif
-/* TARGET */
+/* Target */
 #ifndef BALANCED
     #undef BALANCED
 #endif

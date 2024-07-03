@@ -366,7 +366,7 @@ void PQCLEAN_CROSSRSDPG256SMALL_AVX2_rebuild_merkle_tree(unsigned char merkle_tr
                 ctr++;
             }
 
-            /* if the right sibling is invalid, copy it from the merkle proof */
+            /* if the left sibling is invalid, copy it from the merkle proof */
             if (flag_tree_valid[SIBLING(i)] == INVALID_MERKLE_NODE) {
                 memcpy(
                     merkle_tree + OFFSET(SIBLING(i)), 

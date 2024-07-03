@@ -1,6 +1,4 @@
 
-#pragma once
-
 #define RSDPG 1
 #define CATEGORY_1 1
 #define BALANCED 1

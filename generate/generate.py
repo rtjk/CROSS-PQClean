@@ -25,8 +25,22 @@ def replace_in_dir(dir, text_to_search, replacement_text):
             if os.path.isfile(file_path):
                 replace_in_file(file_path, text_to_search, replacement_text)
 
+# use the unifdef utility to remove #if, #ifdef, #elif, etc.
+def remove_dead_code(dir):
+    # call unifdef on the parameter definition file set.h
+    unifdef_command = 'unifdefall '+dir+'/set.h > tmp_set.h ; mv tmp_set.h '+dir+'/set.h'
+    # os.system(unifdef_command)
+    # # use the new set.h to remove dead code in all other files
+    # for file in os.listdir(dir):
+    #     if file.endswith('.c') or file.endswith('.h'):
+    #         os.system('unifdef -m -f '+dir+'/set.h '+dir+'/'+file)
+
 # output here
 TARGET_DIR = './crypto_sign'
+
+# check that the unifdef package is installed
+if os.system('which unifdef > /dev/null 2>&1') != 0:
+    raise Exception('unifdef package not found, please install it')
 
 # delete output directory if it already exists
 if os.path.exists(TARGET_DIR):
@@ -72,6 +86,8 @@ with open(csv_filename, 'r') as csvfile:
         for column_name in columns:
             column_value = row[column_name]
             replace_in_dir(dir, column_name, column_value)
+
+        remove_dead_code(dir)
 
 current_time = datetime.datetime.now().strftime("%H:%M")
 print("Implementations placed in", TARGET_DIR, "@", current_time)

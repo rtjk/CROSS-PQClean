@@ -1,6 +1,6 @@
 # for every every parameter set create the corresponding directory
 # then copy the templates for the 'clean' and 'avx2' implementations inside that directory
-# finally substitute the actual parameters
+# finally substitute the actual parameters and remove dead code
 # parameters are listed in parameter_sets.csv
 
 import os
@@ -27,11 +27,15 @@ def remove_dead_code(dir):
     # call unifdef on the parameter definition file set.h
     unifdef_command = 'unifdefall '+dir+'/set.h > tmp_set.h ; mv tmp_set.h '+dir+'/set.h'
     os.system(unifdef_command)
-    # use the new set.h to remove dead code in all other files
+    # use the new set.h to remove dead code from all other files
     for file in os.listdir(dir):
         if file.endswith('.c') or file.endswith('.h'):
             unifdef_command = 'unifdef -m -f '+dir+'/set.h '+dir+'/'+file
             os.system(unifdef_command)
+
+                        ####################
+                        #       main       #
+                        ####################
 
 # output here
 TARGET_DIR = './crypto_sign'

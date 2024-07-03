@@ -16,9 +16,6 @@ def replace_in_file(path, text_to_search, replacement_text):
       print(re.sub(text_to_search, replacement_text, line), end='')
 
 def replace_in_dir(dir, text_to_search, replacement_text):
-    #if(not os.path.isdir(dir)):
-    #   raise Exception('Directory not found')
-    #else:
     for root, dirs, files in os.walk(dir):
         for file in files:
             file_path = os.path.join(root, file)
@@ -29,11 +26,12 @@ def replace_in_dir(dir, text_to_search, replacement_text):
 def remove_dead_code(dir):
     # call unifdef on the parameter definition file set.h
     unifdef_command = 'unifdefall '+dir+'/set.h > tmp_set.h ; mv tmp_set.h '+dir+'/set.h'
-    # os.system(unifdef_command)
-    # # use the new set.h to remove dead code in all other files
-    # for file in os.listdir(dir):
-    #     if file.endswith('.c') or file.endswith('.h'):
-    #         os.system('unifdef -m -f '+dir+'/set.h '+dir+'/'+file)
+    os.system(unifdef_command)
+    # use the new set.h to remove dead code in all other files
+    for file in os.listdir(dir):
+        if file.endswith('.c') or file.endswith('.h'):
+            unifdef_command = 'unifdef -m -f '+dir+'/set.h '+dir+'/'+file
+            os.system(unifdef_command)
 
 # output here
 TARGET_DIR = './crypto_sign'

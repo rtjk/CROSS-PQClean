@@ -42,11 +42,7 @@ typedef struct {
 
 typedef struct {
   uint8_t y[DENSELY_PACKED_FQ_VEC_SIZE];
-#if defined(RSDP)
   uint8_t sigma[DENSELY_PACKED_FZ_VEC_SIZE];
-#elif defined(RSDPG)
-  uint8_t delta[DENSELY_PACKED_FZ_RSDP_G_VEC_SIZE];
-#endif
 } rsp_0_t;
 
 /* Signature: */
@@ -54,15 +50,8 @@ typedef struct {
    uint8_t salt[SALT_LENGTH_BYTES];
    uint8_t digest_01[HASH_DIGEST_LENGTH];
    uint8_t digest_b[HASH_DIGEST_LENGTH];
-#if defined(NO_TREES)   
    uint8_t stp[W*SEED_LENGTH_BYTES];
    uint8_t mtp[W*HASH_DIGEST_LENGTH];
-#else
-   /*Seed tree paths storage*/
-   uint8_t stp[TREE_NODES_TO_STORE*SEED_LENGTH_BYTES];
-   /*Merkle tree proof field.*/
-   uint8_t mtp[HASH_DIGEST_LENGTH*TREE_NODES_TO_STORE];
-#endif
    rsp_0_t rsp_0[T-W];
    uint8_t rsp_1[T-W][HASH_DIGEST_LENGTH];
 } sig_t;

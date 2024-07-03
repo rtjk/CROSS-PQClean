@@ -77,87 +77,6 @@ void PQCLEAN_CROSSRSDP192SMALL_CLEAN_ptree(unsigned char seed_tree[NUM_NODES_SEE
 #define CSPRNG_INPUT_LEN (SALT_LENGTH_BYTES + SEED_LENGTH_BYTES + SIZEOF_UINT16)
 //const uint32_t csprng_input_len = SALT_LENGTH_BYTES + SEED_LENGTH_BYTES + sizeof(uint16_t);
 
-#if defined(NO_TREES)
-int PQCLEAN_CROSSRSDP192SMALL_CLEAN_compute_round_seeds(unsigned char rounds_seeds[T*SEED_LENGTH_BYTES],
-                  const unsigned char root_seed[SEED_LENGTH_BYTES],
-                  const unsigned char salt[SALT_LENGTH_BYTES]){
-
-   PAR_CSPRNG_STATE_T par_csprng_state;
-   CSPRNG_STATE_T single_csprng_state;
-   
-   unsigned char csprng_inputs[4][CSPRNG_INPUT_LEN];
-   unsigned char csprng_outputs[4][(T/4 + 1)*SEED_LENGTH_BYTES];
-
-   /* prepare the input buffer for the CSPRNG as the concatenation of:
-    * root_seed || salt || domain_separation_counter */
-   memcpy(csprng_inputs[0],root_seed,SEED_LENGTH_BYTES);   
-   memcpy(csprng_inputs[0]+SEED_LENGTH_BYTES,salt,SALT_LENGTH_BYTES);
-   /* set counter for domain separation to 1 */
-   csprng_inputs[0][SEED_LENGTH_BYTES+SALT_LENGTH_BYTES] = 0;
-   csprng_inputs[0][SEED_LENGTH_BYTES+SALT_LENGTH_BYTES+1] = 1;
-
-   /* call the CSPRNG once to generate 4 seeds */
-   unsigned char quad_seed[4*SEED_LENGTH_BYTES];
-   initialize_csprng(&single_csprng_state, csprng_inputs[0], CSPRNG_INPUT_LEN);
-   csprng_randombytes(quad_seed,4*SEED_LENGTH_BYTES,&single_csprng_state);
-   csprng_release(&single_csprng_state);
-
-   /* from the 4 seeds generale all T leaves */
-   for (int i = 0; i < 4; i++){
-      memcpy(csprng_inputs[i],&quad_seed[i*SEED_LENGTH_BYTES],SEED_LENGTH_BYTES);
-      /* increment the domain separation counter */
-      csprng_inputs[i][SEED_LENGTH_BYTES+SALT_LENGTH_BYTES] = 0;
-      csprng_inputs[i][SEED_LENGTH_BYTES+SALT_LENGTH_BYTES+1] = i+2;
-   }
-   par_initialize_csprng(4, &par_csprng_state, csprng_inputs[0], csprng_inputs[1], csprng_inputs[2], csprng_inputs[3], CSPRNG_INPUT_LEN);
-   par_csprng_randombytes(4, &par_csprng_state, csprng_outputs[0], csprng_outputs[1], csprng_outputs[2], csprng_outputs[3], (T/4 + 1)*SEED_LENGTH_BYTES);
-   par_csprng_release(4, &par_csprng_state);
-
-   int remainders[4] = {0};
-   if(T%4 > 0){ remainders[0] = 1; } 
-   if(T%4 > 1){ remainders[1] = 1; } 
-   if(T%4 > 2){ remainders[2] = 1; } 
-
-   int offset = 0;
-   for (int i = 0; i < 4; i++){       
-       memcpy(&rounds_seeds[((T/4)*i+offset)*SEED_LENGTH_BYTES], csprng_outputs[i], (T/4+remainders[i])*SEED_LENGTH_BYTES );
-       offset += remainders[i];
-   }
-
-   return T;
-}
-
-int PQCLEAN_CROSSRSDP192SMALL_CLEAN_publish_round_seeds(unsigned char *seed_storage,
-                  const unsigned char rounds_seeds[T*SEED_LENGTH_BYTES],
-                  const unsigned char indices_to_publish[T]){
-    int published = 0;
-    for(int i=0; i<T; i++){
-       if(indices_to_publish[i] == TO_PUBLISH){
-          memcpy(&seed_storage[SEED_LENGTH_BYTES*published],
-                 &rounds_seeds[i*SEED_LENGTH_BYTES],
-                 SEED_LENGTH_BYTES);
-          published++;
-       }
-    }
-    return published;
-}
-
-/* simply picks seeds out of the storage and places them in the in-memory array */
-int PQCLEAN_CROSSRSDP192SMALL_CLEAN_regenerate_round_seeds(unsigned char rounds_seeds[T*SEED_LENGTH_BYTES],                           
-                           const unsigned char indices_to_publish[T],
-                           const unsigned char *seed_storage){
-    int published = 0;
-    for(int i=0; i<T; i++){
-       if(indices_to_publish[i] == TO_PUBLISH){
-           memcpy(&rounds_seeds[i*SEED_LENGTH_BYTES],
-                  &seed_storage[SEED_LENGTH_BYTES*published],
-                  SEED_LENGTH_BYTES);
-           published++;
-       }
-   }      
-   return published;
-}
-#else
 /*****************************************************************************/
 /**
  * const unsigned char *indices: input parameter denoting an array
@@ -442,4 +361,3 @@ int PQCLEAN_CROSSRSDP192SMALL_CLEAN_regenerate_round_seeds(unsigned char
    }
    return nodes_used;
 } /* end regenerate_leaves */
-#endif

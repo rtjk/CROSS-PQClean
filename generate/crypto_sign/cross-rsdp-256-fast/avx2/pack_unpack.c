@@ -79,13 +79,6 @@ void PQCLEAN_CROSSRSDP256FAST_AVX2_pack_fz_vec(uint8_t out[DENSELY_PACKED_FZ_VEC
  * 
  * This function handles the packing of the add. rdsp(g) vector in Zz
  */
-#ifdef RSDPG
-void PQCLEAN_CROSSRSDP256FAST_AVX2_pack_fz_rsdp_g_vec(uint8_t out[DENSELY_PACKED_FZ_RSDP_G_VEC_SIZE],
-                   const FZ_ELEM in[M])
-{
-   PQCLEAN_CROSSRSDP256FAST_AVX2_generic_pack_fz(out, in, DENSELY_PACKED_FZ_RSDP_G_VEC_SIZE, M);
-}
-#endif
 
 /* 
  * PQCLEAN_CROSSRSDP256FAST_AVX2_generic_pack_fq()
@@ -483,13 +476,6 @@ void PQCLEAN_CROSSRSDP256FAST_AVX2_unpack_fz_vec(FZ_ELEM out[N],
  * 
  * This function handles the unpacking of FQ
  */
-#ifdef RSDPG
-void PQCLEAN_CROSSRSDP256FAST_AVX2_unpack_fz_rsdp_g_vec(FZ_ELEM out[M],
-                   const uint8_t in[DENSELY_PACKED_FZ_RSDP_G_VEC_SIZE])
-{
-   PQCLEAN_CROSSRSDP256FAST_AVX2_generic_unpack_fz(out, in, M);
-}
-#endif
 
 /* 
  * PQCLEAN_CROSSRSDP256FAST_AVX2_generic_unpack_fq()

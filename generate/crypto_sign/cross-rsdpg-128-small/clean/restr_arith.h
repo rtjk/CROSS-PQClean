@@ -27,17 +27,10 @@
 
 #include "parameters.h"
 
-#if defined(RSDP)
-#define FZRED_SINGLE(x)   (((x) & 0x07) + ((x) >> 3))
-#define FZRED_OPPOSITE(x) ((x) ^ 0x07)
-#define FZ_DOUBLE_ZERO_NORM(x) ((x + ((x + 1) >> 3)) & 0x07)
-
-#elif defined(RSDPG)
 #define FZRED_SINGLE(x)   (((x) & 0x7f) + ((x) >> 7))
 #define FZRED_DOUBLE(x) FZRED_SINGLE(FZRED_SINGLE(x))
 #define FZRED_OPPOSITE(x) ((x) ^ 0x7f)
 #define FZ_DOUBLE_ZERO_NORM(x) ((x + ((x + 1) >> 7)) & 0x7f)
-#endif
 
 
 static inline
@@ -87,7 +80,6 @@ int is_zz_vec_in_restr_group(const FZ_ELEM in[N]){
     return is_in_ok;
 }
 
-#if defined(RSDPG)
 /* computes the information word * M_G product to obtain an element of G
  * only non systematic portion of M_G = [W I] is used, transposed to improve
  * cache friendliness */
@@ -130,4 +122,3 @@ void fz_dz_norm_delta(FZ_ELEM v[M]){
        v[i] = FZ_DOUBLE_ZERO_NORM(v[i]);
     }
 }
-#endif

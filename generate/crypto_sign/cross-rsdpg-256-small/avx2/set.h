@@ -3,13 +3,21 @@
 #define CATEGORY_5 1
 #define SIG_SIZE 1
 
-#if defined(SPEED)
-    #define NO_TREES 1
-#endif
+    #undef NO_TREES
 
-// When compiling avx2 override the behaviour of architecture_detect.h
+/* When compiling avx2 override the behaviour of architecture_detect.h */
 #define IMPLEMENTATION_avx2
-#if defined(IMPLEMENTATION_avx2)
     #define HIGH_COMPATIBILITY_X86_64
     #define HIGH_PERFORMANCE_X86_64
-#endif
+
+/* Undefine unused macros to facilitate dead code removal using unifdef */
+
+/* VARIANT */
+    #undef RSDP
+/* CATEGORY */
+    #undef CATEGORY_1
+    #undef CATEGORY_2
+    #undef CATEGORY_3
+/* TARGET */
+    #undef BALANCED
+    #undef SPEED

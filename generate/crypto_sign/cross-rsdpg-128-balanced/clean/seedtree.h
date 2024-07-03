@@ -31,19 +31,6 @@
 void PQCLEAN_CROSSRSDPG128BALANCED_CLEAN_pseed(unsigned char seed[SEED_LENGTH_BYTES]);
 void PQCLEAN_CROSSRSDPG128BALANCED_CLEAN_ptree(unsigned char seed_tree[NUM_NODES_SEED_TREE * SEED_LENGTH_BYTES]);
 
-#if defined(NO_TREES)
-int PQCLEAN_CROSSRSDPG128BALANCED_CLEAN_compute_round_seeds(unsigned char rounds_seeds[T*SEED_LENGTH_BYTES],
-                  const unsigned char root_seed[SEED_LENGTH_BYTES],
-                  const unsigned char salt[SALT_LENGTH_BYTES]);
-
-int PQCLEAN_CROSSRSDPG128BALANCED_CLEAN_publish_round_seeds(unsigned char *seed_storage,
-                  const unsigned char rounds_seeds[T*SEED_LENGTH_BYTES],
-                  const unsigned char indices_to_publish[T]);
-
-int PQCLEAN_CROSSRSDPG128BALANCED_CLEAN_regenerate_round_seeds(unsigned char rounds_seeds[T*SEED_LENGTH_BYTES],                           
-                           const unsigned char indices_to_publish[T],
-                           const unsigned char *seed_storage);
-#else
 /******************************************************************************/
 void PQCLEAN_CROSSRSDPG128BALANCED_CLEAN_generate_seed_tree_from_root(unsigned char
                                   seed_tree[NUM_NODES_SEED_TREE * SEED_LENGTH_BYTES],
@@ -67,4 +54,3 @@ int PQCLEAN_CROSSRSDPG128BALANCED_CLEAN_regenerate_round_seeds(unsigned char
                       const unsigned char salt[SALT_LENGTH_BYTES]);   // input
 
 
-#endif

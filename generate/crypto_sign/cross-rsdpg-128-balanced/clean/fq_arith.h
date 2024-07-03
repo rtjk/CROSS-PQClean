@@ -33,14 +33,6 @@
 
 #define NUM_BITS_Q (BITS_TO_REPRESENT(Q))
 
-#if defined(RSDP)
-#define FQRED_SINGLE(x) (((x) & 0x7F) + ((x) >> 7))
-#define FQRED_DOUBLE(x) FQRED_SINGLE(FQRED_SINGLE(x))
-#define FQRED_OPPOSITE(x) ((x) ^ 0x7F)
-#define FQ_DOUBLE_ZERO_NORM(x) ((x + ((x + 1) >> 7)) & 0x7F)
-#define RESTR_TO_VAL(x) ( (FQ_ELEM) (RESTR_G_TABLE >> (8*(uint64_t)x)) )
-
-#elif defined(RSDPG)
 #define FQRED_SINGLE(x) ((x)% Q)
 #define FQRED_DOUBLE(x) FQRED_SINGLE(FQRED_SINGLE(x))
 #define FQRED_OPPOSITE(x) ((Q-x) % Q)
@@ -82,7 +74,6 @@ FQ_ELEM RESTR_TO_VAL(FQ_ELEM x){
            FQRED_SINGLE(res3 * res4) );
 }
 
-#endif
 
 
 /* in-place normalization of redundant zero representation for syndromes*/

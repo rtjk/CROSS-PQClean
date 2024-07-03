@@ -73,11 +73,7 @@ void xof_shake_extract(SHAKE_STATE_STRUCT *state,
 #include "fips202.h"
 /* standalone FIPS-202 implementation has 
  * different states for SHAKE depending on security level*/
-#if defined(CATEGORY_1)
-#define SHAKE_STATE_STRUCT shake128incctx
-#else
 #define SHAKE_STATE_STRUCT shake256incctx
-#endif
 // %%%%%%%%%%%%%%%%%% Self-contained SHAKE Wrappers %%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 static inline
@@ -85,11 +81,7 @@ void xof_shake_init(SHAKE_STATE_STRUCT *state, int val)
 {
    /* PQClean-edit: unused parameter */
    if(val == 0) {val = 0;};
-#if defined(CATEGORY_1)
-   shake128_inc_init(state);
-#else
    shake256_inc_init(state);
-#endif
 }
 
 static inline
@@ -97,47 +89,29 @@ void xof_shake_update(SHAKE_STATE_STRUCT *state,
                       const unsigned char *input,
                       uint32_t inputByteLen)
 {
-#if defined(CATEGORY_1)
-   shake128_inc_absorb(state,
-                       (const uint8_t *)input,
-                       inputByteLen);
-#else
    shake256_inc_absorb(state,
                        (const uint8_t *)input,
                        inputByteLen);
-#endif
 }
 
 static inline
 void xof_shake_final(SHAKE_STATE_STRUCT *state)
 {
-#if defined(CATEGORY_1)
-   shake128_inc_finalize(state);
-#else
    shake256_inc_finalize(state);
-#endif
 }
 
 static inline
 void xof_shake_extract(SHAKE_STATE_STRUCT *state,
                        unsigned char *output,
                        uint32_t outputByteLen){
-#if defined(CATEGORY_1)
-   shake128_inc_squeeze(output, outputByteLen, state);
-#else
    shake256_inc_squeeze(output, outputByteLen, state);
-#endif
 }
 
 /* PQClean-edit: CSPRNG release context */
 static inline
 void xof_shake_release(SHAKE_STATE_STRUCT *state)
 {
-#if defined(CATEGORY_1)
-   shake128_inc_ctx_release(state);
-#else
    shake256_inc_ctx_release(state);
-#endif
 }
 #endif
 
@@ -149,21 +123,12 @@ void xof_shake_release(SHAKE_STATE_STRUCT *state)
 
 #ifdef USE_LIBOQS_SHAKE
 #include "fips202x4.h"
-   #if defined(CATEGORY_1)
-      #define LIBOQS_SHAKE_X4_STATE_STRUCT OQS_SHA3_shake128_x4_inc_ctx
-      #define SHAKE_X4_INIT OQS_SHA3_shake128_x4_inc_init
-      #define SHAKE_X4_ABSORB OQS_SHA3_shake128_x4_inc_absorb
-      #define SHAKE_X4_FINALIZE OQS_SHA3_shake128_x4_inc_finalize
-      #define SHAKE_X4_SQUEEZE OQS_SHA3_shake128_x4_inc_squeeze
-      #define SHAKE_X4_RELEASE OQS_SHA3_shake128_x4_inc_ctx_release
-   #else
       #define LIBOQS_SHAKE_X4_STATE_STRUCT OQS_SHA3_shake256_x4_inc_ctx
       #define SHAKE_X4_INIT OQS_SHA3_shake256_x4_inc_init
       #define SHAKE_X4_ABSORB OQS_SHA3_shake256_x4_inc_absorb
       #define SHAKE_X4_FINALIZE OQS_SHA3_shake256_x4_inc_finalize
       #define SHAKE_X4_SQUEEZE OQS_SHA3_shake256_x4_inc_squeeze
       #define SHAKE_X4_RELEASE OQS_SHA3_shake256_x4_inc_ctx_release
-   #endif
 #endif
 
 typedef struct {

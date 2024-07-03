@@ -31,19 +31,6 @@
 void PQCLEAN_CROSSRSDP192BALANCED_AVX2_pseed(unsigned char seed[SEED_LENGTH_BYTES]);
 void PQCLEAN_CROSSRSDP192BALANCED_AVX2_ptree(unsigned char seed_tree[NUM_NODES_SEED_TREE * SEED_LENGTH_BYTES]);
 
-#if defined(NO_TREES)
-int PQCLEAN_CROSSRSDP192BALANCED_AVX2_compute_round_seeds(unsigned char rounds_seeds[T*SEED_LENGTH_BYTES],
-                  const unsigned char root_seed[SEED_LENGTH_BYTES],
-                  const unsigned char salt[SALT_LENGTH_BYTES]);
-
-int PQCLEAN_CROSSRSDP192BALANCED_AVX2_publish_round_seeds(unsigned char *seed_storage,
-                  const unsigned char rounds_seeds[T*SEED_LENGTH_BYTES],
-                  const unsigned char indices_to_publish[T]);
-
-int PQCLEAN_CROSSRSDP192BALANCED_AVX2_regenerate_round_seeds(unsigned char rounds_seeds[T*SEED_LENGTH_BYTES],                           
-                           const unsigned char indices_to_publish[T],
-                           const unsigned char *seed_storage);
-#else
 /******************************************************************************/
 void PQCLEAN_CROSSRSDP192BALANCED_AVX2_generate_seed_tree_from_root(unsigned char
                                   seed_tree[NUM_NODES_SEED_TREE * SEED_LENGTH_BYTES],
@@ -67,4 +54,3 @@ int PQCLEAN_CROSSRSDP192BALANCED_AVX2_regenerate_round_seeds(unsigned char
                       const unsigned char salt[SALT_LENGTH_BYTES]);   // input
 
 
-#endif

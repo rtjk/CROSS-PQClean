@@ -33,56 +33,12 @@
 
 #define NUM_BITS_Q (BITS_TO_REPRESENT(Q))
 
-#if defined(RSDP)
 #define FQRED_SINGLE(x) (((x) & 0x7F) + ((x) >> 7))
 #define FQRED_DOUBLE(x) FQRED_SINGLE(FQRED_SINGLE(x))
 #define FQRED_OPPOSITE(x) ((x) ^ 0x7F)
 #define FQ_DOUBLE_ZERO_NORM(x) ((x + ((x + 1) >> 7)) & 0x7F)
 #define RESTR_TO_VAL(x) ( (FQ_ELEM) (RESTR_G_TABLE >> (8*(uint64_t)x)) )
 
-#elif defined(RSDPG)
-#define FQRED_SINGLE(x) ((x)% Q)
-#define FQRED_DOUBLE(x) FQRED_SINGLE(FQRED_SINGLE(x))
-#define FQRED_OPPOSITE(x) ((Q-x) % Q)
-/* no redundant zero notation in F_509 */
-#define FQ_DOUBLE_ZERO_NORM(x) (x)
-
-/* for i in [0,1,2,4,8,16,32,64] RESTR_G_GEN**i mod 509 yields
- * [1, 16, 256, 384, 355, 302, 93, 505]
- * the following is a precomputed-squares S&M, to be optimized into muxed
- * register stored tables */
-
-#define RESTR_G_GEN_1  ((FQ_ELEM)RESTR_G_GEN)
-#define RESTR_G_GEN_2  ((FQ_ELEM) 256)
-#define RESTR_G_GEN_4  ((FQ_ELEM) 384)
-#define RESTR_G_GEN_8  ((FQ_ELEM) 355)
-#define RESTR_G_GEN_16 ((FQ_ELEM) 302)
-#define RESTR_G_GEN_32 ((FQ_ELEM) 93)
-#define RESTR_G_GEN_64 ((FQ_ELEM) 505)
-
-#define FQ_ELEM_CMOV(BIT,TRUE_V,FALSE_V)  ( (((FQ_ELEM)0 - BIT) & TRUE_V) | (~((FQ_ELEM)0 - BIT) & FALSE_V) )
-
-/* log reduction, constant time unrolled S&M w/precomputed squares.
- * To be further optimized with muxed register-fitting tables */
-static inline
-FQ_ELEM RESTR_TO_VAL(FQ_ELEM x){
-    FQ_ELEM res1, res2, res3, res4;
-    res1 = FQRED_SINGLE(
-                ( FQ_ELEM_CMOV(((x >> 0) &1),RESTR_G_GEN_1 ,1)) *
-                ( FQ_ELEM_CMOV(((x >> 1) &1),RESTR_G_GEN_2 ,1)) );
-    res2 = FQRED_SINGLE(
-                ( FQ_ELEM_CMOV(((x >> 2) &1),RESTR_G_GEN_4 ,1)) *
-                ( FQ_ELEM_CMOV(((x >> 3) &1),RESTR_G_GEN_8 ,1)) );
-    res3 = FQRED_SINGLE(
-                ( FQ_ELEM_CMOV(((x >> 4) &1),RESTR_G_GEN_16,1)) *
-                ( FQ_ELEM_CMOV(((x >> 5) &1),RESTR_G_GEN_32,1)) );
-    res4 = FQ_ELEM_CMOV(((x >> 6) &1),RESTR_G_GEN_64,1);
-
-   return FQRED_SINGLE( FQRED_SINGLE(res1 * res2) *
-           FQRED_SINGLE(res3 * res4) );
-}
-
-#endif
 
 
 /* in-place normalization of redundant zero representation for syndromes*/

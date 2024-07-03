@@ -33,7 +33,6 @@
 #include "architecture_detect.h"
 #include "randombytes.h"
 
-#if defined(RSDP)
 static
 void expand_public_seed(FQ_ELEM V_tr[K][N-K],
                         const uint8_t seed_pub[KEYPAIR_SEED_LENGTH_BYTES]){
@@ -44,24 +43,8 @@ void expand_public_seed(FQ_ELEM V_tr[K][N-K],
   /* PQClean-edit: CSPRNG release context */
   csprng_release(&CSPRNG_state_mat);
 }
-#elif defined(RSDPG)
-static
-void expand_public_seed(FQ_ELEM V_tr[K][N-K],
-                        FZ_ELEM W_mat[M][N-M],
-                        const uint8_t seed_pub[KEYPAIR_SEED_LENGTH_BYTES]){
-  CSPRNG_STATE_T CSPRNG_state_mat;
-  initialize_csprng(&CSPRNG_state_mat, seed_pub, KEYPAIR_SEED_LENGTH_BYTES);
-
-  CSPRNG_fq_mat(V_tr,&CSPRNG_state_mat);
-  CSPRNG_fz_mat(W_mat,&CSPRNG_state_mat);
-
-  /* PQClean-edit: CSPRNG release context */
-  csprng_release(&CSPRNG_state_mat);
-}
-#endif
 
 
-#if defined(RSDP)
 static
 void expand_private_seed(FZ_ELEM eta[N],
                          FQ_ELEM V_tr[K][N-K],
@@ -85,46 +68,6 @@ void expand_private_seed(FZ_ELEM eta[N],
   /* PQClean-edit: CSPRNG release context */
   csprng_release(&CSPRNG_state_eta);
 }
-#elif defined(RSDPG)
-static
-void expand_private_seed(FZ_ELEM eta[N],
-                         FZ_ELEM zeta[M],
-                         FQ_ELEM V_tr[K][N-K],
-                         FZ_ELEM W_mat[M][N-M],
-                         const uint8_t seed[KEYPAIR_SEED_LENGTH_BYTES]){
-  uint8_t seede_seed_pub[2][KEYPAIR_SEED_LENGTH_BYTES];
-  CSPRNG_STATE_T CSPRNG_state;
-  initialize_csprng(&CSPRNG_state,seed,KEYPAIR_SEED_LENGTH_BYTES);
-  csprng_randombytes((uint8_t *)seede_seed_pub,
-                     2*KEYPAIR_SEED_LENGTH_BYTES,
-                     &CSPRNG_state);
-
-  /* PQClean-edit: CSPRNG release context */
-  csprng_release(&CSPRNG_state);
-
-  expand_public_seed(V_tr,W_mat,seede_seed_pub[1]);
-
-  CSPRNG_STATE_T CSPRNG_state_eta;
-  initialize_csprng(&CSPRNG_state_eta, seede_seed_pub[0], KEYPAIR_SEED_LENGTH_BYTES);
-  CSPRNG_zz_inf_w(zeta,&CSPRNG_state_eta);
-
-  /* PQClean-edit: CSPRNG release context */
-  csprng_release(&CSPRNG_state_eta);
-
-#if (defined(HIGH_PERFORMANCE_X86_64) && defined(RSDPG) )
-    alignas(EPI8_PER_REG) uint16_t W_mat_avx[M][ROUND_UP(N-M,EPI16_PER_REG)] = {{0}};
-    for(int i = 0; i < M; i++){
-      for (int j = 0; j < N-M; j++){
-         W_mat_avx[i][j] = W_mat[i][j];
-      }
-    }
-  fz_inf_w_by_fz_matrix(eta,zeta,W_mat_avx);
-#else
-  fz_inf_w_by_fz_matrix(eta,zeta,W_mat);
-#endif
-  fz_dz_norm_sigma(eta);
-}
-#endif
 
 
 void PQCLEAN_CROSSRSDP192FAST_AVX2_CROSS_keygen(prikey_t *SK,
@@ -146,36 +89,14 @@ void PQCLEAN_CROSSRSDP192FAST_AVX2_CROSS_keygen(prikey_t *SK,
 
   /* expansion of matrix/matrices */
   FQ_ELEM V_tr[K][N-K];
-#if defined(RSDP)
   expand_public_seed(V_tr,PK->seed_pub);
-#elif defined(RSDPG)
-  FZ_ELEM W_mat[M][N-M];
-  expand_public_seed(V_tr,W_mat,PK->seed_pub);
-#endif
 
   /* expansion of secret key material */
   FZ_ELEM eta[N];
   CSPRNG_STATE_T CSPRNG_state_eta;
   initialize_csprng(&CSPRNG_state_eta, seede_seed_pub[0], KEYPAIR_SEED_LENGTH_BYTES);
 
-#if defined(RSDP)
   CSPRNG_zz_vec(eta,&CSPRNG_state_eta);
-#elif defined(RSDPG)
-  FZ_ELEM zeta[M];
-  CSPRNG_zz_inf_w(zeta,&CSPRNG_state_eta);
-#if (defined(HIGH_PERFORMANCE_X86_64) && defined(RSDPG) )
-    alignas(EPI8_PER_REG) uint16_t W_mat_avx[M][ROUND_UP(N-M,EPI16_PER_REG)] = {{0}};
-    for(int i = 0; i < M; i++){
-      for (int j = 0; j < N-M; j++){
-         W_mat_avx[i][j] = W_mat[i][j];
-      }
-    }
-  fz_inf_w_by_fz_matrix(eta,zeta,W_mat_avx);
-#else
-  fz_inf_w_by_fz_matrix(eta,zeta,W_mat);
-#endif
-  fz_dz_norm_sigma(eta);
-#endif
 
   /* PQClean-edit: CSPRNG release context */
   csprng_release(&CSPRNG_state_eta);
@@ -198,15 +119,8 @@ void PQCLEAN_CROSSRSDP192FAST_AVX2_CROSS_sign(const prikey_t *SK,
     /* Key material expansion */
     FQ_ELEM V_tr[K][N-K];
     FZ_ELEM eta[N];
-#if defined(RSDP)
     expand_private_seed(eta,V_tr,SK->seed);
-#elif defined(RSDPG)
-    FZ_ELEM zeta[M];
-    FZ_ELEM W_mat[M][N-M];
-    expand_private_seed(eta,zeta,V_tr,W_mat,SK->seed);
-#endif
 
-#if (defined(HIGH_PERFORMANCE_X86_64) && defined(RSDP) )
     /* Expanded */
     alignas(EPI8_PER_REG) uint16_t V_tr_avx[K][ROUND_UP(N-K,EPI16_PER_REG)] = {{0}};
     for(int i = 0; i < K; i++){
@@ -214,50 +128,24 @@ void PQCLEAN_CROSSRSDP192FAST_AVX2_CROSS_sign(const prikey_t *SK,
          V_tr_avx[i][j] = V_tr[i][j];
       }
     }
-#endif
-#if (defined(HIGH_PERFORMANCE_X86_64) && defined(RSDPG) )
-    alignas(EPI8_PER_REG) uint16_t W_mat_avx[M][ROUND_UP(N-M,EPI16_PER_REG)] = {{0}};
-    for(int i = 0; i < M; i++){
-      for (int j = 0; j < N-M; j++){
-         W_mat_avx[i][j] = W_mat[i][j];
-      }
-    }
-#endif
 
     uint8_t root_seed[SEED_LENGTH_BYTES];
     randombytes(root_seed,SEED_LENGTH_BYTES);
     randombytes(sig->salt,SALT_LENGTH_BYTES);
 
-#if defined(NO_TREES)
     unsigned char rounds_seeds[T*SEED_LENGTH_BYTES] = {0};
     PQCLEAN_CROSSRSDP192FAST_AVX2_compute_round_seeds(rounds_seeds,root_seed,sig->salt);
-#else
-    uint8_t seed_tree[SEED_LENGTH_BYTES*NUM_NODES_SEED_TREE] = {0};
-    PQCLEAN_CROSSRSDP192FAST_AVX2_generate_seed_tree_from_root(seed_tree,root_seed,sig->salt);
-    uint8_t * rounds_seeds = seed_tree +
-                                 SEED_LENGTH_BYTES*NUM_INNER_NODES_SEED_TREE;
-#endif
 
     FZ_ELEM eta_tilde[T][N];
     FZ_ELEM sigma[T][N];
     FQ_ELEM u_tilde[T][N];
     FQ_ELEM s_tilde[N-K];
 
-#if defined(RSDP)
     uint8_t cmt_0_i_input[DENSELY_PACKED_FQ_SYN_SIZE+
                           DENSELY_PACKED_FZ_VEC_SIZE+
                           SALT_LENGTH_BYTES+sizeof(uint16_t)];
     const int offset_salt = DENSELY_PACKED_FQ_SYN_SIZE+DENSELY_PACKED_FZ_VEC_SIZE;
     const int offset_round_idx = offset_salt+SALT_LENGTH_BYTES;
-#elif defined(RSDPG)
-    FZ_ELEM zeta_tilde[M];
-    FZ_ELEM delta[T][M];
-    uint8_t cmt_0_i_input[DENSELY_PACKED_FQ_SYN_SIZE+
-                          DENSELY_PACKED_FZ_RSDP_G_VEC_SIZE+
-                          SALT_LENGTH_BYTES+sizeof(uint16_t)];
-    const int offset_salt = DENSELY_PACKED_FQ_SYN_SIZE+DENSELY_PACKED_FZ_RSDP_G_VEC_SIZE;
-    const int offset_round_idx = offset_salt+SALT_LENGTH_BYTES;
-#endif
     /* cmt_0_i_input is syndrome||sigma ||salt ; place salt at the end */
     memcpy(cmt_0_i_input+offset_salt, sig->salt, SALT_LENGTH_BYTES);
 
@@ -286,19 +174,7 @@ void PQCLEAN_CROSSRSDP192FAST_AVX2_CROSS_sign(const prikey_t *SK,
                           csprng_input,
                           SEED_LENGTH_BYTES+SALT_LENGTH_BYTES+sizeof(uint16_t));
         /* expand eta_tilde */
-#if defined(RSDP)
         CSPRNG_zz_vec(eta_tilde[i], &CSPRNG_state);
-#elif defined(RSDPG)
-        CSPRNG_zz_inf_w(zeta_tilde, &CSPRNG_state);
-        restr_inf_w_sub(delta[i], zeta,zeta_tilde);
-        fz_dz_norm_delta(delta[i]);
-#if defined(HIGH_PERFORMANCE_X86_64)
-        fz_inf_w_by_fz_matrix(eta_tilde[i],zeta_tilde,W_mat_avx);
-#else
-        fz_inf_w_by_fz_matrix(eta_tilde[i],zeta_tilde,W_mat);
-#endif
-        fz_dz_norm_sigma(eta_tilde[i]);
-#endif
         restr_vec_sub(sigma[i], eta,eta_tilde[i]);
 
         FQ_ELEM v[N];
@@ -309,21 +185,13 @@ void PQCLEAN_CROSSRSDP192FAST_AVX2_CROSS_sign(const prikey_t *SK,
 
         FQ_ELEM u[N];
         fq_vec_by_fq_vec_pointwise(u,v,u_tilde[i]);
-#if (defined(HIGH_PERFORMANCE_X86_64) && defined(RSDP) )
         fq_vec_by_fq_matrix(s_tilde,u,V_tr_avx);
-#else
-        fq_vec_by_fq_matrix(s_tilde,u,V_tr);
-#endif
         fq_dz_norm_synd(s_tilde);
 
         /* cmt_0_i_input contains s-tilde || sigma_i || salt */
         PQCLEAN_CROSSRSDP192FAST_AVX2_pack_fq_syn(cmt_0_i_input,s_tilde);
 
-#if defined(RSDP)
         PQCLEAN_CROSSRSDP192FAST_AVX2_pack_fz_vec(cmt_0_i_input + DENSELY_PACKED_FQ_SYN_SIZE, sigma[i]);
-#elif defined(RSDPG)
-        PQCLEAN_CROSSRSDP192FAST_AVX2_pack_fz_rsdp_g_vec(cmt_0_i_input + DENSELY_PACKED_FQ_SYN_SIZE, delta[i]);
-#endif
         /* i+c+dsc */
         uint16_t domain_sep_idx_hash = domain_sep_i+HASH_CSPRNG_DOMAIN_SEP_CONST;
         /* Fixed endianness marshalling of round counter */
@@ -344,12 +212,7 @@ void PQCLEAN_CROSSRSDP192FAST_AVX2_CROSS_sign(const prikey_t *SK,
 
     /* vector containing d_0 and d_1 from spec */
     uint8_t commit_digests[2][HASH_DIGEST_LENGTH];
-#if defined(NO_TREES)
     PQCLEAN_CROSSRSDP192FAST_AVX2_merkle_tree_root_compute(commit_digests[0], cmt_0);
-#else
-    uint8_t merkle_tree_0[NUM_NODES_MERKLE_TREE * HASH_DIGEST_LENGTH];
-    PQCLEAN_CROSSRSDP192FAST_AVX2_merkle_tree_root_compute(commit_digests[0], merkle_tree_0, cmt_0);
-#endif
     hash(commit_digests[1], (unsigned char*)cmt_1, sizeof(cmt_1));
     hash(sig->digest_01,
               (unsigned char*) commit_digests,
@@ -396,13 +259,8 @@ void PQCLEAN_CROSSRSDP192FAST_AVX2_CROSS_sign(const prikey_t *SK,
 
     /* Computation of the second round of responses */
 
-#if defined(NO_TREES)
     PQCLEAN_CROSSRSDP192FAST_AVX2_merkle_tree_proof_compute(sig->mtp,cmt_0,fixed_weight_b);
     PQCLEAN_CROSSRSDP192FAST_AVX2_publish_round_seeds(sig->stp,rounds_seeds,fixed_weight_b);
-#else
-    PQCLEAN_CROSSRSDP192FAST_AVX2_merkle_tree_proof_compute(sig->mtp,merkle_tree_0,fixed_weight_b);
-    PQCLEAN_CROSSRSDP192FAST_AVX2_publish_seeds(sig->stp,seed_tree,fixed_weight_b);
-#endif
 
     int published_rsps = 0;
     for(int i = 0; i<T; i++){
@@ -410,11 +268,7 @@ void PQCLEAN_CROSSRSDP192FAST_AVX2_CROSS_sign(const prikey_t *SK,
             /* PQClean-edit: remove assertion */
             //assert(published_rsps < T-W);
             PQCLEAN_CROSSRSDP192FAST_AVX2_pack_fq_vec(sig->rsp_0[published_rsps].y, y[i]);
-#if defined(RSDP)
             PQCLEAN_CROSSRSDP192FAST_AVX2_pack_fz_vec(sig->rsp_0[published_rsps].sigma, sigma[i]);
-#elif defined(RSDPG)
-            PQCLEAN_CROSSRSDP192FAST_AVX2_pack_fz_rsdp_g_vec(sig->rsp_0[published_rsps].delta, delta[i]);
-#endif
             memcpy(sig->rsp_1[published_rsps], cmt_1[i], HASH_DIGEST_LENGTH);
             published_rsps++;
         }
@@ -429,13 +283,7 @@ int PQCLEAN_CROSSRSDP192FAST_AVX2_CROSS_verify(const pubkey_t *const PK,
     CSPRNG_STATE_T CSPRNG_state;
 
     FQ_ELEM V_tr[K][N-K];
-#if defined(RSDP)
     expand_public_seed(V_tr,PK->seed_pub);
-#elif defined(RSDPG)
-    FZ_ELEM W_mat[M][N-M];
-    expand_public_seed(V_tr,W_mat,PK->seed_pub);
-#endif
-#if (defined(HIGH_PERFORMANCE_X86_64) && defined(RSDP) )
     /* Expanded */
     alignas(EPI8_PER_REG) uint16_t V_tr_avx[K][ROUND_UP(N-K,EPI16_PER_REG)] = {{0}};
     for(int i = 0; i < K; i++){
@@ -443,15 +291,6 @@ int PQCLEAN_CROSSRSDP192FAST_AVX2_CROSS_verify(const pubkey_t *const PK,
          V_tr_avx[i][j] = V_tr[i][j];
       }
     }
-#endif
-#if (defined(HIGH_PERFORMANCE_X86_64) && defined(RSDPG) )
-    alignas(EPI8_PER_REG) uint16_t W_mat_avx[M][ROUND_UP(N-M,EPI16_PER_REG)] = {{0}};
-    for(int i = 0; i < M; i++){
-      for (int j = 0; j < N-M; j++){
-         W_mat_avx[i][j] = W_mat[i][j];
-      }
-    }
-#endif
 
     FQ_ELEM pub_syn[N-K];
     PQCLEAN_CROSSRSDP192FAST_AVX2_unpack_fq_syn(pub_syn,PK->s);
@@ -474,29 +313,14 @@ int PQCLEAN_CROSSRSDP192FAST_AVX2_CROSS_verify(const pubkey_t *const PK,
     uint8_t fixed_weight_b[T]={0};
     PQCLEAN_CROSSRSDP192FAST_AVX2_expand_digest_to_fixed_weight(fixed_weight_b,sig->digest_b);
 
-#if defined(NO_TREES)
     uint8_t rounds_seeds[T*SEED_LENGTH_BYTES] = {0};
     PQCLEAN_CROSSRSDP192FAST_AVX2_regenerate_round_seeds(rounds_seeds,fixed_weight_b,sig->stp);
-#else
-    uint8_t seed_tree[SEED_LENGTH_BYTES*NUM_NODES_SEED_TREE] = {0};
-    PQCLEAN_CROSSRSDP192FAST_AVX2_regenerate_round_seeds(seed_tree, fixed_weight_b, sig->stp, sig->salt);
-    uint8_t * rounds_seeds = seed_tree +
-                                 SEED_LENGTH_BYTES*NUM_INNER_NODES_SEED_TREE;
-#endif
 
-#if defined(RSDP)
     uint8_t cmt_0_i_input[DENSELY_PACKED_FQ_SYN_SIZE+
                           DENSELY_PACKED_FZ_VEC_SIZE+
                           SALT_LENGTH_BYTES+sizeof(uint16_t)];
     const int offset_salt = DENSELY_PACKED_FQ_SYN_SIZE+DENSELY_PACKED_FZ_VEC_SIZE;
     const int offset_round_idx = offset_salt+SALT_LENGTH_BYTES;
-#elif defined(RSDPG)
-    uint8_t cmt_0_i_input[DENSELY_PACKED_FQ_SYN_SIZE+
-                          DENSELY_PACKED_FZ_RSDP_G_VEC_SIZE+
-                          SALT_LENGTH_BYTES+sizeof(uint16_t)];
-    const int offset_salt = DENSELY_PACKED_FQ_SYN_SIZE+DENSELY_PACKED_FZ_RSDP_G_VEC_SIZE;
-    const int offset_round_idx = offset_salt+SALT_LENGTH_BYTES;
-#endif
     /* cmt_0_i_input is syndrome||sigma ||salt */
     memcpy(cmt_0_i_input+offset_salt, sig->salt, SALT_LENGTH_BYTES);
 
@@ -543,19 +367,8 @@ int PQCLEAN_CROSSRSDP192FAST_AVX2_CROSS_verify(const pubkey_t *const PK,
 
             /* expand seed[i] into seed_e and seed_u */
             initialize_csprng(&CSPRNG_state, csprng_input,csprng_input_length);
-#if defined(RSDP)
             /* expand eta_tilde */
             CSPRNG_zz_vec(eta_tilde, &CSPRNG_state);
-#elif defined(RSDPG)
-            FZ_ELEM zeta_tilde[M];
-            CSPRNG_zz_inf_w(zeta_tilde, &CSPRNG_state);
-#if defined(HIGH_PERFORMANCE_X86_64)
-            fz_inf_w_by_fz_matrix(eta_tilde,zeta_tilde,W_mat_avx);
-#else
-            fz_inf_w_by_fz_matrix(eta_tilde,zeta_tilde,W_mat);
-#endif
-            fz_dz_norm_sigma(eta_tilde);
-#endif
             /* expand u_tilde */
             CSPRNG_fq_vec(u_tilde, &CSPRNG_state);
 
@@ -572,7 +385,6 @@ int PQCLEAN_CROSSRSDP192FAST_AVX2_CROSS_verify(const pubkey_t *const PK,
             PQCLEAN_CROSSRSDP192FAST_AVX2_unpack_fq_vec(y[i], sig->rsp_0[used_rsps].y);
 
             FZ_ELEM sigma_local[N];
-#if defined(RSDP)
             /*sigma is memcpy'ed directly into cmt_0 input buffer */
             FZ_ELEM* sigma_ptr = cmt_0_i_input+DENSELY_PACKED_FQ_SYN_SIZE;
 	        PQCLEAN_CROSSRSDP192FAST_AVX2_unpack_fz_vec(sigma_local, sig->rsp_0[used_rsps].sigma);
@@ -581,34 +393,13 @@ int PQCLEAN_CROSSRSDP192FAST_AVX2_CROSS_verify(const pubkey_t *const PK,
                    DENSELY_PACKED_FZ_VEC_SIZE);
             is_signature_ok = is_signature_ok &&
                               is_zz_vec_in_restr_group(sigma_local);
-#elif defined(RSDPG)
-            /*delta is memcpy'ed directly into cmt_0 input buffer */
-            FZ_ELEM* delta_ptr = cmt_0_i_input+DENSELY_PACKED_FQ_SYN_SIZE;
-            memcpy(delta_ptr,
-                   &sig->rsp_0[used_rsps].delta,
-                   DENSELY_PACKED_FZ_RSDP_G_VEC_SIZE);
-            FZ_ELEM delta_local[M];
-	        PQCLEAN_CROSSRSDP192FAST_AVX2_unpack_fz_rsdp_g_vec(delta_local, sig->rsp_0[used_rsps].delta);
-            is_signature_ok = is_signature_ok &&
-                              is_zz_inf_w_valid(delta_local);
-#if defined(HIGH_PERFORMANCE_X86_64)
-            fz_inf_w_by_fz_matrix(sigma_local,delta_local,W_mat_avx);
-#else
-            fz_inf_w_by_fz_matrix(sigma_local,delta_local,W_mat);
-#endif
-
-#endif
             memcpy(cmt_1[i], sig->rsp_1[used_rsps], HASH_DIGEST_LENGTH);
             used_rsps++;
 
             FQ_ELEM v[N];
             convert_restr_vec_to_fq(v,sigma_local);
             fq_vec_by_fq_vec_pointwise(y_tilde,v,y[i]);
-#if (defined(HIGH_PERFORMANCE_X86_64) && defined(RSDP) )
             fq_vec_by_fq_matrix(s_tilde,y_tilde,V_tr_avx);
-            #else
-            fq_vec_by_fq_matrix(s_tilde,y_tilde,V_tr);
-#endif
             fq_dz_norm_synd(s_tilde);
             FQ_ELEM to_compress[N-K];
             fq_synd_minus_fq_vec_scaled(to_compress,

@@ -342,47 +342,6 @@ void CSPRNG_fq_mat(FQ_ELEM res[K][N-K],
     }   
 }
 
-#if defined(RSDP)
-static inline
-void CSPRNG_zz_vec(FZ_ELEM res[N],
-                   CSPRNG_STATE_T * const csprng_state){
-    const FZ_ELEM mask = ( (FZ_ELEM) 1 << BITS_FOR_Z) - 1;
-    uint32_t correction_bit_len =  (BITS_N_ZZ_CT_RNG - N*BITS_FOR_Z) * (BITS_FOR_Z-1);
-    uint32_t CSPRNG_buffer_size = ROUND_UP(BITS_N_ZZ_CT_RNG+correction_bit_len,8)/8;   
-    uint8_t CSPRNG_buffer[ROUND_UP(CSPRNG_buffer_size,4)];
-    /* To facilitate hardware implementations, the uint64_t 
-     * sub-buffer is consumed starting from the least significant byte 
-     * i.e., from the first being output by SHAKE. Bits in the byte are 
-     * discarded shifting them out to the right , shifting fresh ones
-     * in from the left end */
-    csprng_randombytes(CSPRNG_buffer,CSPRNG_buffer_size,csprng_state);    
-    int placed = 0;
-    uint64_t sub_buffer = *(uint64_t*)CSPRNG_buffer;
-    int bits_in_sub_buf = 64;
-    /* position of the next fresh byte in CSPRNG_buffer*/
-    int pos_in_buf = 8;
-    while(placed < N){
-        if(bits_in_sub_buf <= 32){
-            /* get 32 fresh bits from main buffer with a single load */
-            uint32_t refresh_buf = *(uint32_t*) (CSPRNG_buffer+pos_in_buf);
-            pos_in_buf += 4;
-            sub_buffer |=  ((uint64_t) refresh_buf) << bits_in_sub_buf;
-            bits_in_sub_buf += 32; 
-      }
-        /* get */
-        res[placed] = sub_buffer & mask;
-        if(res[placed] < Z) {
-           placed++;
-           sub_buffer = sub_buffer >> BITS_FOR_Z;
-           bits_in_sub_buf -= BITS_FOR_Z;
-            
-        } else {
-           sub_buffer = sub_buffer >> 1;
-           bits_in_sub_buf -= 1;
-        }
-    }
-}
-#elif defined(RSDPG)
 static inline
 void CSPRNG_zz_inf_w(FZ_ELEM res[M],
                    CSPRNG_STATE_T * const csprng_state){
@@ -460,4 +419,3 @@ void CSPRNG_fz_mat(FZ_ELEM res[M][N-M],
         }
     }    
 }
-#endif

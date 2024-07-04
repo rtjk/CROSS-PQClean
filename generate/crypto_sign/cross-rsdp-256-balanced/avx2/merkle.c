@@ -228,9 +228,7 @@ void PQCLEAN_CROSSRSDP256BALANCED_AVX2_generate_merkle_tree(unsigned char merkle
                 2*HASH_DIGEST_LENGTH);
             to_hash = 0;
         }
-
     }
-    
 }
 
 /* PQCLEAN_CROSSRSDP256BALANCED_AVX2_generate_merkle_proof()
@@ -402,6 +400,5 @@ void PQCLEAN_CROSSRSDP256BALANCED_AVX2_rebuild_merkle_tree(unsigned char merkle_
                 2*HASH_DIGEST_LENGTH);
             to_hash = 0;
         }
-
     }
 }

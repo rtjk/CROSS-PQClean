@@ -128,7 +128,7 @@ static void compute_seeds_to_publish(
    }
 } /* end compute_seeds_to_publish */
 
-/*****************************************************************************/
+
 /**
  * unsigned char *seed_tree:
  * it is intended as an output parameter;

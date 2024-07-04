@@ -29,7 +29,6 @@
 
 #include "csprng_hash.h"
 
-
 void PQCLEAN_CROSSRSDP192BALANCED_CLEAN_merkle_tree_root_compute(uint8_t root[HASH_DIGEST_LENGTH],
                               uint8_t tree[NUM_NODES_MERKLE_TREE * HASH_DIGEST_LENGTH],
                               uint8_t leaves[T][HASH_DIGEST_LENGTH]);

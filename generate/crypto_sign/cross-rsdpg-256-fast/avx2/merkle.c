@@ -228,9 +228,7 @@ void PQCLEAN_CROSSRSDPG256FAST_AVX2_generate_merkle_tree(unsigned char merkle_tr
                 2*HASH_DIGEST_LENGTH);
             to_hash = 0;
         }
-
     }
-    
 }
 
 /* PQCLEAN_CROSSRSDPG256FAST_AVX2_generate_merkle_proof()
@@ -402,6 +400,5 @@ void PQCLEAN_CROSSRSDPG256FAST_AVX2_rebuild_merkle_tree(unsigned char merkle_tre
                 2*HASH_DIGEST_LENGTH);
             to_hash = 0;
         }
-
     }
 }

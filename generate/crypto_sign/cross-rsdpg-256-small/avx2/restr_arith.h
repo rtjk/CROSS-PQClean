@@ -27,15 +27,6 @@
 
 #include "parameters.h"
 
-// TODO: diagnose verify error
-// When these three conditions are present:
-// - compiling CROSS' optimized implementation (avx2)
-// - avx2 processor flags are missing (e.g. __AVX2__ is not defined)
-// - immintrin.h is included in restr_arith.h
-// then a rare error can occour during signature verification
-// immintrin.h should NOT be included here
-// #include <immintrin.h>
-
 #define FZRED_SINGLE(x)   (((x) & 0x7f) + ((x) >> 7))
 #define FZRED_DOUBLE(x) FZRED_SINGLE(FZRED_SINGLE(x))
 #define FZRED_OPPOSITE(x) ((x) ^ 0x7f)

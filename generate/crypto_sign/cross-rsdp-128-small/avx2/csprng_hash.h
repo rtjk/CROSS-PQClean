@@ -27,9 +27,6 @@
 #include "parameters.h"
 #include "sha3.h"
 
-// TODO: check max buffer size
-#define EXTRA_BYTES_FIX 5
-
 /************************* CSPRNG ********************************/
 
 #define CSPRNG_STATE_T SHAKE_STATE_STRUCT
@@ -59,15 +56,14 @@ void csprng_release(CSPRNG_STATE_T * const csprng_state){
 }
 
 
-///////////////////////////////////////////////////////////////
-//                SHAKE x2 x3 x4 wrappers                    //
-///////////////////////////////////////////////////////////////
+/**************** Parallel CSPRNG (x2, x3, x4) ***********************/
 
 #define CSPRNG_X2_STATE_T SHAKE_X2_STATE_STRUCT
-#define CSPRNG_X3_STATE_T SHAKE_X4_STATE_STRUCT // CRSPRNG_x3 calls SHAKE_x4 and discards the fourth input/output
+/* CRSPRNG_x3 calls SHAKE_x4 and discards the fourth input/output */
+#define CSPRNG_X3_STATE_T SHAKE_X4_STATE_STRUCT
 #define CSPRNG_X4_STATE_T SHAKE_X4_STATE_STRUCT
 
-// INITIALIZE
+/* initialize */
 static inline
 void initialize_csprng_x2(CSPRNG_X2_STATE_T * const csprng_state,const unsigned char * const seed1, const unsigned char * const seed2,const uint32_t seed_len_bytes) {
    xof_shake_x2_init(csprng_state);
@@ -87,7 +83,7 @@ void initialize_csprng_x4(CSPRNG_X4_STATE_T * const csprng_state,const unsigned 
    xof_shake_x4_update(csprng_state,seed1,seed2,seed3,seed4,seed_len_bytes);
    xof_shake_x4_final(csprng_state);
 }
-// RANDOMBYTES
+/* randombytes */
 static inline
 void csprng_randombytes_x2(unsigned char * const x1, unsigned char * const x2, uint64_t xlen, CSPRNG_X2_STATE_T * const csprng_state){
    xof_shake_x2_extract(csprng_state,x1,x2,xlen);
@@ -101,7 +97,7 @@ static inline
 void csprng_randombytes_x4(unsigned char * const x1,unsigned char * const x2,unsigned char * const x3,unsigned char * const x4,uint64_t xlen,CSPRNG_X4_STATE_T * const csprng_state){
    xof_shake_x4_extract(csprng_state,x1,x2,x3,x4,xlen);
 }
-// RELEASE
+/* release */
 static inline
 void csprng_release_x2(CSPRNG_X2_STATE_T * const csprng_state){
    xof_shake_x2_release(csprng_state);
@@ -115,9 +111,7 @@ void csprng_release_x4(CSPRNG_X4_STATE_T * const csprng_state){
    xof_shake_x4_release(csprng_state);
 }
 
-///////////////////////////////////////////////////////////////
-//  SINGLE INTERFACE FOR ALL SHAKE VERSIONS (x1 x2 x3 x4)    //
-///////////////////////////////////////////////////////////////
+/************** Single API for Parallel CSPRNG *******************/
 
 #define PAR_CSPRNG_STATE_T par_shake_ctx
 
@@ -165,6 +159,10 @@ void hash(uint8_t digest[HASH_DIGEST_LENGTH],
    xof_shake_release(&csprng_state);
 }
 
+#define par_xof_input par_initialize_csprng
+#define par_xof_output par_csprng_randombytes
+#define par_xof_release par_csprng_release
+
 static inline
 void par_hash(
                int par_level,
@@ -178,9 +176,9 @@ void par_hash(
                const unsigned char *const m_4,
                const uint64_t mlen){
    PAR_CSPRNG_STATE_T states;
-   par_initialize_csprng(par_level, &states, m_1, m_2, m_3, m_4, mlen);
-   par_csprng_randombytes(par_level, &states, digest_1, digest_2, digest_3, digest_4, HASH_DIGEST_LENGTH);
-   par_csprng_release(par_level, &states);
+   par_xof_input(par_level, &states, m_1, m_2, m_3, m_4, mlen);
+   par_xof_output(par_level, &states, digest_1, digest_2, digest_3, digest_4, HASH_DIGEST_LENGTH);
+   par_xof_release(par_level, &states);
 }
 
 /********************** CSPRNG Sampling functions helpers ********************/
@@ -296,7 +294,6 @@ void CSPRNG_fq_vec_beta(FQ_ELEM res[T],
     }
 }
 
-//#include <stdio.h>
 static inline
 void CSPRNG_fq_mat(FQ_ELEM res[K][N-K],
                    CSPRNG_STATE_T * const csprng_state){

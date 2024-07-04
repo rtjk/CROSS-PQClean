@@ -29,7 +29,6 @@
 
 #include "csprng_hash.h"
 
-
 #define TO_PUBLISH 1
 #define NOT_TO_PUBLISH 0
 

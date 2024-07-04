@@ -228,9 +228,7 @@ void PQCLEAN_CROSSRSDPG192BALANCED_CLEAN_generate_merkle_tree(unsigned char merk
                 2*HASH_DIGEST_LENGTH);
             to_hash = 0;
         }
-
     }
-    
 }
 
 /* PQCLEAN_CROSSRSDPG192BALANCED_CLEAN_generate_merkle_proof()
@@ -402,6 +400,5 @@ void PQCLEAN_CROSSRSDPG192BALANCED_CLEAN_rebuild_merkle_tree(unsigned char merkl
                 2*HASH_DIGEST_LENGTH);
             to_hash = 0;
         }
-
     }
 }

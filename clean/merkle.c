@@ -228,9 +228,7 @@ void __namespace__generate_merkle_tree(unsigned char merkle_tree[NUM_NODES_MERKL
                 2*HASH_DIGEST_LENGTH);
             to_hash = 0;
         }
-
     }
-    
 }
 
 /* __namespace__generate_merkle_proof()
@@ -402,6 +400,5 @@ void __namespace__rebuild_merkle_tree(unsigned char merkle_tree[NUM_NODES_MERKLE
                 2*HASH_DIGEST_LENGTH);
             to_hash = 0;
         }
-
     }
 }

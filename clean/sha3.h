@@ -28,7 +28,6 @@
 #if defined(SHA_3_LIBKECCAK)
 #include <libkeccak.a.headers/KeccakHash.h>
 
-
 /* LibKeccak SHAKE Wrappers */
 
 #define SHAKE_STATE_STRUCT Keccak_HashInstance
@@ -78,7 +77,7 @@ void xof_shake_extract(SHAKE_STATE_STRUCT *state,
 #else
 #define SHAKE_STATE_STRUCT shake256incctx
 #endif
-// %%%%%%%%%%%%%%%%%% Self-contained SHAKE Wrappers %%%%%%%%%%%%%%%%%%%%%%%%%%%%
+// %%%%%%%%%%%%%%%%%% Self-contained SHAKE x1 Wrappers %%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 static inline
 void xof_shake_init(SHAKE_STATE_STRUCT *state, int val)
@@ -141,175 +140,93 @@ void xof_shake_release(SHAKE_STATE_STRUCT *state)
 }
 #endif
 
-///////////////////////////////////////////////////////////////
-//                    SHAKE x4 wrappers                      //
-///////////////////////////////////////////////////////////////
+// %%%%%%%%%%%%%%%%%% Self-contained SHAKE x4 Wrappers %%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-#define USE_LIBOQS_SHAKE_1
-
-#ifdef USE_LIBOQS_SHAKE
 #include "fips202x4.h"
-   #if defined(CATEGORY_1)
-      #define LIBOQS_SHAKE_X4_STATE_STRUCT OQS_SHA3_shake128_x4_inc_ctx
-      #define SHAKE_X4_INIT OQS_SHA3_shake128_x4_inc_init
-      #define SHAKE_X4_ABSORB OQS_SHA3_shake128_x4_inc_absorb
-      #define SHAKE_X4_FINALIZE OQS_SHA3_shake128_x4_inc_finalize
-      #define SHAKE_X4_SQUEEZE OQS_SHA3_shake128_x4_inc_squeeze
-      #define SHAKE_X4_RELEASE OQS_SHA3_shake128_x4_inc_ctx_release
-   #else
-      #define LIBOQS_SHAKE_X4_STATE_STRUCT OQS_SHA3_shake256_x4_inc_ctx
-      #define SHAKE_X4_INIT OQS_SHA3_shake256_x4_inc_init
-      #define SHAKE_X4_ABSORB OQS_SHA3_shake256_x4_inc_absorb
-      #define SHAKE_X4_FINALIZE OQS_SHA3_shake256_x4_inc_finalize
-      #define SHAKE_X4_SQUEEZE OQS_SHA3_shake256_x4_inc_squeeze
-      #define SHAKE_X4_RELEASE OQS_SHA3_shake256_x4_inc_ctx_release
-   #endif
-#endif
-
-typedef struct {
-   SHAKE_STATE_STRUCT state1;
-   SHAKE_STATE_STRUCT state2;
-   SHAKE_STATE_STRUCT state3;
-   SHAKE_STATE_STRUCT state4;
-} shake_x4_ctx;
-
-#ifdef USE_LIBOQS_SHAKE
-#define SHAKE_X4_STATE_STRUCT LIBOQS_SHAKE_X4_STATE_STRUCT
+#if defined(CATEGORY_1)
+   #define SHAKE_X4_STATE_STRUCT shake128x4incctx
+   #define SHAKE_X4_INIT shake128x4_inc_init
+   #define SHAKE_X4_ABSORB shake128x4_inc_absorb
+   #define SHAKE_X4_FINALIZE shake128x4_inc_finalize
+   #define SHAKE_X4_SQUEEZE shake128x4_inc_squeeze
+   #define SHAKE_X4_RELEASE shake128x4_inc_ctx_release
 #else
-#define SHAKE_X4_STATE_STRUCT shake_x4_ctx
+   #define SHAKE_X4_STATE_STRUCT shake256x4incctx
+   #define SHAKE_X4_INIT shake256x4_inc_init
+   #define SHAKE_X4_ABSORB shake256x4_inc_absorb
+   #define SHAKE_X4_FINALIZE shake256x4_inc_finalize
+   #define SHAKE_X4_SQUEEZE shake256x4_inc_squeeze
+   #define SHAKE_X4_RELEASE shake256x4_inc_ctx_release
 #endif
 
-static inline
-void xof_shake_x4_init(SHAKE_X4_STATE_STRUCT *states)
-{
-#ifdef USE_LIBOQS_SHAKE
+static inline void xof_shake_x4_init(SHAKE_X4_STATE_STRUCT *states) {
    SHAKE_X4_INIT(states);
-#else
-   xof_shake_init(&(states->state4), 0);  // change order to simulate parallelism
-   xof_shake_init(&(states->state1), 0);
-   xof_shake_init(&(states->state2), 0);
-   xof_shake_init(&(states->state3), 0);
-#endif
 }
-
-static inline
-void xof_shake_x4_update(SHAKE_X4_STATE_STRUCT *states,
+static inline void xof_shake_x4_update(SHAKE_X4_STATE_STRUCT *states,
                       const unsigned char *in1,
                       const unsigned char *in2,
                       const unsigned char *in3,
                       const unsigned char *in4,
-                      uint32_t singleInputByteLen)
-{
-#ifdef USE_LIBOQS_SHAKE
+                      uint32_t singleInputByteLen) {
    SHAKE_X4_ABSORB(states, in1, in2, in3, in4, singleInputByteLen);
-#else
-   xof_shake_update(&(states->state4), (const uint8_t *)in4, singleInputByteLen); // change order to simulate parallelism
-   xof_shake_update(&(states->state1), (const uint8_t *)in1, singleInputByteLen);
-   xof_shake_update(&(states->state2), (const uint8_t *)in2, singleInputByteLen);
-   xof_shake_update(&(states->state3), (const uint8_t *)in3, singleInputByteLen);
-#endif
 }
-
-static inline
-void xof_shake_x4_final(SHAKE_X4_STATE_STRUCT *states)
-{
-#ifdef USE_LIBOQS_SHAKE
+static inline void xof_shake_x4_final(SHAKE_X4_STATE_STRUCT *states) {
    SHAKE_X4_FINALIZE(states);
-#else
-   xof_shake_final(&(states->state1));
-   xof_shake_final(&(states->state2));
-   xof_shake_final(&(states->state4));  // change order to simulate parallelism
-   xof_shake_final(&(states->state3));
-#endif
 }
-
-static inline
-void xof_shake_x4_extract(SHAKE_X4_STATE_STRUCT *states,
+static inline void xof_shake_x4_extract(SHAKE_X4_STATE_STRUCT *states,
                        unsigned char *out1,
                        unsigned char *out2,
                        unsigned char *out3,
                        unsigned char *out4,
                        uint32_t singleOutputByteLen){
-#ifdef USE_LIBOQS_SHAKE
    SHAKE_X4_SQUEEZE(out1, out2, out3, out4, singleOutputByteLen, states);
-#else
-   xof_shake_extract(&(states->state1), out1, singleOutputByteLen);
-   xof_shake_extract(&(states->state2), out2, singleOutputByteLen);
-   xof_shake_extract(&(states->state4), out4, singleOutputByteLen); // change order to simulate parallelism
-   xof_shake_extract(&(states->state3), out3, singleOutputByteLen);
-#endif
 }
-
-static inline
-void xof_shake_x4_release(SHAKE_X4_STATE_STRUCT *states)
-{
-#ifdef USE_LIBOQS_SHAKE
+static inline void xof_shake_x4_release(SHAKE_X4_STATE_STRUCT *states) {
    SHAKE_X4_RELEASE(states);
-#else
-   xof_shake_release(&(states->state1));
-   xof_shake_release(&(states->state4)); // change order to simulate parallelism
-   xof_shake_release(&(states->state2));
-   xof_shake_release(&(states->state3));
-#endif
 }
 
-///////////////////////////////////////////////////////////////
-//                    SHAKE x2 wrappers                      //
-///////////////////////////////////////////////////////////////
+// %%%%%%%%%%%%%%%%%% Self-contained SHAKE x2 Wrappers %%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+/* SHAKE_x2 just calls SHAKE_x1 twice. If a suitable SHAKE_x2 implementation becomes available, it should be used instead */
 
 typedef struct {
    SHAKE_STATE_STRUCT state1;
    SHAKE_STATE_STRUCT state2;
 } shake_x2_ctx;
-
-
 #define SHAKE_X2_STATE_STRUCT shake_x2_ctx
-
-static inline
-void xof_shake_x2_init(SHAKE_X2_STATE_STRUCT *states)
-{
+static inline void xof_shake_x2_init(SHAKE_X2_STATE_STRUCT *states) {
    xof_shake_init(&(states->state1), 0);
    xof_shake_init(&(states->state2), 0);
 }
-
-static inline
-void xof_shake_x2_update(SHAKE_X2_STATE_STRUCT *states,
+static inline void xof_shake_x2_update(SHAKE_X2_STATE_STRUCT *states,
                       const unsigned char *in1,
                       const unsigned char *in2,
-                      uint32_t singleInputByteLen)
-{
+                      uint32_t singleInputByteLen) {
    xof_shake_update(&(states->state1), (const uint8_t *)in1, singleInputByteLen);
    xof_shake_update(&(states->state2), (const uint8_t *)in2, singleInputByteLen);
 }
-
-static inline
-void xof_shake_x2_final(SHAKE_X2_STATE_STRUCT *states)
-{
+static inline void xof_shake_x2_final(SHAKE_X2_STATE_STRUCT *states) {
    xof_shake_final(&(states->state1));
    xof_shake_final(&(states->state2));
 }
-
-static inline
-void xof_shake_x2_extract(SHAKE_X2_STATE_STRUCT *states,
+static inline void xof_shake_x2_extract(SHAKE_X2_STATE_STRUCT *states,
                        unsigned char *out1,
                        unsigned char *out2,
                        uint32_t singleOutputByteLen){
    xof_shake_extract(&(states->state1), out1, singleOutputByteLen);
    xof_shake_extract(&(states->state2), out2, singleOutputByteLen);
 }
-
-static inline
-void xof_shake_x2_release(SHAKE_X2_STATE_STRUCT *states)
+static inline void xof_shake_x2_release(SHAKE_X2_STATE_STRUCT *states)
 {
    xof_shake_release(&(states->state1));
    xof_shake_release(&(states->state2));
 }
 
-///////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////
+// %%%%%%%%%%%%%%%%%%%% Parallel SHAKE State Struct %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 typedef struct {
    SHAKE_STATE_STRUCT state1;
    SHAKE_X2_STATE_STRUCT state2;
    SHAKE_X4_STATE_STRUCT state4;
 } par_shake_ctx;
+

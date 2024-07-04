@@ -278,6 +278,9 @@ void __namespace__CROSS_sign(const prikey_t *SK,
         /* expand u_tilde */
         CSPRNG_fq_vec(u_tilde[i], &CSPRNG_state);
 
+        /* PQClean-edit: CSPRNG release context */
+        csprng_release(&CSPRNG_state);
+
         FQ_ELEM u[N];
         fq_vec_by_fq_vec_pointwise(u,v,u_tilde[i]);
         fq_vec_by_fq_matrix(s_tilde,u,V_tr);

@@ -93,7 +93,6 @@ void PQCLEAN_CROSSRSDP128BALANCED_CLEAN_pack_fz_vec(uint8_t out[DENSELY_PACKED_F
 void PQCLEAN_CROSSRSDP128BALANCED_CLEAN_generic_pack_fq(uint8_t *out, const FQ_ELEM *in,
                        const size_t outlen, const size_t inlen)
 {
-#if Q == 127
    size_t i;
    for(i = 0; i < outlen; i++)
    {
@@ -160,97 +159,6 @@ void PQCLEAN_CROSSRSDP128BALANCED_CLEAN_generic_pack_fq(uint8_t *out, const FQ_E
       out[i*7+6] |= (in[i*8+6] << 7);
    }
 
-#elif Q == 509
-   size_t i;
-   for(i = 0; i < outlen; i++)
-   {
-      out[i] = 0;
-   }
-   for(i = 0; i < inlen/8; i++)
-   {
-      out[i*9] = (in[i*8] >> 1);
-      out[i*9+1] |= (in[i*8] << 7) | (in[i*8+1] >> 2);
-      out[i*9+2] |= (in[i*8+1] << 6) | (in[i*8+2] >> 3);
-      out[i*9+3] |= (in[i*8+2] << 5) | (in[i*8+3] >> 4);
-      out[i*9+4] |= (in[i*8+3] << 4) | (in[i*8+4] >> 5);
-      out[i*9+5] |= (in[i*8+4] << 3) | (in[i*8+5] >> 6);
-      out[i*9+6] |= (in[i*8+5] << 2) | (in[i*8+6] >> 7);
-      out[i*9+7] |= (in[i*8+6] << 1) | (in[i*8+7] >> 8);
-      out[i*9+8] |= (in[i*8+7]);
-   }
-   const uint8_t n_remainder = inlen%8;
-   if(n_remainder == 1)
-   {
-      out[i*9] = (in[i*8] >> 1);
-      out[i*9+1] = (in[i*8] << 7);
-   }
-   else if(n_remainder == 2)
-   {
-      out[i*9] = (in[i*8] >> 1);
-      out[i*9+1] |= (in[i*8] << 7) | (in[i*8+1] >> 2);
-      out[i*9+2] = (in[i*8+1] << 6);
-   }
-   else if(n_remainder == 3)
-   {
-      out[i*9] = (in[i*8] >> 1);
-      out[i*9+1] |= (in[i*8] << 7) | (in[i*8+1] >> 2);
-      out[i*9+2] |= (in[i*8+1] << 6) | (in[i*8+2] >> 3);
-      out[i*9+3] = (in[i*8+2] << 5);
-   }
-   else if(n_remainder == 4)
-   {
-      out[i*9] = (in[i*8] >> 1);
-      out[i*9+1] |= (in[i*8] << 7) | (in[i*8+1] >> 2);
-      out[i*9+2] |= (in[i*8+1] << 6) | (in[i*8+2] >> 3);
-      out[i*9+3] |= (in[i*8+2] << 5) | (in[i*8+3] >> 4);
-      out[i*9+4] = (in[i*8+3] << 4);
-   }
-   else if(n_remainder == 5)
-   {
-      out[i*9] = (in[i*8] >> 1);
-      out[i*9+1] |= (in[i*8] << 7) | (in[i*8+1] >> 2);
-      out[i*9+2] |= (in[i*8+1] << 6) | (in[i*8+2] >> 3);
-      out[i*9+3] |= (in[i*8+2] << 5) | (in[i*8+3] >> 4);
-      out[i*9+4] |= (in[i*8+3] << 4) | (in[i*8+4] >> 5);
-      out[i*9+5] = (in[i*8+4] << 3);
-   }
-   else if(n_remainder == 6)
-   {
-      out[i*9] = (in[i*8] >> 1);
-      out[i*9+1] |= (in[i*8] << 7) | (in[i*8+1] >> 2);
-      out[i*9+2] |= (in[i*8+1] << 6) | (in[i*8+2] >> 3);
-      out[i*9+3] |= (in[i*8+2] << 5) | (in[i*8+3] >> 4);
-      out[i*9+4] |= (in[i*8+3] << 4) | (in[i*8+4] >> 5);
-      out[i*9+5] |= (in[i*8+4] << 3) | (in[i*8+5] >> 6);
-      out[i*9+6] = (in[i*8+5] << 2);
-   }
-   else if(n_remainder == 7)
-   {
-      out[i*9] = (in[i*8] >> 1);
-      out[i*9+1] |= (in[i*8] << 7) | (in[i*8+1] >> 2);
-      out[i*9+2] |= (in[i*8+1] << 6) | (in[i*8+2] >> 3);
-      out[i*9+3] |= (in[i*8+2] << 5) | (in[i*8+3] >> 4);
-      out[i*9+4] |= (in[i*8+3] << 4) | (in[i*8+4] >> 5);
-      out[i*9+5] |= (in[i*8+4] << 3) | (in[i*8+5] >> 6);
-      out[i*9+6] |= (in[i*8+5] << 2) | (in[i*8+6] >> 7);
-      out[i*9+7] = (in[i*8+6] << 1);
-   } 
-
-#elif FQ_ELEM == uint8_t
-   uint16_t in_tmp[inlen];
-   for(size_t i = 0; i < inlen; i++)
-   {
-	   in_tmp[i] = (uint16_t)in[i];
-   }
-   PQCLEAN_CROSSRSDP128BALANCED_CLEAN_generic_uint16_t_pack(out, in_tmp, outlen, inlen, BITS_TO_REPRESENT(Q-1));
-
-#elif FQ_ELEM == uint16_t
-   PQCLEAN_CROSSRSDP128BALANCED_CLEAN_generic_uint16_t_pack(out, in, outlen, inlen, BITS_TO_REPRESENT(Q-1));
-
-#else
-   #error not implemented
-
-#endif
 }
 
 /* 
@@ -265,74 +173,6 @@ void PQCLEAN_CROSSRSDP128BALANCED_CLEAN_generic_pack_fq(uint8_t *out, const FQ_E
  */
 void PQCLEAN_CROSSRSDP128BALANCED_CLEAN_generic_pack_fz(uint8_t *out, const FZ_ELEM *in, const size_t outlen, const size_t inlen)
 {
-#if Z == 127
-   size_t i;
-   for(i = 0; i < outlen; i++)
-   {
-      out[i] = 0;
-   }
-   for(i = 0; i < inlen/8; i++)
-   {
-      out[i*7] |= (in[i*8] << 1) | (in[i*8+1] >> 6);
-      out[i*7+1] |= (in[i*8+1] << 2) | (in[i*8+2] >> 5);
-      out[i*7+2] |= (in[i*8+2] << 3) | (in[i*8+3] >> 4);
-      out[i*7+3] |= (in[i*8+3] << 4) | (in[i*8+4] >> 3);
-      out[i*7+4] |= (in[i*8+4] << 5) | (in[i*8+5] >> 2);
-      out[i*7+5] |= (in[i*8+5] << 6) | (in[i*8+6] >> 1);
-      out[i*7+6] |= (in[i*8+6] << 7) | (in[i*8+7]);
-   }
-   const uint8_t n_remainder = inlen%8;
-   if(n_remainder == 1)
-   {
-      out[i*7] = (in[i*8] << 1);
-   }
-   else if(n_remainder == 2)
-   { 
-      out[i*7] |= (in[i*8] << 1) | (in[i*8+1] >> 6);
-      out[i*7+1] = (in[i*8+1] << 2);
-   }
-   else if(n_remainder == 3)
-   {
-      out[i*7] |= (in[i*8] << 1) | (in[i*8+1] >> 6);
-      out[i*7+1] |= (in[i*8+1] << 2) | (in[i*8+2] >> 5);
-      out[i*7+2] = (in[i*8+2] << 3);
-   }
-   else if(n_remainder == 4)
-   {
-      out[i*7] |= (in[i*8] << 1) | (in[i*8+1] >> 6);
-      out[i*7+1] |= (in[i*8+1] << 2) | (in[i*8+2] >> 5);
-      out[i*7+2] |= (in[i*8+2] << 3) | (in[i*8+3] >> 4);
-      out[i*7+3] |= (in[i*8+3] << 4);
-   }
-   else if(n_remainder == 5)
-   {
-      out[i*7] |= (in[i*8] << 1) | (in[i*8+1] >> 6);
-      out[i*7+1] |= (in[i*8+1] << 2) | (in[i*8+2] >> 5);
-      out[i*7+2] |= (in[i*8+2] << 3) | (in[i*8+3] >> 4);
-      out[i*7+3] |= (in[i*8+3] << 4) | (in[i*8+4] >> 3);
-      out[i*7+4] = (in[i*8+4] << 5);
-   }
-   else if(n_remainder == 6)
-   {
-      out[i*7] |= (in[i*8] << 1) | (in[i*8+1] >> 6);
-      out[i*7+1] |= (in[i*8+1] << 2) | (in[i*8+2] >> 5);
-      out[i*7+2] |= (in[i*8+2] << 3) | (in[i*8+3] >> 4);
-      out[i*7+3] |= (in[i*8+3] << 4) | (in[i*8+4] >> 3);
-      out[i*7+4] |= (in[i*8+4] << 5) | (in[i*8+5] >> 2);
-      out[i*7+5] = (in[i*8+5] << 6);
-   }
-   else if(n_remainder == 7)
-   {
-      out[i*7] |= (in[i*8] << 1) | (in[i*8+1] >> 6);
-      out[i*7+1] |= (in[i*8+1] << 2) | (in[i*8+2] >> 5);
-      out[i*7+2] |= (in[i*8+2] << 3) | (in[i*8+3] >> 4);
-      out[i*7+3] |= (in[i*8+3] << 4) | (in[i*8+4] >> 3);
-      out[i*7+4] |= (in[i*8+4] << 5) | (in[i*8+5] >> 2);
-      out[i*7+5] |= (in[i*8+5] << 6) | (in[i*8+6] >> 1);
-      out[i*7+6] |= (in[i*8+6] << 7);
-   }
-
-#elif Z == 7
    size_t i;
    for(i = 0; i < outlen; i++)
    {
@@ -409,21 +249,6 @@ void PQCLEAN_CROSSRSDP128BALANCED_CLEAN_generic_pack_fz(uint8_t *out, const FZ_E
       out[i*3+2] |= (in[i*8+6] << 3);
    } 
 
-#elif FZ_ELEM == uint8_t
-   uint16_t in_tmp[inlen];
-   for(size_t i = 0; i < inlen; i++)
-   {
-	   in_tmp[i] = (uint16_t)in[i];
-   }
-   PQCLEAN_CROSSRSDP128BALANCED_CLEAN_generic_uint16_t_pack(out, in_tmp, outlen, inlen, BITS_TO_REPRESENT(Z-1));
-
-#elif FZ_ELEM == uint16_t
-   PQCLEAN_CROSSRSDP128BALANCED_CLEAN_generic_uint16_t_pack(out, in, outlen, inlen, BITS_TO_REPRESENT(Z-1));
-
-#else
-   #error not implemented
-
-#endif
 }
 
 /* 
@@ -492,7 +317,6 @@ void PQCLEAN_CROSSRSDP128BALANCED_CLEAN_generic_unpack_fq(FQ_ELEM *out, const ui
 {
 
 
-#if Q == 127
 
    /* PQClean-edit: unused parameter */
    if(inlen == 0) inlen = 0;
@@ -590,125 +414,6 @@ void PQCLEAN_CROSSRSDP128BALANCED_CLEAN_generic_unpack_fq(FQ_ELEM *out, const ui
       out[i*8+6]  = ((in[i*7+5] << 1) & 0x7F);
       out[i*8+6] |= (in[i*7+6] >> 7);
    }
-#elif Q == 509
-   size_t i;
-   for(i = 0; i < outlen; i++)
-   {
-      out[i] = 0;
-   }
-   for(i = 0; i < inlen/9; i++)
-   {
-      out[i*8]    = (in[i*9] << 1);
-      out[i*8]   |= (in[i*9+1] >> 7);
-      out[i*8+1]  = ((in[i*9+1] << 2) & 0x1FF);
-      out[i*8+1] |= (in[i*9+2] >> 6);
-      out[i*8+2]  = ((in[i*9+2] << 3) & 0x1FF);
-      out[i*8+2] |= (in[i*9+3] >> 5);
-      out[i*8+3]  = ((in[i*9+3] << 4) & 0x1FF);
-      out[i*8+3] |= (in[i*9+4] >> 4);
-      out[i*8+4]  = ((in[i*9+4] << 5) & 0x1FF);
-      out[i*8+4] |= (in[i*9+5] >> 3);
-      out[i*8+5]  = ((in[i*9+5] << 6) & 0x1FF);
-      out[i*8+5] |= (in[i*9+6] >> 2);
-      out[i*8+6]  = ((in[i*9+6] << 7) & 0x1FF);
-      out[i*8+6] |= (in[i*9+7] >> 1);
-      out[i*8+7]  = ((in[i*9+7] << 8) & 0x1FF);
-      out[i*8+7] |= (in[i*9+8]);
-   }
-   const uint8_t n_remainder = outlen%8;
-   if(n_remainder == 1)
-   {
-      out[i*8]    = (in[i*9] << 1);
-      out[i*8]   |= (in[i*9+1] >> 7);
-   }
-   if(n_remainder == 2)
-   {
-      out[i*8]    = (in[i*9] << 1);
-      out[i*8]   |= (in[i*9+1] >> 7);
-      out[i*8+1]  = ((in[i*9+1] << 2) & 0x1FF);
-      out[i*8+1] |= (in[i*9+2] >> 6);
-   }
-   if(n_remainder == 3)
-   {
-      out[i*8]    = (in[i*9] << 1);
-      out[i*8]   |= (in[i*9+1] >> 7);
-      out[i*8+1]  = ((in[i*9+1] << 2) & 0x1FF);
-      out[i*8+1] |= (in[i*9+2] >> 6);
-      out[i*8+2]  = ((in[i*9+2] << 3) & 0x1FF);
-      out[i*8+2] |= (in[i*9+3] >> 5);
-   }
-   if(n_remainder == 4)
-   {
-      out[i*8]    = (in[i*9] << 1);
-      out[i*8]   |= (in[i*9+1] >> 7);
-      out[i*8+1]  = ((in[i*9+1] << 2) & 0x1FF);
-      out[i*8+1] |= (in[i*9+2] >> 6);
-      out[i*8+2]  = ((in[i*9+2] << 3) & 0x1FF);
-      out[i*8+2] |= (in[i*9+3] >> 5);
-      out[i*8+3]  = ((in[i*9+3] << 4) & 0x1FF);
-      out[i*8+3] |= (in[i*9+4] >> 4);
-   }
-   if(n_remainder == 5)
-   {
-      out[i*8]    = (in[i*9] << 1);
-      out[i*8]   |= (in[i*9+1] >> 7);
-      out[i*8+1]  = ((in[i*9+1] << 2) & 0x1FF);
-      out[i*8+1] |= (in[i*9+2] >> 6);
-      out[i*8+2]  = ((in[i*9+2] << 3) & 0x1FF);
-      out[i*8+2] |= (in[i*9+3] >> 5);
-      out[i*8+3]  = ((in[i*9+3] << 4) & 0x1FF);
-      out[i*8+3] |= (in[i*9+4] >> 4);
-      out[i*8+4]  = ((in[i*9+4] << 5) & 0x1FF);
-      out[i*8+4] |= (in[i*9+5] >> 3);
-   }
-   if(n_remainder == 6)
-   {
-      out[i*8]    = (in[i*9] << 1);
-      out[i*8]   |= (in[i*9+1] >> 7);
-      out[i*8+1]  = ((in[i*9+1] << 2) & 0x1FF);
-      out[i*8+1] |= (in[i*9+2] >> 6);
-      out[i*8+2]  = ((in[i*9+2] << 3) & 0x1FF);
-      out[i*8+2] |= (in[i*9+3] >> 5);
-      out[i*8+3]  = ((in[i*9+3] << 4) & 0x1FF);
-      out[i*8+3] |= (in[i*9+4] >> 4);
-      out[i*8+4]  = ((in[i*9+4] << 5) & 0x1FF);
-      out[i*8+4] |= (in[i*9+5] >> 3);
-      out[i*8+5]  = ((in[i*9+5] << 6) & 0x1FF);
-      out[i*8+5] |= (in[i*9+6] >> 2);
-   }
-   if(n_remainder == 7)
-   {
-      out[i*8]    = (in[i*9] << 1);
-      out[i*8]   |= (in[i*9+1] >> 7);
-      out[i*8+1]  = ((in[i*9+1] << 2) & 0x1FF);
-      out[i*8+1] |= (in[i*9+2] >> 6);
-      out[i*8+2]  = ((in[i*9+2] << 3) & 0x1FF);
-      out[i*8+2] |= (in[i*9+3] >> 5);
-      out[i*8+3]  = ((in[i*9+3] << 4) & 0x1FF);
-      out[i*8+3] |= (in[i*9+4] >> 4);
-      out[i*8+4]  = ((in[i*9+4] << 5) & 0x1FF);
-      out[i*8+4] |= (in[i*9+5] >> 3);
-      out[i*8+5]  = ((in[i*9+5] << 6) & 0x1FF);
-      out[i*8+5] |= (in[i*9+6] >> 2);
-      out[i*8+6]  = ((in[i*9+6] << 7) & 0x1FF);
-      out[i*8+6] |= (in[i*9+7] >> 1);
-   }
-
-#elif FQ_ELEM == uint8_t
-   uint16_t out_tmp[outlen];
-   PQCLEAN_CROSSRSDP128BALANCED_CLEAN_generic_uint16_t_unpack(out_tmp, in, outlen, inlen, BITS_TO_REPRESENT(Q-1));
-   for(size_t i = 0; i < outlen; i++)
-   {
-	   out[i] = (uint8_t)out_tmp[i];
-   }
-
-#elif FQ_ELEM == uint16_t
-   PQCLEAN_CROSSRSDP128BALANCED_CLEAN_generic_uint16_t_unpack(out, in, outlen, inlen, BITS_TO_REPRESENT(Q-1));
-
-#else
-   #error not implemented
-
-#endif
 }
 
 /* 
@@ -724,101 +429,6 @@ void PQCLEAN_CROSSRSDP128BALANCED_CLEAN_generic_unpack_fz(FZ_ELEM *out, const ui
                        size_t outlen)
 {
 
-#if Z == 127
-   size_t i;
-   for(i = 0; i < outlen; i++)
-   {
-      out[i] = 0;
-   }
-   for(i = 0; i < outlen/8; i++)
-   {
-      out[i*8]    = (in[i*7] >> 1);
-      out[i*8+1]  = ((in[i*7] << 6) & 0x7F);
-      out[i*8+1] |= (in[i*7+1] >> 2);
-      out[i*8+2]  = ((in[i*7+1] << 5) & 0x7F);
-      out[i*8+2] |= (in[i*7+2] >> 3);
-      out[i*8+3]  = ((in[i*7+2] << 4) & 0x7F);
-      out[i*8+3] |= (in[i*7+3] >> 4);
-      out[i*8+4]  = ((in[i*7+3] << 3) & 0x7F);
-      out[i*8+4] |= (in[i*7+4] >> 5);
-      out[i*8+5]  = ((in[i*7+4] << 2) & 0x7F);
-      out[i*8+5] |= (in[i*7+5] >> 6);
-      out[i*8+6]  = ((in[i*7+5] << 1) & 0x7F);
-      out[i*8+6] |= (in[i*7+6] >> 7);
-      out[i*8+7]  = (in[i*7+6] & 0x7F);
-   }
-   const uint8_t n_remainder = outlen%8;
-   if(n_remainder == 1)
-   {
-      out[i*8]    = (in[i*7] >> 1);
-   }
-   else if(n_remainder == 2)
-   { 
-      out[i*8]    = (in[i*7] >> 1);
-      out[i*8+1]  = ((in[i*7] << 6) & 0x7F);
-      out[i*8+1] |= (in[i*7+1] >> 2);
-   }
-   else if(n_remainder == 3)
-   {
-      out[i*8]    = (in[i*7] >> 1);
-      out[i*8+1]  = ((in[i*7] << 6) & 0x7F);
-      out[i*8+1] |= (in[i*7+1] >> 2);
-      out[i*8+2]  = ((in[i*7+1] << 5) & 0x7F);
-      out[i*8+2] |= (in[i*7+2] >> 3);
-   }
-   else if(n_remainder == 4)
-   {
-      out[i*8]    = (in[i*7] >> 1);
-      out[i*8+1]  = ((in[i*7] << 6) & 0x7F);
-      out[i*8+1] |= (in[i*7+1] >> 2);
-      out[i*8+2]  = ((in[i*7+1] << 5) & 0x7F);
-      out[i*8+2] |= (in[i*7+2] >> 3);
-      out[i*8+3]  = ((in[i*7+2] << 4) & 0x7F);
-      out[i*8+3] |= (in[i*7+3] >> 4);
-   }
-   else if(n_remainder == 5)
-   {
-      out[i*8]    = (in[i*7] >> 1);
-      out[i*8+1]  = ((in[i*7] << 6) & 0x7F);
-      out[i*8+1] |= (in[i*7+1] >> 2);
-      out[i*8+2]  = ((in[i*7+1] << 5) & 0x7F);
-      out[i*8+2] |= (in[i*7+2] >> 3);
-      out[i*8+3]  = ((in[i*7+2] << 4) & 0x7F);
-      out[i*8+3] |= (in[i*7+3] >> 4);
-      out[i*8+4]  = ((in[i*7+3] << 3) & 0x7F);
-      out[i*8+4] |= (in[i*7+4] >> 5);
-   }
-   else if(n_remainder == 6)
-   {
-      out[i*8]    = (in[i*7] >> 1);
-      out[i*8+1]  = ((in[i*7] << 6) & 0x7F);
-      out[i*8+1] |= (in[i*7+1] >> 2);
-      out[i*8+2]  = ((in[i*7+1] << 5) & 0x7F);
-      out[i*8+2] |= (in[i*7+2] >> 3);
-      out[i*8+3]  = ((in[i*7+2] << 4) & 0x7F);
-      out[i*8+3] |= (in[i*7+3] >> 4);
-      out[i*8+4]  = ((in[i*7+3] << 3) & 0x7F);
-      out[i*8+4] |= (in[i*7+4] >> 5);
-      out[i*8+5]  = ((in[i*7+4] << 2) & 0x7F);
-      out[i*8+5] |= (in[i*7+5] >> 6);
-   }
-   else if(n_remainder == 7)
-   {
-      out[i*8]    = (in[i*7] >> 1);
-      out[i*8+1]  = ((in[i*7] << 6) & 0x7F);
-      out[i*8+1] |= (in[i*7+1] >> 2);
-      out[i*8+2]  = ((in[i*7+1] << 5) & 0x7F);
-      out[i*8+2] |= (in[i*7+2] >> 3);
-      out[i*8+3]  = ((in[i*7+2] << 4) & 0x7F);
-      out[i*8+3] |= (in[i*7+3] >> 4);
-      out[i*8+4]  = ((in[i*7+3] << 3) & 0x7F);
-      out[i*8+4] |= (in[i*7+4] >> 5);
-      out[i*8+5]  = ((in[i*7+4] << 2) & 0x7F);
-      out[i*8+5] |= (in[i*7+5] >> 6);
-      out[i*8+6]  = ((in[i*7+5] << 1) & 0x7F);
-      out[i*8+6] |= (in[i*7+6] >> 7);
-   }
-#elif Z == 7
    size_t i;
    for(i = 0; i < outlen; i++)
    {
@@ -895,21 +505,6 @@ void PQCLEAN_CROSSRSDP128BALANCED_CLEAN_generic_unpack_fz(FZ_ELEM *out, const ui
       out[i*8+6]  = ((in[i*3+2] >> 3) & 0x7);
    }
 
-#elif FZ_ELEM == uint8_t
-   uint16_t out_tmp[outlen];
-   PQCLEAN_CROSSRSDP128BALANCED_CLEAN_generic_uint16_t_unpack(out_tmp, in, outlen, inlen, BITS_TO_REPRESENT(Z-1));
-   for(size_t i = 0; i < outlen; i++)
-   {
-	   out[i] = (uint8_t)out_tmp[i];
-   }
-
-#elif FZ_ELEM == uint16_t
-   PQCLEAN_CROSSRSDP128BALANCED_CLEAN_generic_uint16_t_unpack(out, in, outlen, inlen, BITS_TO_REPRESENT(Z-1));
-
-#else
-   #error not implemented
-
-#endif
 }
 
 void PQCLEAN_CROSSRSDP128BALANCED_CLEAN_generic_uint16_t_pack(uint8_t *out, const uint16_t *in,

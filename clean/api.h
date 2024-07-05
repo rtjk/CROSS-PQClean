@@ -23,10 +23,10 @@
  *
  **/
 
-#pragma once
-
 #ifndef __namespace__API_H
 #define __namespace__API_H
+
+#pragma once
 
 #include <stdint.h>
 

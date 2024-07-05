@@ -136,6 +136,8 @@ CROSS' source code makes heavy use of `#ifdef` and similar preprocessor macros, 
 sudo apt install unifdef
 ```
 
+PQClean has a handy test (`test_preprocessor.py`) to check that all the preprocessor macros have been removed.
+
 ### No external includes in `api.h`
 PQClean requires that the api file does not include any external file. Define parameters such as the length of the public key as placeholders, which will be substituted by actual values by `generate.py`.
 

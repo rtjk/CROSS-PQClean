@@ -23,10 +23,10 @@
  *
  **/
 
-#pragma once
-
 #ifndef PQCLEAN_CROSSRSDP128SMALL_AVX2_API_H
 #define PQCLEAN_CROSSRSDP128SMALL_AVX2_API_H
+
+#pragma once
 
 #include <stdint.h>
 

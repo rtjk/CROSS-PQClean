@@ -25,50 +25,6 @@
 
 #pragma once
 
-#if defined(SHA_3_LIBKECCAK)
-#include <libkeccak.a.headers/KeccakHash.h>
-
-/* LibKeccak SHAKE Wrappers */
-
-#define SHAKE_STATE_STRUCT Keccak_HashInstance
-static inline
-void xof_shake_init(SHAKE_STATE_STRUCT *state, int val)
-{
-   if (val == 128)
-      /* will result in a zero-length output for Keccak_HashFinal */
-      Keccak_HashInitialize_SHAKE128(state);
-   else
-      /* will result in a zero-length output for Keccak_HashFinal */
-      Keccak_HashInitialize_SHAKE256(state);
-}
-
-static inline
-void xof_shake_update(SHAKE_STATE_STRUCT *state,
-                      const unsigned char *input,
-                      uint32_t inputByteLen)
-{
-   Keccak_HashUpdate(state,
-                     (const BitSequence *) input,
-                     (BitLength) inputByteLen*8 );
-}
-
-static inline
-void xof_shake_final(SHAKE_STATE_STRUCT *state)
-{
-   Keccak_HashFinal(state, NULL);
-}
-
-static inline
-void xof_shake_extract(SHAKE_STATE_STRUCT *state,
-                       unsigned char *output,
-                       uint32_t outputByteLen)
-{
-   Keccak_HashSqueeze(state,
-                      (BitSequence *) output,
-                      (BitLength) outputByteLen*8 );
-}
-
-#else
 #include "fips202.h"
 /* standalone FIPS-202 implementation has 
  * different states for SHAKE depending on security level*/
@@ -112,7 +68,6 @@ void xof_shake_release(SHAKE_STATE_STRUCT *state)
 {
    shake128_inc_ctx_release(state);
 }
-#endif
 
 // %%%%%%%%%%%%%%%%%% Self-contained SHAKE x4 Wrappers %%%%%%%%%%%%%%%%%%%%%%%%%%%%
 

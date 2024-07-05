@@ -23,10 +23,10 @@
  *
  **/
 
-#pragma once
-
 #ifndef PQCLEAN_CROSSRSDPG192FAST_CLEAN_API_H
 #define PQCLEAN_CROSSRSDPG192FAST_CLEAN_API_H
+
+#pragma once
 
 #include <stdint.h>
 

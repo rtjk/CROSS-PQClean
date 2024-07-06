@@ -4,8 +4,8 @@ claimed-nist-level: 1
 length-public-key: 54
 length-secret-key: 32
 length-signature: 9236
-nistkat-sha256: lzx
-testvectors-sha256: lzx
+nistkat-sha256: f1ebf700c39e84da903b513fc7b2455d03008b14b3e8c713de450fd96202a50e
+testvectors-sha256: 94ce9dd921d4a74bff0f2e745e871fbb64a4aa0733685ad990d96053b5fbb2c7
 principal-submitters: #TODO: check submitters
   - Marco Baldi
   - Alessandro Barenghi

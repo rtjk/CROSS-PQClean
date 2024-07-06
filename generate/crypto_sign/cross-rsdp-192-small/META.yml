@@ -4,8 +4,8 @@ claimed-nist-level: 3
 length-public-key: 115
 length-secret-key: 48
 length-signature: 23642
-nistkat-sha256: 67f3b7e24f8d28227bb9e51b1ba0d712ea9ab62b3161b743af30d6864088eedf
-testvectors-sha256: 7889ec8e89ec9e09160f4352454b6d83680b3775866ea45fc6628c3102842d61
+nistkat-sha256: yui
+testvectors-sha256: yui
 principal-submitters: #TODO: check submitters
   - Marco Baldi
   - Alessandro Barenghi

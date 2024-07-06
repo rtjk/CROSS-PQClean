@@ -177,6 +177,9 @@ void PQCLEAN_CROSSRSDP256SMALL_CLEAN_CROSS_sign(const prikey_t *SK,
         /* expand u_tilde */
         CSPRNG_fq_vec(u_tilde[i], &CSPRNG_state);
 
+        /* PQClean-edit: CSPRNG release context */
+        csprng_release(&CSPRNG_state);
+
         FQ_ELEM u[N];
         fq_vec_by_fq_vec_pointwise(u,v,u_tilde[i]);
         fq_vec_by_fq_matrix(s_tilde,u,V_tr);
@@ -201,8 +204,6 @@ void PQCLEAN_CROSSRSDP256SMALL_CLEAN_CROSS_sign(const prikey_t *SK,
         cmt_1_i_input[SEED_LENGTH_BYTES+SALT_LENGTH_BYTES+1] = domain_sep_idx_hash & 0xFF;
         hash(cmt_1[i],cmt_1_i_input,sizeof(cmt_1_i_input));
 
-        /* PQClean-edit: CSPRNG release context */
-        csprng_release(&CSPRNG_state);
     }
 
     /* vector containing d_0 and d_1 from spec */

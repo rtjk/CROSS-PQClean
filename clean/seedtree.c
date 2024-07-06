@@ -71,15 +71,15 @@ void __namespace__ptree(unsigned char seed_tree[NUM_NODES_SEED_TREE * SEED_LENGT
 
 
 /* PQClean-edit: avoid VLA */
-#define CSPRNG_INPUT_LEN (SALT_LENGTH_BYTES + SEED_LENGTH_BYTES + 2)
+#define SIZEOF_UINT16 2
+#define CSPRNG_INPUT_LEN (SALT_LENGTH_BYTES + SEED_LENGTH_BYTES + SIZEOF_UINT16)
+//const uint32_t csprng_input_len = SALT_LENGTH_BYTES + SEED_LENGTH_BYTES + sizeof(uint16_t);
 
 #if defined(NO_TREES)
 int __namespace__compute_round_seeds(unsigned char rounds_seeds[T*SEED_LENGTH_BYTES],
                   const unsigned char root_seed[SEED_LENGTH_BYTES],
                   const unsigned char salt[SALT_LENGTH_BYTES]){
-   const uint32_t csprng_input_len = SALT_LENGTH_BYTES +
-                                     SEED_LENGTH_BYTES +
-                                     sizeof(uint16_t);
+
    unsigned char csprng_input[CSPRNG_INPUT_LEN];
    memcpy(csprng_input,root_seed,SEED_LENGTH_BYTES);   
    memcpy(csprng_input+SEED_LENGTH_BYTES,salt,SALT_LENGTH_BYTES);
@@ -89,7 +89,7 @@ int __namespace__compute_round_seeds(unsigned char rounds_seeds[T*SEED_LENGTH_BY
    
    unsigned char quad_seed[4*SEED_LENGTH_BYTES];
    CSPRNG_STATE_T csprng_states[4];
-   initialize_csprng(&csprng_states[0], csprng_input, csprng_input_len);
+   initialize_csprng(&csprng_states[0], csprng_input, CSPRNG_INPUT_LEN);
    csprng_randombytes(quad_seed,4*SEED_LENGTH_BYTES,&csprng_states[0]);
 
    /* PQClean-edit: CSPRNG release context */
@@ -104,7 +104,7 @@ int __namespace__compute_round_seeds(unsigned char rounds_seeds[T*SEED_LENGTH_BY
    for (int i = 0; i < 4; i++){
        memcpy(csprng_input,&quad_seed[i*SEED_LENGTH_BYTES],SEED_LENGTH_BYTES);   
        csprng_input[SEED_LENGTH_BYTES+SALT_LENGTH_BYTES+1] += 1;
-       initialize_csprng(&csprng_states[i], csprng_input, csprng_input_len);
+       initialize_csprng(&csprng_states[i], csprng_input, CSPRNG_INPUT_LEN);
        
        csprng_randombytes(&rounds_seeds[((T/4)*i+offset)*SEED_LENGTH_BYTES],
                           (T/4+remainders[i])*SEED_LENGTH_BYTES,

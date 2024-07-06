@@ -4,8 +4,8 @@ claimed-nist-level: 5
 length-public-key: 153
 length-secret-key: 64
 length-signature: 51056
-nistkat-sha256: 37ff515d6b111f814f34ee08470420a4ca1614db105baca47f003ccd0123a02f
-testvectors-sha256: f534698fe33638b212d7ff988c192b0ab1aa73aa81f1908375d18d116fbce4c7
+nistkat-sha256: uio
+testvectors-sha256: uio
 principal-submitters: #TODO: check submitters
   - Marco Baldi
   - Alessandro Barenghi

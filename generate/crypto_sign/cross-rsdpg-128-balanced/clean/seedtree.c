@@ -71,7 +71,9 @@ void PQCLEAN_CROSSRSDPG128BALANCED_CLEAN_ptree(unsigned char seed_tree[NUM_NODES
 
 
 /* PQClean-edit: avoid VLA */
-#define CSPRNG_INPUT_LEN (SALT_LENGTH_BYTES + SEED_LENGTH_BYTES + 2)
+#define SIZEOF_UINT16 2
+#define CSPRNG_INPUT_LEN (SALT_LENGTH_BYTES + SEED_LENGTH_BYTES + SIZEOF_UINT16)
+//const uint32_t csprng_input_len = SALT_LENGTH_BYTES + SEED_LENGTH_BYTES + sizeof(uint16_t);
 
 /*****************************************************************************/
 /**

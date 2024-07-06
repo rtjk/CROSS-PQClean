@@ -104,6 +104,7 @@ int PQCLEAN_CROSSRSDPG128FAST_AVX2_compute_round_seeds(unsigned char rounds_seed
    /* from the 4 seeds generale all T leaves */
    for (int i = 0; i < 4; i++){
       memcpy(csprng_inputs[i],&quad_seed[i*SEED_LENGTH_BYTES],SEED_LENGTH_BYTES);
+      memcpy(csprng_inputs[i]+SEED_LENGTH_BYTES,salt,SALT_LENGTH_BYTES);
       /* increment the domain separation counter */
       csprng_inputs[i][SEED_LENGTH_BYTES+SALT_LENGTH_BYTES] = 0;
       csprng_inputs[i][SEED_LENGTH_BYTES+SALT_LENGTH_BYTES+1] = i+2;

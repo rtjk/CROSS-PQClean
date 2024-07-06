@@ -24,6 +24,7 @@
  **/
 
 #include <string.h>
+
 #include "csprng_hash.h"
 
 #define  POSITION_MASK (( (uint16_t)1 << BITS_TO_REPRESENT(T-1))-1)

@@ -25,8 +25,8 @@
 
 #pragma once
 
-#include "parameters.h"
 #include "csprng_hash.h"
+#include "parameters.h"
 
 void __namespace__pseed(unsigned char seed[SEED_LENGTH_BYTES]);
 void __namespace__ptree(unsigned char seed_tree[NUM_NODES_SEED_TREE * SEED_LENGTH_BYTES]);

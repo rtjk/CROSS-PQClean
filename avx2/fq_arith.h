@@ -25,13 +25,13 @@
 
 #pragma once
 
+#include <stdalign.h>
 #include <stdlib.h>
 #include <string.h>
-#include <stdalign.h>
-#include "architecture_detect.h"
 
-#include "parameters.h"
+#include "architecture_detect.h"
 #include "csprng_hash.h"
+#include "parameters.h"
 #include "restr_arith.h"
 
 #define NUM_BITS_Q (BITS_TO_REPRESENT(Q))
@@ -40,13 +40,13 @@
 #define FQRED_SINGLE(x) (((x) & 0x7F) + ((x) >> 7))
 #define FQRED_DOUBLE(x) FQRED_SINGLE(FQRED_SINGLE(x))
 #define FQRED_OPPOSITE(x) ((x) ^ 0x7F)
-#define FQ_DOUBLE_ZERO_NORM(x) ((x + ((x + 1) >> 7)) & 0x7F)
-#define RESTR_TO_VAL(x) ( (FQ_ELEM) (RESTR_G_TABLE >> (8*(uint64_t)x)) )
+#define FQ_DOUBLE_ZERO_NORM(x) (((x) + (((x) + 1) >> 7)) & 0x7F)
+#define RESTR_TO_VAL(x) ( (FQ_ELEM) (RESTR_G_TABLE >> (8*(uint64_t)(x))) )
 
 #elif defined(RSDPG)
 #define FQRED_SINGLE(x) ((x)% Q)
 #define FQRED_DOUBLE(x) FQRED_SINGLE(FQRED_SINGLE(x))
-#define FQRED_OPPOSITE(x) ((Q-x) % Q)
+#define FQRED_OPPOSITE(x) ((Q-(x)) % Q)
 /* no redundant zero notation in F_509 */
 #define FQ_DOUBLE_ZERO_NORM(x) (x)
 
@@ -63,7 +63,7 @@
 #define RESTR_G_GEN_32 ((FQ_ELEM) 93)
 #define RESTR_G_GEN_64 ((FQ_ELEM) 505)
 
-#define FQ_ELEM_CMOV(BIT,TRUE_V,FALSE_V)  ( (((FQ_ELEM)0 - BIT) & TRUE_V) | (~((FQ_ELEM)0 - BIT) & FALSE_V) )
+#define FQ_ELEM_CMOV(BIT,TRUE_V,FALSE_V)  ( (((FQ_ELEM)0 - (BIT)) & (TRUE_V)) | (~((FQ_ELEM)0 - (BIT)) & (FALSE_V)) )
 
 /* log reduction, constant time unrolled S&M w/precomputed squares.
  * To be further optimized with muxed register-fitting tables */
@@ -110,7 +110,7 @@ void fq_dz_norm(FQ_ELEM v[N]){
 /* Used by keygen */
 static
 void restr_vec_by_fq_matrix(FQ_ELEM res[N-K],
-                            FZ_ELEM e[N],
+                            const FZ_ELEM e[N],
                             FQ_ELEM V_tr[K][N-K]){
     FQ_DOUBLEPREC res_dprec[N-K] = {0};
     for(int i=0; i< N-K;i++) {
@@ -137,7 +137,7 @@ void restr_vec_by_fq_matrix(FQ_ELEM res[N-K],
 #if defined(HIGH_PERFORMANCE_X86_64)
 static
 void fq_vec_by_fq_matrix(FQ_ELEM res[N-K],
-                         FQ_ELEM e[N],
+                         const FQ_ELEM e[N],
                          FQ_DOUBLEPREC V_tr[K][ROUND_UP(N-K,EPI16_PER_REG)]){
 
     alignas(EPI8_PER_REG) FQ_DOUBLEPREC res_dprec[ROUND_UP(N-K,EPI16_PER_REG)] = {0};
@@ -172,7 +172,7 @@ void fq_vec_by_fq_matrix(FQ_ELEM res[N-K],
 #else
 static
 void fq_vec_by_fq_matrix(FQ_ELEM res[N-K],
-                         FQ_ELEM e[N],
+                         const FQ_ELEM e[N],
                          FQ_ELEM V_tr[K][N-K]){
     FQ_DOUBLEPREC res_dprec[N-K] = {0};
     for(int i=0; i< N-K;i++) {
@@ -196,7 +196,7 @@ void fq_vec_by_fq_matrix(FQ_ELEM res[N-K],
 /* FQ_elem is uint16_t Q is 509 */
 static
 void fq_vec_by_fq_matrix(FQ_ELEM res[N-K],
-                         FQ_ELEM e[N],
+                         const FQ_ELEM e[N],
                          FQ_ELEM V_tr[K][N-K]){
     FQ_DOUBLEPREC res_dprec[N-K] = {0};
     for(int i=0; i< N-K;i++) {

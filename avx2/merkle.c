@@ -31,9 +31,9 @@
 #define PARENT(i) ( ((i)%2) ? (((i)-1)/2) : (((i)-2)/2) )
 #define RIGHT_CHILD(i) ( (2*(i)+2) )
 #define LEFT_CHILD(i) ( (2*(i)+1) )
-#define SIBLING(i) ( ((i)%2) ? i+1 : i-1 )
+#define SIBLING(i) ( ((i)%2) ? (i)+1 : (i)-1 )
 
-#define RL(i) (i==1 ? r_node : l_node)
+#define RL(i) ((i)==1 ? r_node : l_node)
 #define OFFSET(i) ( (i)*HASH_DIGEST_LENGTH )
 
 #define CHALLENGE_PROOF_VALUE 0
@@ -276,8 +276,9 @@ void __namespace__generate_merkle_proof(uint16_t merkle_proof_indices[TREE_NODES
         }
 
         /* Add right sibling only right was computed */
-        if ( (flag_tree[i] == NOT_COMPUTED) && (flag_tree[SIBLING(i)] == COMPUTED) )
+        if ( (flag_tree[i] == NOT_COMPUTED) && (flag_tree[SIBLING(i)] == COMPUTED) ) {
             merkle_proof_indices[(*merkle_proof_len)++] = i;
+        }
 
         /* Due to the unbalenced structure we got to keep track of the nodes per layer processed */
         if (node_ctr >= (uint32_t) nodes_per_layer[parent_layer+1] - 2) {

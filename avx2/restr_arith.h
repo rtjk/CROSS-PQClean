@@ -30,13 +30,13 @@
 #if defined(RSDP)
 #define FZRED_SINGLE(x)   (((x) & 0x07) + ((x) >> 3))
 #define FZRED_OPPOSITE(x) ((x) ^ 0x07)
-#define FZ_DOUBLE_ZERO_NORM(x) ((x + ((x + 1) >> 3)) & 0x07)
+#define FZ_DOUBLE_ZERO_NORM(x) (((x) + (((x) + 1) >> 3)) & 0x07)
 
 #elif defined(RSDPG)
 #define FZRED_SINGLE(x)   (((x) & 0x7f) + ((x) >> 7))
 #define FZRED_DOUBLE(x) FZRED_SINGLE(FZRED_SINGLE(x))
 #define FZRED_OPPOSITE(x) ((x) ^ 0x7f)
-#define FZ_DOUBLE_ZERO_NORM(x) ((x + ((x + 1) >> 7)) & 0x7f)
+#define FZ_DOUBLE_ZERO_NORM(x) (((x) + (((x) + 1) >> 7)) & 0x7f)
 #endif
 
 

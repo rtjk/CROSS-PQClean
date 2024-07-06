@@ -27,8 +27,9 @@
 
 #include <stdlib.h>
 #include <string.h>
-#include "parameters.h"
+
 #include "csprng_hash.h"
+#include "parameters.h"
 #include "restr_arith.h"
 
 #define NUM_BITS_Q (BITS_TO_REPRESENT(Q))
@@ -37,13 +38,13 @@
 #define FQRED_SINGLE(x) (((x) & 0x7F) + ((x) >> 7))
 #define FQRED_DOUBLE(x) FQRED_SINGLE(FQRED_SINGLE(x))
 #define FQRED_OPPOSITE(x) ((x) ^ 0x7F)
-#define FQ_DOUBLE_ZERO_NORM(x) ((x + ((x + 1) >> 7)) & 0x7F)
-#define RESTR_TO_VAL(x) ( (FQ_ELEM) (RESTR_G_TABLE >> (8*(uint64_t)x)) )
+#define FQ_DOUBLE_ZERO_NORM(x) (((x) + (((x) + 1) >> 7)) & 0x7F)
+#define RESTR_TO_VAL(x) ( (FQ_ELEM) (RESTR_G_TABLE >> (8*(uint64_t)(x))) )
 
 #elif defined(RSDPG)
 #define FQRED_SINGLE(x) ((x)% Q)
 #define FQRED_DOUBLE(x) FQRED_SINGLE(FQRED_SINGLE(x))
-#define FQRED_OPPOSITE(x) ((Q-x) % Q)
+#define FQRED_OPPOSITE(x) ((Q-(x)) % Q)
 /* no redundant zero notation in F_509 */
 #define FQ_DOUBLE_ZERO_NORM(x) (x)
 
@@ -60,7 +61,7 @@
 #define RESTR_G_GEN_32 ((FQ_ELEM) 93)
 #define RESTR_G_GEN_64 ((FQ_ELEM) 505)
 
-#define FQ_ELEM_CMOV(BIT,TRUE_V,FALSE_V)  ( (((FQ_ELEM)0 - BIT) & TRUE_V) | (~((FQ_ELEM)0 - BIT) & FALSE_V) )
+#define FQ_ELEM_CMOV(BIT,TRUE_V,FALSE_V)  ( (((FQ_ELEM)0 - (BIT)) & (TRUE_V)) | (~((FQ_ELEM)0 - (BIT)) & (FALSE_V)) )
 
 /* log reduction, constant time unrolled S&M w/precomputed squares.
  * To be further optimized with muxed register-fitting tables */
@@ -106,7 +107,7 @@ void fq_dz_norm(FQ_ELEM v[N]){
 
 static
 void restr_vec_by_fq_matrix(FQ_ELEM res[N-K],
-                            FZ_ELEM e[N],
+                            const FZ_ELEM e[N],
                             FQ_ELEM V_tr[K][N-K]){
     for (int i = K ;i < N; i++){
        res[i-K] = RESTR_TO_VAL(e[i]);
@@ -122,7 +123,7 @@ void restr_vec_by_fq_matrix(FQ_ELEM res[N-K],
 
 static
 void fq_vec_by_fq_matrix(FQ_ELEM res[N-K],
-                         FQ_ELEM e[N],
+                         const FQ_ELEM e[N],
                          FQ_ELEM V_tr[K][N-K]){
     memcpy(res,e+K,(N-K)*sizeof(FQ_ELEM));
     for(int i = 0; i < K; i++){

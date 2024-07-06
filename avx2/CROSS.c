@@ -24,14 +24,15 @@
  **/
 #include <assert.h>
 #include <stdalign.h>
+
+#include "architecture_detect.h"
 #include "CROSS.h"
 #include "csprng_hash.h"
 #include "fq_arith.h"
-#include "seedtree.h"
 #include "merkle_tree.h"
 #include "pack_unpack.h"
-#include "architecture_detect.h"
 #include "randombytes.h"
+#include "seedtree.h"
 
 #if defined(RSDP)
 static
@@ -188,10 +189,10 @@ void __namespace__CROSS_keygen(prikey_t *SK,
 }
 
 /* sign cannot fail */
-void __namespace__CROSS_sign(const prikey_t *SK,
-               const char *const m,
-               const uint64_t mlen,
-               sig_t *sig){
+void __namespace__CROSS_sign(const prikey_t * const SK,
+                const char * const m,
+                const uint64_t mlen,
+                sig_t * const sig){
     /* Wipe any residual information in the sig structure allocated by the 
      * caller */
     memset(sig,0,sizeof(sig_t));
@@ -459,10 +460,10 @@ void __namespace__CROSS_sign(const prikey_t *SK,
 }
 
 /* verify returns 1 if signature is ok, 0 otherwise */
-int __namespace__CROSS_verify(const pubkey_t *const PK,
-                 const char *const m,
+int __namespace__CROSS_verify(const pubkey_t * const PK,
+                 const char * const m,
                  const uint64_t mlen,
-                 const sig_t *const sig){
+                 const sig_t * const sig){
     CSPRNG_STATE_T CSPRNG_state;
 
     FQ_ELEM V_tr[K][N-K];

@@ -22,9 +22,10 @@
  *
  **/
 
-#include "pack_unpack.h"
-#include <stdint.h>
 #include <stddef.h>
+#include <stdint.h>
+
+#include "pack_unpack.h"
 
 /*Implementation of packing of 1 to 16 bits value vectors in 8 bit vectors,
  * generic inputs from 1 to 16 bit possible*/
@@ -509,7 +510,7 @@ void __namespace__generic_unpack_fq(FQ_ELEM *out, const uint8_t *in,
 #if Q == 127
 
    /* PQClean-edit: unused parameter */
-   if(inlen == 0) inlen = 0;
+   if(inlen == 0) {size_t tmp = inlen; tmp++;}
 
    size_t i;
    for(i = 0; i < outlen; i++)
@@ -932,7 +933,7 @@ void __namespace__generic_uint16_t_pack(uint8_t *out, const uint16_t *in,
    size_t i;
    size_t in_i = 0;
    uint8_t left, right;
-   uint8_t skip;
+   uint8_t skip = 0;
    if(btr <= 8)
    {
       left = 8 - btr;
@@ -1024,6 +1025,8 @@ void __namespace__generic_uint16_t_pack(uint8_t *out, const uint16_t *in,
          }
       }
    }
+   /* PQClean-edit: unused parameter */
+   if(skip == 0) {uint8_t tmp = skip; tmp++;}
 }
 
 void __namespace__generic_uint16_t_unpack(uint16_t *out, const uint8_t *in,
@@ -1145,4 +1148,6 @@ void __namespace__generic_uint16_t_unpack(uint16_t *out, const uint8_t *in,
          }
       }
    }
+   /* PQClean-edit: unused parameter */
+   if(skip == 0) {uint8_t tmp = skip; tmp++;}
 }

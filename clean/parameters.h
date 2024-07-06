@@ -227,13 +227,13 @@
 
 /************* Helper macros for derived parameter computation ***************/
 
-#define ROUND_UP(amount, round_amt) ( ((amount+round_amt-1)/round_amt)*round_amt )
+#define ROUND_UP(amount, round_amt) ( (((amount)+(round_amt)-1)/(round_amt))*(round_amt) )
 
 #define IS_REPRESENTABLE_IN_D_BITS(D, N)                \
-(((uint32_t) N>=(1UL << (D-1)) && (uint32_t) N<(1UL << D)) ? D : -1)
+(((uint32_t) (N)>=(1UL << ((D)-1)) && (uint32_t) (N)<(1UL << (D))) ? (D) : -1)
 
 #define BITS_TO_REPRESENT(N)                            \
-  (N == 0 ? 1 : (15                                     \
+  ((N) == 0 ? 1 : (15                                     \
                  + IS_REPRESENTABLE_IN_D_BITS( 1, N)    \
                  + IS_REPRESENTABLE_IN_D_BITS( 2, N)    \
                  + IS_REPRESENTABLE_IN_D_BITS( 3, N)    \
@@ -253,7 +253,7 @@
                  )                                      \
    )
 
-#define LOG2(L) ( (BITS_TO_REPRESENT(L) > BITS_TO_REPRESENT(L-1)) ? (BITS_TO_REPRESENT(L-1)) : (BITS_TO_REPRESENT(L)) )
+#define LOG2(L) ( (BITS_TO_REPRESENT(L) > BITS_TO_REPRESENT((L)-1)) ? (BITS_TO_REPRESENT((L)-1)) : (BITS_TO_REPRESENT(L)) )
 
 /***************** Derived parameters *****************************************/
 #define SEED_LENGTH_BYTES (SEC_MARGIN_LAMBDA/8)

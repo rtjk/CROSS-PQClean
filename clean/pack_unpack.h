@@ -26,8 +26,9 @@
 
 #pragma once
 
-#include <stdint.h>
 #include <stddef.h>
+#include <stdint.h>
+
 #include "parameters.h"
 
 /* compact Z_z/F_q vector encoding functions */

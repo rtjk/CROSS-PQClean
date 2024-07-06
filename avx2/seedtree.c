@@ -27,44 +27,14 @@
 #include <stdint.h>
 #include <string.h> // memcpy(...), memset(...)
 
-#define LEFT_CHILD(i) (2*i+1)
-#define RIGHT_CHILD(i) (2*i+2)
-#define PARENT(i) ((i-1)/2)
+#define LEFT_CHILD(i) (2*(i)+1)
+#define RIGHT_CHILD(i) (2*(i)+2)
+#define PARENT(i) (((i)-1)/2)
 
 /* Seed tree implementation. The binary seed tree is linearized into an array
  * from root to leaves, and from left to right. The nodes are numbered picking
  * the indexes from the corresponding full tree, having 2**LOG2(T) leaves */
-#define DIV_BY_TWO_CEIL(i)  (i/2 + i % 2)
-
-/****************************** Pretty Printers ******************************/
-
-#include <stdio.h>
-void __namespace__pseed(unsigned char seed[SEED_LENGTH_BYTES]){
-     fprintf(stderr,"-");
-   for (int i = 0 ; i < SEED_LENGTH_BYTES; i++){
-     fprintf(stderr,"%02X", seed[i]);
-   }
-     fprintf(stderr,"- ");
-}
-
-void __namespace__ptree(unsigned char seed_tree[NUM_NODES_SEED_TREE * SEED_LENGTH_BYTES]){
-   int node_idx =0;
-   fprintf(stderr,"Tree dump\n");
-   int ancestors = 0;
-   for (int level = 0; level < LOG2(T)+1; level++){
-      fprintf(stderr,"level %d ", level);
-      int nodes_in_level_full = (1UL << (level));
-      for (int idx_in_level = 0; idx_in_level < nodes_in_level_full; idx_in_level++ ) {
-          node_idx = ancestors + idx_in_level ;
-          fprintf(stderr," [%d] ",node_idx);
-          __namespace__pseed(seed_tree+node_idx*SEED_LENGTH_BYTES);
-      }
-      ancestors += nodes_in_level_full ;
-      fprintf(stderr,"\n");
-   }
-   fprintf(stderr,"\n");
-}
-
+#define DIV_BY_TWO_CEIL(i)  ((i)/2 + (i) % 2)
 
 #define TO_PUBLISH 1
 #define NOT_TO_PUBLISH 0

@@ -24,9 +24,10 @@
  **/
 #pragma once
 
-#include "parameters.h"
-#include "pack_unpack.h"
 #include <stdint.h>
+
+#include "pack_unpack.h"
+#include "parameters.h"
 
 /* Public key: the parity check matrix is shrunk to a seed, syndrome
  * represented in full */
@@ -73,13 +74,13 @@ void __namespace__CROSS_keygen(prikey_t *SK,
                  pubkey_t *PK);
 
 /* sign cannot fail */
-void __namespace__CROSS_sign(const prikey_t * const SK,
-                const char * const m,
-                const uint64_t mlen,
-                sig_t * const sig);
+void __namespace__CROSS_sign(const prikey_t * SK,
+                const char * m,
+                uint64_t mlen,
+                sig_t * sig);
 
 /* verify returns 1 if signature is ok, 0 otherwise */
-int __namespace__CROSS_verify(const pubkey_t * const PK,
-                 const char * const m,
-                 const uint64_t mlen,
-                 const sig_t * const sig);
+int __namespace__CROSS_verify(const pubkey_t * PK,
+                 const char * m,
+                 uint64_t mlen,
+                 const sig_t * sig);

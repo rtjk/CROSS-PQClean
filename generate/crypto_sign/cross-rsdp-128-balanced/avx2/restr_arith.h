@@ -31,12 +31,10 @@
 #define FZRED_OPPOSITE(x) ((x) ^ 0x07)
 #define FZ_DOUBLE_ZERO_NORM(x) (((x) + (((x) + 1) >> 3)) & 0x07)
 
-
-
 static inline
-void fz_dz_norm_sigma(FZ_ELEM v[N]){
-    for (int i = 0; i < N; i++){
-       v[i] = FZ_DOUBLE_ZERO_NORM(v[i]);
+void fz_dz_norm_sigma(FZ_ELEM v[N]) {
+    for (int i = 0; i < N; i++) {
+        v[i] = FZ_DOUBLE_ZERO_NORM(v[i]);
     }
 }
 
@@ -45,9 +43,9 @@ void fz_dz_norm_sigma(FZ_ELEM v[N]){
 static inline
 void restr_vec_sub(FZ_ELEM res[N],
                    const FZ_ELEM a[N],
-                   const FZ_ELEM b[N]){
-    for(int i = 0; i < N; i++){
-        res[i]= FZRED_SINGLE( a[i] + FZRED_OPPOSITE(b[i]) );
+                   const FZ_ELEM b[N]) {
+    for (int i = 0; i < N; i++) {
+        res[i] = FZRED_SINGLE( a[i] + FZRED_OPPOSITE(b[i]) );
     }
 }
 
@@ -59,22 +57,21 @@ void restr_vec_sub(FZ_ELEM res[N],
  * note that 0x80 is not excluded as sigmas are in double-zero redundant repr.
  */
 static inline
-int is_fq_vec_in_restr_group(const FQ_ELEM in[N]){
+int is_fq_vec_in_restr_group(const FQ_ELEM in[N]) {
     int is_in_ok = 1;
-    for(int i=0; i<N; i++){
+    for (int i = 0; i < N; i++) {
         FQ_ELEM tmp;
-        tmp = ( in[i]- (FQ_ELEM)1 ) & in[i];
+        tmp = ( in[i] - (FQ_ELEM)1 ) & in[i];
         is_in_ok = is_in_ok && (tmp == 0);
     }
     return is_in_ok;
 }
 
 static inline
-int is_zz_vec_in_restr_group(const FZ_ELEM in[N]){
+int is_zz_vec_in_restr_group(const FZ_ELEM in[N]) {
     int is_in_ok = 1;
-    for(int i=0; i<N; i++){
+    for (int i = 0; i < N; i++) {
         is_in_ok = is_in_ok && (in[i] < Z);
     }
     return is_in_ok;
 }
-

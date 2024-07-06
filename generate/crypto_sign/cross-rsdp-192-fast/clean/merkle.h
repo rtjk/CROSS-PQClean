@@ -27,15 +27,15 @@
 
 /***********************************************************************************************/
 void PQCLEAN_CROSSRSDP192FAST_CLEAN_generate_merkle_tree(unsigned char merkle_tree[NUM_NODES_MERKLE_TREE * HASH_DIGEST_LENGTH],
-                         unsigned char commitments[T][HASH_DIGEST_LENGTH]);
+        unsigned char commitments[T][HASH_DIGEST_LENGTH]);
 
 /***********************************************************************************************/
 void PQCLEAN_CROSSRSDP192FAST_CLEAN_generate_merkle_proof(uint16_t merkle_proof_indices[TREE_NODES_TO_STORE],
-                            uint16_t *merkle_proof_len,
-                            const unsigned char challenge[T]);
+        uint16_t *merkle_proof_len,
+        const unsigned char challenge[T]);
 
 /***********************************************************************************************/
 void PQCLEAN_CROSSRSDP192FAST_CLEAN_rebuild_merkle_tree(unsigned char merkle_tree[NUM_NODES_MERKLE_TREE * HASH_DIGEST_LENGTH],
-                            const unsigned char merkle_proof[TREE_NODES_TO_STORE * HASH_DIGEST_LENGTH],
-                            unsigned char commitments[T][HASH_DIGEST_LENGTH],
-                            const unsigned char challenge[T]);
+        const unsigned char merkle_proof[TREE_NODES_TO_STORE * HASH_DIGEST_LENGTH],
+        unsigned char commitments[T][HASH_DIGEST_LENGTH],
+        const unsigned char challenge[T]);

@@ -1,4 +1,4 @@
-# for every every parameter set create the corresponding directory
+# for every parameter set create the corresponding directory
 # then copy the templates for the 'clean' and 'avx2' implementations inside that directory
 # then substitute the actual parameters (listed in parameter_sets.csv)
 # finally remove dead code (#if, #ifdef, #elif, etc.)
@@ -64,6 +64,8 @@ with open(csv_filename, 'r') as csvfile:
             utility.replace_in_dir(dir, column_name, column_value)
 
         utility.remove_dead_code(dir)
+
+        utility.run_astyle(dir)
 
 current_time = datetime.datetime.now().strftime("%H:%M")
 print("Implementations placed in", TARGET_DIR, "@", current_time)

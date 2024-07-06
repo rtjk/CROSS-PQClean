@@ -40,20 +40,18 @@
 #define FQ_DOUBLE_ZERO_NORM(x) (((x) + (((x) + 1) >> 7)) & 0x7F)
 #define RESTR_TO_VAL(x) ( (FQ_ELEM) (RESTR_G_TABLE >> (8*(uint64_t)(x))) )
 
-
-
 /* in-place normalization of redundant zero representation for syndromes*/
 static inline
-void fq_dz_norm_synd(FQ_ELEM v[N-K]){
-    for (int i = 0; i < N-K; i++){
-       v[i] = FQ_DOUBLE_ZERO_NORM(v[i]);
+void fq_dz_norm_synd(FQ_ELEM v[N - K]) {
+    for (int i = 0; i < N - K; i++) {
+        v[i] = FQ_DOUBLE_ZERO_NORM(v[i]);
     }
 }
 
 static inline
-void fq_dz_norm(FQ_ELEM v[N]){
-    for (int i = 0; i < N; i++){
-       v[i] = FQ_DOUBLE_ZERO_NORM(v[i]);
+void fq_dz_norm(FQ_ELEM v[N]) {
+    for (int i = 0; i < N; i++) {
+        v[i] = FQ_DOUBLE_ZERO_NORM(v[i]);
     }
 }
 /* computes the product e*H of an n-element restricted vector by a (n-k)*n
@@ -62,40 +60,40 @@ void fq_dz_norm(FQ_ELEM v[N]){
  * computation is vectorizable. */
 
 static
-void restr_vec_by_fq_matrix(FQ_ELEM res[N-K],
+void restr_vec_by_fq_matrix(FQ_ELEM res[N - K],
                             const FZ_ELEM e[N],
-                            FQ_ELEM V_tr[K][N-K]){
-    for (int i = K ;i < N; i++){
-       res[i-K] = RESTR_TO_VAL(e[i]);
+                            FQ_ELEM V_tr[K][N - K]) {
+    for (int i = K ; i < N; i++) {
+        res[i - K] = RESTR_TO_VAL(e[i]);
     }
-    for(int i = 0; i < K; i++){
-       for(int j = 0; j < N-K; j++){
-           res[j] = FQRED_DOUBLE( (FQ_DOUBLEPREC) res[j] +
-                                  (FQ_DOUBLEPREC) RESTR_TO_VAL(e[i]) *
-                                  (FQ_DOUBLEPREC) V_tr[i][j]);
-       }
+    for (int i = 0; i < K; i++) {
+        for (int j = 0; j < N - K; j++) {
+            res[j] = FQRED_DOUBLE( (FQ_DOUBLEPREC) res[j] +
+                                   (FQ_DOUBLEPREC) RESTR_TO_VAL(e[i]) *
+                                   (FQ_DOUBLEPREC) V_tr[i][j]);
+        }
     }
 }
 
 static
-void fq_vec_by_fq_matrix(FQ_ELEM res[N-K],
+void fq_vec_by_fq_matrix(FQ_ELEM res[N - K],
                          const FQ_ELEM e[N],
-                         FQ_ELEM V_tr[K][N-K]){
-    memcpy(res,e+K,(N-K)*sizeof(FQ_ELEM));
-    for(int i = 0; i < K; i++){
-       for(int j = 0; j < N-K; j++){
-           res[j] = FQRED_DOUBLE( (FQ_DOUBLEPREC) res[j] +
-                                  (FQ_DOUBLEPREC) e[i] *
-                                  (FQ_DOUBLEPREC) V_tr[i][j]);
-       }
+                         FQ_ELEM V_tr[K][N - K]) {
+    memcpy(res, e + K, (N - K)*sizeof(FQ_ELEM));
+    for (int i = 0; i < K; i++) {
+        for (int j = 0; j < N - K; j++) {
+            res[j] = FQRED_DOUBLE( (FQ_DOUBLEPREC) res[j] +
+                                   (FQ_DOUBLEPREC) e[i] *
+                                   (FQ_DOUBLEPREC) V_tr[i][j]);
+        }
     }
 }
 
 static inline
 void fq_vec_by_fq_vec_pointwise(FQ_ELEM res[N],
                                 const FQ_ELEM in1[N],
-                                const FQ_ELEM in2[N]){
-    for(int i = 0; i < N; i++){
+                                const FQ_ELEM in2[N]) {
+    for (int i = 0; i < N; i++) {
         res[i] = FQRED_DOUBLE( (FQ_DOUBLEPREC) in1[i] *
                                (FQ_DOUBLEPREC) in2[i] );
     }
@@ -103,9 +101,9 @@ void fq_vec_by_fq_vec_pointwise(FQ_ELEM res[N],
 
 static inline
 void restr_by_fq_vec_pointwise(FQ_ELEM res[N],
-                                const FZ_ELEM in1[N],
-                                const FQ_ELEM in2[N]){
-    for(int i = 0; i < N; i++){
+                               const FZ_ELEM in1[N],
+                               const FQ_ELEM in2[N]) {
+    for (int i = 0; i < N; i++) {
         res[i] = FQRED_DOUBLE( (FQ_DOUBLEPREC) RESTR_TO_VAL(in1[i]) *
                                (FQ_DOUBLEPREC) in2[i]);
     }
@@ -116,20 +114,19 @@ static inline
 void fq_vec_by_restr_vec_scaled(FQ_ELEM res[N],
                                 const FZ_ELEM e[N],
                                 const FQ_ELEM beta,
-                                const FQ_ELEM u_tilde[N]){
-    for(int i = 0; i < N; i++){
+                                const FQ_ELEM u_tilde[N]) {
+    for (int i = 0; i < N; i++) {
         res[i] = FQRED_DOUBLE( (FQ_DOUBLEPREC) u_tilde[i] +
                                (FQ_DOUBLEPREC) RESTR_TO_VAL(e[i]) * (FQ_DOUBLEPREC) beta) ;
     }
 }
 
-
 static inline
-void fq_synd_minus_fq_vec_scaled(FQ_ELEM res[N-K],
-                                 const FQ_ELEM synd[N-K],
+void fq_synd_minus_fq_vec_scaled(FQ_ELEM res[N - K],
+                                 const FQ_ELEM synd[N - K],
                                  const FQ_ELEM beta,
-                                 const FQ_ELEM s[N-K]){
-    for(int j = 0; j < N-K; j++){
+                                 const FQ_ELEM s[N - K]) {
+    for (int j = 0; j < N - K; j++) {
         FQ_ELEM tmp = FQRED_DOUBLE( (FQ_DOUBLEPREC) s[j] * (FQ_DOUBLEPREC) beta);
         tmp = FQ_DOUBLE_ZERO_NORM(tmp);
         res[j] = FQRED_SINGLE( (FQ_DOUBLEPREC) synd[j] + FQRED_OPPOSITE(tmp) );
@@ -138,8 +135,8 @@ void fq_synd_minus_fq_vec_scaled(FQ_ELEM res[N-K],
 
 static inline
 void convert_restr_vec_to_fq(FQ_ELEM res[N],
-                            const FZ_ELEM in[N]){
-    for(int j = 0; j < N; j++){
+                             const FZ_ELEM in[N]) {
+    for (int j = 0; j < N; j++) {
         res[j] = RESTR_TO_VAL(in[j]);
     }
 }

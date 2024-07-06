@@ -33,59 +33,65 @@
 #define NOT_TO_PUBLISH 0
 
 void PQCLEAN_CROSSRSDP192FAST_CLEAN_merkle_tree_root_compute(uint8_t root[HASH_DIGEST_LENGTH],
-                              uint8_t leaves[T][HASH_DIGEST_LENGTH]);
-uint16_t PQCLEAN_CROSSRSDP192FAST_CLEAN_merkle_tree_proof_compute(uint8_t mtp[W*HASH_DIGEST_LENGTH],
-                                   uint8_t leaves[T][HASH_DIGEST_LENGTH],
-                                   const uint8_t leaves_to_reveal[T]);
+        uint8_t leaves[T][HASH_DIGEST_LENGTH]);
+uint16_t PQCLEAN_CROSSRSDP192FAST_CLEAN_merkle_tree_proof_compute(uint8_t mtp[W * HASH_DIGEST_LENGTH],
+        uint8_t leaves[T][HASH_DIGEST_LENGTH],
+        const uint8_t leaves_to_reveal[T]);
 void PQCLEAN_CROSSRSDP192FAST_CLEAN_merkle_tree_root_recompute(uint8_t root[HASH_DIGEST_LENGTH],
-                                uint8_t recomputed_leaves[T][HASH_DIGEST_LENGTH],
-                                const uint8_t mtp[W*HASH_DIGEST_LENGTH],
-                                const uint8_t leaves_to_reveal[T]);
+        uint8_t recomputed_leaves[T][HASH_DIGEST_LENGTH],
+        const uint8_t mtp[W * HASH_DIGEST_LENGTH],
+        const uint8_t leaves_to_reveal[T]);
 
 void PQCLEAN_CROSSRSDP192FAST_CLEAN_merkle_tree_root_compute(uint8_t root[HASH_DIGEST_LENGTH],
-                              uint8_t leaves[T][HASH_DIGEST_LENGTH]){
-   uint8_t quad_hash[4][HASH_DIGEST_LENGTH];
-   int remainders[4] = {0};
-   if(T%4 > 0){ remainders[0] = 1; } 
-   if(T%4 > 1){ remainders[1] = 1; } 
-   if(T%4 > 2){ remainders[2] = 1; }
-   int offset = 0;
-   for (int i = 0; i < 4; i++){
-       hash(quad_hash[i],
-            leaves[(T/4)*i+offset],
-            (T/4+remainders[i])*HASH_DIGEST_LENGTH);
-       offset += remainders[i];  
-   }
-   hash(root,(const unsigned char *)quad_hash,4*HASH_DIGEST_LENGTH);
+        uint8_t leaves[T][HASH_DIGEST_LENGTH]) {
+    uint8_t quad_hash[4][HASH_DIGEST_LENGTH];
+    int remainders[4] = {0};
+    if (T % 4 > 0) {
+        remainders[0] = 1;
+    }
+    if (T % 4 > 1) {
+        remainders[1] = 1;
+    }
+    if (T % 4 > 2) {
+        remainders[2] = 1;
+    }
+    int offset = 0;
+    for (int i = 0; i < 4; i++) {
+        hash(quad_hash[i],
+             leaves[(T / 4)*i + offset],
+             (T / 4 + remainders[i])*HASH_DIGEST_LENGTH);
+        offset += remainders[i];
+    }
+    hash(root, (const unsigned char *)quad_hash, 4 * HASH_DIGEST_LENGTH);
 }
 
-uint16_t PQCLEAN_CROSSRSDP192FAST_CLEAN_merkle_tree_proof_compute(uint8_t mtp[W*HASH_DIGEST_LENGTH],
-                                   uint8_t leaves[T][HASH_DIGEST_LENGTH],
-                                   const uint8_t leaves_to_reveal[T]){
+uint16_t PQCLEAN_CROSSRSDP192FAST_CLEAN_merkle_tree_proof_compute(uint8_t mtp[W * HASH_DIGEST_LENGTH],
+        uint8_t leaves[T][HASH_DIGEST_LENGTH],
+        const uint8_t leaves_to_reveal[T]) {
     uint16_t published = 0;
-    for(int i=0; i<T; i++){
-       if(leaves_to_reveal[i] == TO_PUBLISH){
-          memcpy(&mtp[HASH_DIGEST_LENGTH*published],
-                 &leaves[i],
-                 HASH_DIGEST_LENGTH);
-          published++;
-       }
+    for (int i = 0; i < T; i++) {
+        if (leaves_to_reveal[i] == TO_PUBLISH) {
+            memcpy(&mtp[HASH_DIGEST_LENGTH * published],
+                   &leaves[i],
+                   HASH_DIGEST_LENGTH);
+            published++;
+        }
     }
-    return published;    
+    return published;
 }
 
 void PQCLEAN_CROSSRSDP192FAST_CLEAN_merkle_tree_root_recompute(uint8_t root[HASH_DIGEST_LENGTH],
-                                uint8_t recomputed_leaves[T][HASH_DIGEST_LENGTH],
-                                const uint8_t mtp[W*HASH_DIGEST_LENGTH],
-                                const uint8_t leaves_to_reveal[T]){
+        uint8_t recomputed_leaves[T][HASH_DIGEST_LENGTH],
+        const uint8_t mtp[W * HASH_DIGEST_LENGTH],
+        const uint8_t leaves_to_reveal[T]) {
     uint16_t published = 0;
-    for(int i=0; i<T; i++){
-       if(leaves_to_reveal[i] == TO_PUBLISH){
-          memcpy(&recomputed_leaves[i],
-                 &mtp[HASH_DIGEST_LENGTH*published],
-                 HASH_DIGEST_LENGTH);
-          published++;
-       }
+    for (int i = 0; i < T; i++) {
+        if (leaves_to_reveal[i] == TO_PUBLISH) {
+            memcpy(&recomputed_leaves[i],
+                   &mtp[HASH_DIGEST_LENGTH * published],
+                   HASH_DIGEST_LENGTH);
+            published++;
+        }
     }
-    PQCLEAN_CROSSRSDP192FAST_CLEAN_merkle_tree_root_compute(root,recomputed_leaves);
+    PQCLEAN_CROSSRSDP192FAST_CLEAN_merkle_tree_root_compute(root, recomputed_leaves);
 }

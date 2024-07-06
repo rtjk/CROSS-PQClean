@@ -14,6 +14,12 @@ def replace_in_dir(dir, text_to_search, replacement_text):
             if os.path.isfile(file_path):
                 replace_in_file(file_path, text_to_search, replacement_text)
 
+def run_astyle(dir):
+    for file in os.listdir(dir):
+        if file.endswith('.c') or file.endswith('.h'):
+            astyle_command = 'astyle --options=pqclean_astyle.ini '+dir+'/'+file+' > /dev/null 2>&1'
+            os.system(astyle_command)
+
 # use the unifdef utility to remove #if, #ifdef, #elif, etc.
 # unifdef has a few quirks, some additional processing is needed
 # (e.g. it does not recognize multiline #define statements)

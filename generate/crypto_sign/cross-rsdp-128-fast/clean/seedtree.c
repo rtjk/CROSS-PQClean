@@ -39,81 +39,86 @@
 #define TO_PUBLISH 1
 #define NOT_TO_PUBLISH 0
 
-
 /* PQClean-edit: avoid VLA */
 #define SIZEOF_UINT16 2
 #define CSPRNG_INPUT_LEN (SALT_LENGTH_BYTES + SEED_LENGTH_BYTES + SIZEOF_UINT16)
 //const uint32_t csprng_input_len = SALT_LENGTH_BYTES + SEED_LENGTH_BYTES + sizeof(uint16_t);
 
-int PQCLEAN_CROSSRSDP128FAST_CLEAN_compute_round_seeds(unsigned char rounds_seeds[T*SEED_LENGTH_BYTES],
-                  const unsigned char root_seed[SEED_LENGTH_BYTES],
-                  const unsigned char salt[SALT_LENGTH_BYTES]){
+int PQCLEAN_CROSSRSDP128FAST_CLEAN_compute_round_seeds(unsigned char rounds_seeds[T * SEED_LENGTH_BYTES],
+        const unsigned char root_seed[SEED_LENGTH_BYTES],
+        const unsigned char salt[SALT_LENGTH_BYTES]) {
 
-   unsigned char csprng_input[CSPRNG_INPUT_LEN];
-   memcpy(csprng_input,root_seed,SEED_LENGTH_BYTES);   
-   memcpy(csprng_input+SEED_LENGTH_BYTES,salt,SALT_LENGTH_BYTES);
-   /* set counter for domain separation to 1 */
-   csprng_input[SEED_LENGTH_BYTES+SALT_LENGTH_BYTES] = 0;
-   csprng_input[SEED_LENGTH_BYTES+SALT_LENGTH_BYTES+1] = 1;
-   
-   unsigned char quad_seed[4*SEED_LENGTH_BYTES];
-   CSPRNG_STATE_T csprng_states[4];
-   initialize_csprng(&csprng_states[0], csprng_input, CSPRNG_INPUT_LEN);
-   csprng_randombytes(quad_seed,4*SEED_LENGTH_BYTES,&csprng_states[0]);
+    unsigned char csprng_input[CSPRNG_INPUT_LEN];
+    memcpy(csprng_input, root_seed, SEED_LENGTH_BYTES);
+    memcpy(csprng_input + SEED_LENGTH_BYTES, salt, SALT_LENGTH_BYTES);
+    /* set counter for domain separation to 1 */
+    csprng_input[SEED_LENGTH_BYTES + SALT_LENGTH_BYTES] = 0;
+    csprng_input[SEED_LENGTH_BYTES + SALT_LENGTH_BYTES + 1] = 1;
 
-   /* PQClean-edit: CSPRNG release context */
-   csprng_release(&csprng_states[0]);
+    unsigned char quad_seed[4 * SEED_LENGTH_BYTES];
+    CSPRNG_STATE_T csprng_states[4];
+    initialize_csprng(&csprng_states[0], csprng_input, CSPRNG_INPUT_LEN);
+    csprng_randombytes(quad_seed, 4 * SEED_LENGTH_BYTES, &csprng_states[0]);
 
-   int remainders[4] = {0};
-   if(T%4 > 0){ remainders[0] = 1; } 
-   if(T%4 > 1){ remainders[1] = 1; } 
-   if(T%4 > 2){ remainders[2] = 1; } 
-   
-   int offset = 0;
-   for (int i = 0; i < 4; i++){
-       memcpy(csprng_input,&quad_seed[i*SEED_LENGTH_BYTES],SEED_LENGTH_BYTES);   
-       csprng_input[SEED_LENGTH_BYTES+SALT_LENGTH_BYTES+1] += 1;
-       initialize_csprng(&csprng_states[i], csprng_input, CSPRNG_INPUT_LEN);
-       
-       csprng_randombytes(&rounds_seeds[((T/4)*i+offset)*SEED_LENGTH_BYTES],
-                          (T/4+remainders[i])*SEED_LENGTH_BYTES,
-                          &csprng_states[i]);
+    /* PQClean-edit: CSPRNG release context */
+    csprng_release(&csprng_states[0]);
 
-       /* PQClean-edit: CSPRNG release context */
-       csprng_release(&csprng_states[i]);
+    int remainders[4] = {0};
+    if (T % 4 > 0) {
+        remainders[0] = 1;
+    }
+    if (T % 4 > 1) {
+        remainders[1] = 1;
+    }
+    if (T % 4 > 2) {
+        remainders[2] = 1;
+    }
 
-       offset += remainders[i];
-   }
-   return T;
+    int offset = 0;
+    for (int i = 0; i < 4; i++) {
+        memcpy(csprng_input, &quad_seed[i * SEED_LENGTH_BYTES], SEED_LENGTH_BYTES);
+        csprng_input[SEED_LENGTH_BYTES + SALT_LENGTH_BYTES + 1] += 1;
+        initialize_csprng(&csprng_states[i], csprng_input, CSPRNG_INPUT_LEN);
+
+        csprng_randombytes(&rounds_seeds[((T / 4)*i + offset)*SEED_LENGTH_BYTES],
+                           (T / 4 + remainders[i])*SEED_LENGTH_BYTES,
+                           &csprng_states[i]);
+
+        /* PQClean-edit: CSPRNG release context */
+        csprng_release(&csprng_states[i]);
+
+        offset += remainders[i];
+    }
+    return T;
 }
 
 int PQCLEAN_CROSSRSDP128FAST_CLEAN_publish_round_seeds(unsigned char *seed_storage,
-                  const unsigned char rounds_seeds[T*SEED_LENGTH_BYTES],
-                  const unsigned char indices_to_publish[T]){
+        const unsigned char rounds_seeds[T * SEED_LENGTH_BYTES],
+        const unsigned char indices_to_publish[T]) {
     int published = 0;
-    for(int i=0; i<T; i++){
-       if(indices_to_publish[i] == TO_PUBLISH){
-          memcpy(&seed_storage[SEED_LENGTH_BYTES*published],
-                 &rounds_seeds[i*SEED_LENGTH_BYTES],
-                 SEED_LENGTH_BYTES);
-          published++;
-       }
+    for (int i = 0; i < T; i++) {
+        if (indices_to_publish[i] == TO_PUBLISH) {
+            memcpy(&seed_storage[SEED_LENGTH_BYTES * published],
+                   &rounds_seeds[i * SEED_LENGTH_BYTES],
+                   SEED_LENGTH_BYTES);
+            published++;
+        }
     }
     return published;
 }
 
 /* simply picks seeds out of the storage and places them in the in-memory array */
-int PQCLEAN_CROSSRSDP128FAST_CLEAN_regenerate_round_seeds(unsigned char rounds_seeds[T*SEED_LENGTH_BYTES],                           
-                           const unsigned char indices_to_publish[T],
-                           const unsigned char *seed_storage){
+int PQCLEAN_CROSSRSDP128FAST_CLEAN_regenerate_round_seeds(unsigned char rounds_seeds[T * SEED_LENGTH_BYTES],
+        const unsigned char indices_to_publish[T],
+        const unsigned char *seed_storage) {
     int published = 0;
-    for(int i=0; i<T; i++){
-       if(indices_to_publish[i] == TO_PUBLISH){
-           memcpy(&rounds_seeds[i*SEED_LENGTH_BYTES],
-                  &seed_storage[SEED_LENGTH_BYTES*published],
-                  SEED_LENGTH_BYTES);
-           published++;
-       }
-   }      
-   return published;
+    for (int i = 0; i < T; i++) {
+        if (indices_to_publish[i] == TO_PUBLISH) {
+            memcpy(&rounds_seeds[i * SEED_LENGTH_BYTES],
+                   &seed_storage[SEED_LENGTH_BYTES * published],
+                   SEED_LENGTH_BYTES);
+            published++;
+        }
+    }
+    return published;
 }

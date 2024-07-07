@@ -32,29 +32,29 @@
 /* Public key: the parity check matrix is shrunk to a seed, syndrome
  * represented in full */
 typedef struct {
-    uint8_t seed_pub[KEYPAIR_SEED_LENGTH_BYTES];
-    uint8_t s[DENSELY_PACKED_FQ_SYN_SIZE];
+	uint8_t seed_pub[KEYPAIR_SEED_LENGTH_BYTES];
+	uint8_t s[DENSELY_PACKED_FQ_SYN_SIZE];
 } pubkey_t;
 
 /* Private key: just a single seed*/
 typedef struct {
-    uint8_t seed[KEYPAIR_SEED_LENGTH_BYTES];
+	uint8_t seed[KEYPAIR_SEED_LENGTH_BYTES];
 } prikey_t;
 
 typedef struct {
-    uint8_t y[DENSELY_PACKED_FQ_VEC_SIZE];
-    uint8_t sigma[DENSELY_PACKED_FZ_VEC_SIZE];
+	uint8_t y[DENSELY_PACKED_FQ_VEC_SIZE];
+	uint8_t sigma[DENSELY_PACKED_FZ_VEC_SIZE];
 } rsp_0_t;
 
 /* Signature: */
 typedef struct {
-    uint8_t salt[SALT_LENGTH_BYTES];
-    uint8_t digest_01[HASH_DIGEST_LENGTH];
-    uint8_t digest_b[HASH_DIGEST_LENGTH];
-    uint8_t stp[W * SEED_LENGTH_BYTES];
-    uint8_t mtp[W * HASH_DIGEST_LENGTH];
-    rsp_0_t rsp_0[T - W];
-    uint8_t rsp_1[T - W][HASH_DIGEST_LENGTH];
+	uint8_t salt[SALT_LENGTH_BYTES];
+	uint8_t digest_01[HASH_DIGEST_LENGTH];
+	uint8_t digest_b[HASH_DIGEST_LENGTH];
+	uint8_t stp[W * SEED_LENGTH_BYTES];
+	uint8_t mtp[W * HASH_DIGEST_LENGTH];
+	rsp_0_t rsp_0[T - W];
+	uint8_t rsp_1[T - W][HASH_DIGEST_LENGTH];
 } sig_t;
 
 /* keygen cannot fail */

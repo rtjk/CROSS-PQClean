@@ -34,9 +34,9 @@
 
 static inline
 void fz_dz_norm_sigma(FZ_ELEM v[N]) {
-    for (int i = 0; i < N; i++) {
-        v[i] = FZ_DOUBLE_ZERO_NORM(v[i]);
-    }
+	for (int i = 0; i < N; i++) {
+		v[i] = FZ_DOUBLE_ZERO_NORM(v[i]);
+	}
 }
 
 /* Elements of the restricted subgroups are represented as the exponents of
@@ -45,9 +45,9 @@ static inline
 void restr_vec_sub(FZ_ELEM res[N],
                    const FZ_ELEM a[N],
                    const FZ_ELEM b[N]) {
-    for (int i = 0; i < N; i++) {
-        res[i] = FZRED_SINGLE( a[i] + FZRED_OPPOSITE(b[i]) );
-    }
+	for (int i = 0; i < N; i++) {
+		res[i] = FZRED_SINGLE( a[i] + FZRED_OPPOSITE(b[i]) );
+	}
 }
 
 /* Given the choice of q and z, all elements of G are represented as n-elements
@@ -59,22 +59,22 @@ void restr_vec_sub(FZ_ELEM res[N],
  */
 static inline
 int is_fq_vec_in_restr_group(const FQ_ELEM in[N]) {
-    int is_in_ok = 1;
-    for (int i = 0; i < N; i++) {
-        FQ_ELEM tmp;
-        tmp = ( in[i] - (FQ_ELEM)1 ) & in[i];
-        is_in_ok = is_in_ok && (tmp == 0);
-    }
-    return is_in_ok;
+	int is_in_ok = 1;
+	for (int i = 0; i < N; i++) {
+		FQ_ELEM tmp;
+		tmp = ( in[i] - (FQ_ELEM)1 ) & in[i];
+		is_in_ok = is_in_ok && (tmp == 0);
+	}
+	return is_in_ok;
 }
 
 static inline
 int is_zz_vec_in_restr_group(const FZ_ELEM in[N]) {
-    int is_in_ok = 1;
-    for (int i = 0; i < N; i++) {
-        is_in_ok = is_in_ok && (in[i] < Z);
-    }
-    return is_in_ok;
+	int is_in_ok = 1;
+	for (int i = 0; i < N; i++) {
+		is_in_ok = is_in_ok && (in[i] < Z);
+	}
+	return is_in_ok;
 }
 
 /* computes the information word * M_G product to obtain an element of G
@@ -85,37 +85,37 @@ void fz_inf_w_by_fz_matrix(FZ_ELEM res[N],
                            const FZ_ELEM e[M],
                            FZ_ELEM W_mat[M][N - M]) {
 
-    memset(res, 0, (N - M)*sizeof(FZ_ELEM));
-    memcpy(res + (N - M), e, M * sizeof(FZ_ELEM));
-    for (int i = 0; i < M; i++) {
-        for (int j = 0; j < N - M; j++) {
-            res[j] = FZRED_DOUBLE( (FZ_DOUBLEPREC) res[j] +
-                                   (FZ_DOUBLEPREC) e[i] *
-                                   (FZ_DOUBLEPREC) W_mat[i][j]);
-        }
-    }
+	memset(res, 0, (N - M)*sizeof(FZ_ELEM));
+	memcpy(res + (N - M), e, M * sizeof(FZ_ELEM));
+	for (int i = 0; i < M; i++) {
+		for (int j = 0; j < N - M; j++) {
+			res[j] = FZRED_DOUBLE( (FZ_DOUBLEPREC) res[j] +
+			                       (FZ_DOUBLEPREC) e[i] *
+			                       (FZ_DOUBLEPREC) W_mat[i][j]);
+		}
+	}
 }
 
 static inline
 void restr_inf_w_sub(FZ_ELEM res[M],
                      const FZ_ELEM a[M],
                      const FZ_ELEM b[M]) {
-    for (int i = 0; i < M; i++) {
-        res[i] = FZRED_SINGLE( a[i] + FZRED_OPPOSITE(b[i]) );
-    }
+	for (int i = 0; i < M; i++) {
+		res[i] = FZRED_SINGLE( a[i] + FZRED_OPPOSITE(b[i]) );
+	}
 }
 
 static inline
 int is_zz_inf_w_valid(const FZ_ELEM in[M]) {
-    int is_in_ok = 1;
-    for (int i = 0; i < M; i++) {
-        is_in_ok = is_in_ok && (in[i] < Z);
-    }
-    return is_in_ok;
+	int is_in_ok = 1;
+	for (int i = 0; i < M; i++) {
+		is_in_ok = is_in_ok && (in[i] < Z);
+	}
+	return is_in_ok;
 }
 static inline
 void fz_dz_norm_delta(FZ_ELEM v[M]) {
-    for (int i = 0; i < M; i++) {
-        v[i] = FZ_DOUBLE_ZERO_NORM(v[i]);
-    }
+	for (int i = 0; i < M; i++) {
+		v[i] = FZ_DOUBLE_ZERO_NORM(v[i]);
+	}
 }

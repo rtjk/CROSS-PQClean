@@ -47,9 +47,9 @@ void PQCLEAN_CROSSRSDPG256SMALL_AVX2_merkle_tree_root_compute(uint8_t root[HASH_
         /* input, although mutable in caller, having as const is non
          * tolerated in strict ISO C */
         uint8_t leaves[T][HASH_DIGEST_LENGTH]) {
-    PQCLEAN_CROSSRSDPG256SMALL_AVX2_generate_merkle_tree(tree, leaves);
-    /* Root is at first position of the tree */
-    memcpy(root, tree, HASH_DIGEST_LENGTH);
+	PQCLEAN_CROSSRSDPG256SMALL_AVX2_generate_merkle_tree(tree, leaves);
+	/* Root is at first position of the tree */
+	memcpy(root, tree, HASH_DIGEST_LENGTH);
 }
 
 /* Stub interface to the function computing the Merkle tree proof, storing it
@@ -57,16 +57,16 @@ void PQCLEAN_CROSSRSDPG256SMALL_AVX2_merkle_tree_root_compute(uint8_t root[HASH_
 uint16_t PQCLEAN_CROSSRSDPG256SMALL_AVX2_merkle_tree_proof_compute(uint8_t mtp[HASH_DIGEST_LENGTH * TREE_NODES_TO_STORE],
         const uint8_t tree[NUM_NODES_MERKLE_TREE * HASH_DIGEST_LENGTH],
         const uint8_t leaves_to_reveal[T]) {
-    uint16_t mtp_len;
-    uint16_t merkle_proof_indices[TREE_NODES_TO_STORE];
+	uint16_t mtp_len;
+	uint16_t merkle_proof_indices[TREE_NODES_TO_STORE];
 
-    PQCLEAN_CROSSRSDPG256SMALL_AVX2_generate_merkle_proof(merkle_proof_indices, &mtp_len, leaves_to_reveal);
+	PQCLEAN_CROSSRSDPG256SMALL_AVX2_generate_merkle_proof(merkle_proof_indices, &mtp_len, leaves_to_reveal);
 
-    for (size_t i = 0; i < mtp_len; i++) {
-        memcpy(mtp + i * HASH_DIGEST_LENGTH, tree + merkle_proof_indices[i]*HASH_DIGEST_LENGTH,
-               HASH_DIGEST_LENGTH);
-    }
-    return mtp_len;
+	for (size_t i = 0; i < mtp_len; i++) {
+		memcpy(mtp + i * HASH_DIGEST_LENGTH, tree + merkle_proof_indices[i]*HASH_DIGEST_LENGTH,
+		       HASH_DIGEST_LENGTH);
+	}
+	return mtp_len;
 }
 
 /* stub of the interface to Merkle tree recomputation given the proof and
@@ -76,8 +76,8 @@ void PQCLEAN_CROSSRSDPG256SMALL_AVX2_merkle_tree_root_recompute(uint8_t root[HAS
         const uint8_t mtp[HASH_DIGEST_LENGTH * TREE_NODES_TO_STORE],
         const uint8_t leaves_to_reveal[T]) {
 
-    unsigned char tree[NUM_NODES_MERKLE_TREE * HASH_DIGEST_LENGTH];
+	unsigned char tree[NUM_NODES_MERKLE_TREE * HASH_DIGEST_LENGTH];
 
-    PQCLEAN_CROSSRSDPG256SMALL_AVX2_rebuild_merkle_tree(tree, mtp, recomputed_leaves, leaves_to_reveal);
-    memcpy(root, tree, HASH_DIGEST_LENGTH);
+	PQCLEAN_CROSSRSDPG256SMALL_AVX2_rebuild_merkle_tree(tree, mtp, recomputed_leaves, leaves_to_reveal);
+	memcpy(root, tree, HASH_DIGEST_LENGTH);
 }

@@ -33,9 +33,9 @@
 
 static inline
 void fz_dz_norm_sigma(FZ_ELEM v[N]) {
-    for (int i = 0; i < N; i++) {
-        v[i] = FZ_DOUBLE_ZERO_NORM(v[i]);
-    }
+	for (int i = 0; i < N; i++) {
+		v[i] = FZ_DOUBLE_ZERO_NORM(v[i]);
+	}
 }
 
 /* Elements of the restricted subgroups are represented as the exponents of
@@ -44,9 +44,9 @@ static inline
 void restr_vec_sub(FZ_ELEM res[N],
                    const FZ_ELEM a[N],
                    const FZ_ELEM b[N]) {
-    for (int i = 0; i < N; i++) {
-        res[i] = FZRED_SINGLE( a[i] + FZRED_OPPOSITE(b[i]) );
-    }
+	for (int i = 0; i < N; i++) {
+		res[i] = FZRED_SINGLE( a[i] + FZRED_OPPOSITE(b[i]) );
+	}
 }
 
 /* Given the choice of q and z, all elements of G are represented as n-elements
@@ -58,20 +58,20 @@ void restr_vec_sub(FZ_ELEM res[N],
  */
 static inline
 int is_fq_vec_in_restr_group(const FQ_ELEM in[N]) {
-    int is_in_ok = 1;
-    for (int i = 0; i < N; i++) {
-        FQ_ELEM tmp;
-        tmp = ( in[i] - (FQ_ELEM)1 ) & in[i];
-        is_in_ok = is_in_ok && (tmp == 0);
-    }
-    return is_in_ok;
+	int is_in_ok = 1;
+	for (int i = 0; i < N; i++) {
+		FQ_ELEM tmp;
+		tmp = ( in[i] - (FQ_ELEM)1 ) & in[i];
+		is_in_ok = is_in_ok && (tmp == 0);
+	}
+	return is_in_ok;
 }
 
 static inline
 int is_zz_vec_in_restr_group(const FZ_ELEM in[N]) {
-    int is_in_ok = 1;
-    for (int i = 0; i < N; i++) {
-        is_in_ok = is_in_ok && (in[i] < Z);
-    }
-    return is_in_ok;
+	int is_in_ok = 1;
+	for (int i = 0; i < N; i++) {
+		is_in_ok = is_in_ok && (in[i] < Z);
+	}
+	return is_in_ok;
 }

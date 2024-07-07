@@ -69,28 +69,28 @@
 #define ROUND_UP(amount, round_amt) ( (((amount)+(round_amt)-1)/(round_amt))*(round_amt) )
 
 #define IS_REPRESENTABLE_IN_D_BITS(D, N)                \
-    (((uint32_t) (N)>=(1UL << ((D)-1)) && (uint32_t) (N)<(1UL << (D))) ? (D) : -1)
+(((uint32_t) (N)>=(1UL << ((D)-1)) && (uint32_t) (N)<(1UL << (D))) ? (D) : -1)
 
 #define BITS_TO_REPRESENT(N)                            \
-    ((N) == 0 ? 1 : (15                                     \
-                     + IS_REPRESENTABLE_IN_D_BITS( 1, N)    \
-                     + IS_REPRESENTABLE_IN_D_BITS( 2, N)    \
-                     + IS_REPRESENTABLE_IN_D_BITS( 3, N)    \
-                     + IS_REPRESENTABLE_IN_D_BITS( 4, N)    \
-                     + IS_REPRESENTABLE_IN_D_BITS( 5, N)    \
-                     + IS_REPRESENTABLE_IN_D_BITS( 6, N)    \
-                     + IS_REPRESENTABLE_IN_D_BITS( 7, N)    \
-                     + IS_REPRESENTABLE_IN_D_BITS( 8, N)    \
-                     + IS_REPRESENTABLE_IN_D_BITS( 9, N)    \
-                     + IS_REPRESENTABLE_IN_D_BITS(10, N)    \
-                     + IS_REPRESENTABLE_IN_D_BITS(11, N)    \
-                     + IS_REPRESENTABLE_IN_D_BITS(12, N)    \
-                     + IS_REPRESENTABLE_IN_D_BITS(13, N)    \
-                     + IS_REPRESENTABLE_IN_D_BITS(14, N)    \
-                     + IS_REPRESENTABLE_IN_D_BITS(15, N)    \
-                     + IS_REPRESENTABLE_IN_D_BITS(16, N)    \
-                    )                                      \
-    )
+  ((N) == 0 ? 1 : (15                                     \
+                 + IS_REPRESENTABLE_IN_D_BITS( 1, N)    \
+                 + IS_REPRESENTABLE_IN_D_BITS( 2, N)    \
+                 + IS_REPRESENTABLE_IN_D_BITS( 3, N)    \
+                 + IS_REPRESENTABLE_IN_D_BITS( 4, N)    \
+                 + IS_REPRESENTABLE_IN_D_BITS( 5, N)    \
+                 + IS_REPRESENTABLE_IN_D_BITS( 6, N)    \
+                 + IS_REPRESENTABLE_IN_D_BITS( 7, N)    \
+                 + IS_REPRESENTABLE_IN_D_BITS( 8, N)    \
+                 + IS_REPRESENTABLE_IN_D_BITS( 9, N)    \
+                 + IS_REPRESENTABLE_IN_D_BITS(10, N)    \
+                 + IS_REPRESENTABLE_IN_D_BITS(11, N)    \
+                 + IS_REPRESENTABLE_IN_D_BITS(12, N)    \
+                 + IS_REPRESENTABLE_IN_D_BITS(13, N)    \
+                 + IS_REPRESENTABLE_IN_D_BITS(14, N)    \
+                 + IS_REPRESENTABLE_IN_D_BITS(15, N)    \
+                 + IS_REPRESENTABLE_IN_D_BITS(16, N)    \
+                 )                                      \
+   )
 
 #define LOG2(L) ( (BITS_TO_REPRESENT(L) > BITS_TO_REPRESENT((L)-1)) ? (BITS_TO_REPRESENT((L)-1)) : (BITS_TO_REPRESENT(L)) )
 
@@ -113,11 +113,11 @@
  * will pack 8 values in num_bits_for_q-1 bytes exactly, leaving the remaining
  * N % 8 as a tail */
 #define DENSELY_PACKED_FQ_VEC_SIZE ((N/8)*BITS_TO_REPRESENT(Q-1) + \
-                                    ROUND_UP( ((N%8)*BITS_TO_REPRESENT(Q-1)),8)/8)
+                                   ROUND_UP( ((N%8)*BITS_TO_REPRESENT(Q-1)),8)/8)
 #define DENSELY_PACKED_FQ_SYN_SIZE (((N-K)/8)*BITS_TO_REPRESENT(Q-1) + \
-                                    ROUND_UP( (((N-K)%8)*BITS_TO_REPRESENT(Q-1)),8)/8)
+                                   ROUND_UP( (((N-K)%8)*BITS_TO_REPRESENT(Q-1)),8)/8)
 #define DENSELY_PACKED_FZ_VEC_SIZE ((N/8)*BITS_TO_REPRESENT(Z-1) + \
-                                    ROUND_UP( ((N%8)*BITS_TO_REPRESENT(Z-1)),8)/8)
+                                   ROUND_UP( ((N%8)*BITS_TO_REPRESENT(Z-1)),8)/8)
 
 /* Derived parameters computed via compute_derived_parameters.py */
 #define TREE_NODES_TO_STORE 162

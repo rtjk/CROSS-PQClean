@@ -6,7 +6,7 @@ length-secret-key: __length-secret-key__
 length-signature: __length-signature__
 nistkat-sha256: __nistkat-sha256__
 testvectors-sha256: __testvectors-sha256__
-principal-submitters: #TODO: check submitters
+principal-submitters:
   - Marco Baldi
   - Alessandro Barenghi
   - Sebastian Bitzer

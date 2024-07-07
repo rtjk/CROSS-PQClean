@@ -6,7 +6,7 @@ length-secret-key: 32
 length-signature: 19152
 nistkat-sha256: 2f83ba2b950e3690ee84457ac9b4f8e4dcc92ba6c8306f2a096a92cfc44cd05d
 testvectors-sha256: 8e591842678307ec035200e98e8a7a9b3d056912ce1d806c8fd4c8977f70b179
-principal-submitters: #TODO: check submitters
+principal-submitters:
   - Marco Baldi
   - Alessandro Barenghi
   - Sebastian Bitzer

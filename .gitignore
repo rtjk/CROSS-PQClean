@@ -1,5 +1,6 @@
 bin/
 build/
+generate/__pycache__/
 
 # Prerequisites
 *.d

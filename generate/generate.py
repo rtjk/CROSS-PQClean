@@ -38,6 +38,8 @@ with open(csv_filename, 'r') as csvfile:
     columns = csv_reader.fieldnames
 
     for row in csv_reader:
+
+        print('.', end='', flush=True)
         
         # create the directory for a given set of parameters 
         dir = row['__dir__']
@@ -68,4 +70,4 @@ with open(csv_filename, 'r') as csvfile:
         utility.run_astyle(dir)
 
 current_time = datetime.datetime.now().strftime("%H:%M")
-print("Implementations placed in", TARGET_DIR, "@", current_time)
+print("\nImplementations placed in", TARGET_DIR, "@", current_time)

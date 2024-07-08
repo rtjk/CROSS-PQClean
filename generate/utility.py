@@ -17,7 +17,7 @@ def replace_in_dir(dir, text_to_search, replacement_text):
 def run_astyle(dir):
     for file in os.listdir(dir):
         if file.endswith('.c') or file.endswith('.h'):
-            astyle_command = 'astyle --options=liboqs_astyle.ini '+dir+'/'+file+' > /dev/null 2>&1'
+            astyle_command = 'astyle --options=astyle/liboqs_astyle.ini '+dir+'/'+file+' > /dev/null 2>&1'
             os.system(astyle_command)
 
 # use the unifdef utility to remove #if, #ifdef, #elif, etc.

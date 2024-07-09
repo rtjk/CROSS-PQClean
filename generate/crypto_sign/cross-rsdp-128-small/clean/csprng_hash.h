@@ -71,7 +71,9 @@ void initialize_csprng_x2(CSPRNG_X2_STATE_T *const csprng_state, const unsigned 
 }
 static inline
 void initialize_csprng_x3(CSPRNG_X3_STATE_T *const csprng_state, const unsigned char *const seed1, const unsigned char *const seed2, const unsigned char *const seed3, const uint32_t seed_len_bytes) {
-	const unsigned char seed4[seed_len_bytes]; // discarded
+	/* seed4 is initialized even if dicarded
+	 * to avoid uninitialized memory access */
+	const unsigned char seed4[seed_len_bytes] = {0};
 	xof_shake_x4_init(csprng_state);
 	xof_shake_x4_update(csprng_state, seed1, seed2, seed3, seed4, seed_len_bytes);
 	xof_shake_x4_final(csprng_state);

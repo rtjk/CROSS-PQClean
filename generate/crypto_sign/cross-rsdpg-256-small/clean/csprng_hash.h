@@ -71,11 +71,9 @@ void initialize_csprng_x2(CSPRNG_X2_STATE_T *const csprng_state, const unsigned 
 }
 static inline
 void initialize_csprng_x3(CSPRNG_X3_STATE_T *const csprng_state, const unsigned char *const seed1, const unsigned char *const seed2, const unsigned char *const seed3, const uint32_t seed_len_bytes) {
-	/* seed4 is initialized even if dicarded
-	 * to avoid uninitialized memory access */
-	const unsigned char seed4[seed_len_bytes] = {0};
+	/* to perfor xof_x3 it's faster to call xof_x4 and discard the last output */
 	xof_shake_x4_init(csprng_state);
-	xof_shake_x4_update(csprng_state, seed1, seed2, seed3, seed4, seed_len_bytes);
+	xof_shake_x4_update(csprng_state, seed1, seed2, seed3, seed3, seed_len_bytes);
 	xof_shake_x4_final(csprng_state);
 }
 static inline
@@ -91,8 +89,8 @@ void csprng_randombytes_x2(unsigned char *const x1, unsigned char *const x2, uin
 }
 static inline
 void csprng_randombytes_x3(unsigned char *const x1, unsigned char *const x2, unsigned char *const x3, uint64_t xlen, CSPRNG_X3_STATE_T *const csprng_state) {
-	unsigned char x4[xlen]; // discarded
-	xof_shake_x4_extract(csprng_state, x1, x2, x3, x4, xlen);
+	/* to perfor xof_x3 it's faster to call xof_x4 and discard the last output */
+	xof_shake_x4_extract(csprng_state, x1, x2, x3, x3, xlen);
 }
 static inline
 void csprng_randombytes_x4(unsigned char *const x1, unsigned char *const x2, unsigned char *const x3, unsigned char *const x4, uint64_t xlen, CSPRNG_X4_STATE_T *const csprng_state) {

@@ -27,9 +27,6 @@
 #include "parameters.h"
 #include "sha3.h"
 
-// TODO
-#include <stdio.h>
-
 /************************* CSPRNG ********************************/
 
 #define CSPRNG_STATE_T SHAKE_STATE_STRUCT

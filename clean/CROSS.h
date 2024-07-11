@@ -66,7 +66,7 @@ typedef struct {
 #endif
    rsp_0_t rsp_0[T-W];
    uint8_t rsp_1[T-W][HASH_DIGEST_LENGTH];
-} sig_t;
+} CROSS_sig_t;
 
 
 /* keygen cannot fail */
@@ -77,10 +77,10 @@ void __namespace__CROSS_keygen(prikey_t *SK,
 void __namespace__CROSS_sign(const prikey_t * SK,
                 const char * m,
                 uint64_t mlen,
-                sig_t * sig);
+                CROSS_sig_t * sig);
 
 /* verify returns 1 if signature is ok, 0 otherwise */
 int __namespace__CROSS_verify(const pubkey_t * PK,
                  const char * m,
                  uint64_t mlen,
-                 const sig_t * sig);
+                 const CROSS_sig_t * sig);

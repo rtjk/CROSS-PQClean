@@ -54,8 +54,8 @@ int __namespace__crypto_sign(unsigned char *sm,
    memcpy(sm, m, mlen);
    __namespace__CROSS_sign((const prikey_t *) sk,                               // in parameter
              (const char *const) m, (const uint64_t) mlen,         // in parameter
-             (sig_t *) (sm+mlen));                                 // out parameter
-   *smlen = mlen + (uint64_t) sizeof(sig_t);
+             (CROSS_sig_t *) (sm+mlen));                                 // out parameter
+   *smlen = mlen + (uint64_t) sizeof(CROSS_sig_t);
 
    return 0;  // NIST convention: 0 == zero errors
 } // end __namespace__crypto_sign
@@ -72,13 +72,13 @@ int __namespace__crypto_sign_open(unsigned char *m,
 {
 
    /* verify returns 1 if signature is ok, 0 otherwise */
-   *mlen = smlen-(uint64_t) sizeof(sig_t);
+   *mlen = smlen-(uint64_t) sizeof(CROSS_sig_t);
    
    memcpy((unsigned char *) m, (const unsigned char *) sm, (size_t) *mlen);
    int ok = __namespace__CROSS_verify((const pubkey_t *const)
                         pk,                     // in parameter
                         (const char *const) m, (const uint64_t) *mlen,  // in parameter
-                        (const sig_t * const) (sm+*mlen));              // in parameter
+                        (const CROSS_sig_t * const) (sm+*mlen));              // in parameter
 
 
    return ok-1; // NIST convention: 0 == zero errors, -1 == error condition
@@ -97,8 +97,8 @@ int __namespace__crypto_sign_signature(unsigned char *sig, uint64_t *siglen,    
    /* sign cannot fail */
    __namespace__CROSS_sign((const prikey_t *) sk,                                    // in parameter
              (const char *const) m, (const uint64_t) mlen,              // in parameter
-             (sig_t *) sig);                                            // out parameter
-   *siglen = (uint64_t) sizeof(sig_t);
+             (CROSS_sig_t *) sig);                                            // out parameter
+   *siglen = (uint64_t) sizeof(CROSS_sig_t);
 
    return 0;  // NIST convention: 0 == zero errors
 } // end __namespace__crypto_sign_signature
@@ -120,7 +120,7 @@ int __namespace__crypto_sign_verify(const unsigned char *sig, uint64_t siglen,  
    /* verify returns 1 if signature is ok, 0 otherwise */   
    int ok = __namespace__CROSS_verify((const pubkey_t *const) pk,                     // in parameter
                         (const char *const) m, (const uint64_t) mlen,    // in parameter
-                        (const sig_t * const) sig);                      // in parameter
+                        (const CROSS_sig_t * const) sig);                      // in parameter
 
 
    return ok-1; // NIST convention: 0 == zero errors, -1 == error condition

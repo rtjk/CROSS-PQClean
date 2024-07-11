@@ -52,8 +52,8 @@ int PQCLEAN_CROSSRSDP128FAST_AVX2_crypto_sign(unsigned char *sm,
 	memcpy(sm, m, mlen);
 	PQCLEAN_CROSSRSDP128FAST_AVX2_CROSS_sign((const prikey_t *) sk,                               // in parameter
 	        (const char *const) m, (const uint64_t) mlen,         // in parameter
-	        (sig_t *) (sm + mlen));                               // out parameter
-	*smlen = mlen + (uint64_t) sizeof(sig_t);
+	        (CROSS_sig_t *) (sm + mlen));                               // out parameter
+	*smlen = mlen + (uint64_t) sizeof(CROSS_sig_t);
 
 	return 0;  // NIST convention: 0 == zero errors
 } // end PQCLEAN_CROSSRSDP128FAST_AVX2_crypto_sign
@@ -69,13 +69,13 @@ int PQCLEAN_CROSSRSDP128FAST_AVX2_crypto_sign_open(unsigned char *m,
         const unsigned char *pk) {                         // in parameter
 
 	/* verify returns 1 if signature is ok, 0 otherwise */
-	*mlen = smlen - (uint64_t) sizeof(sig_t);
+	*mlen = smlen - (uint64_t) sizeof(CROSS_sig_t);
 
 	memcpy((unsigned char *) m, (const unsigned char *) sm, (size_t) *mlen);
 	int ok = PQCLEAN_CROSSRSDP128FAST_AVX2_CROSS_verify((const pubkey_t *const)
 	         pk,                     // in parameter
 	         (const char *const) m, (const uint64_t) * mlen, // in parameter
-	         (const sig_t * const) (sm + *mlen));            // in parameter
+	         (const CROSS_sig_t *const) (sm + *mlen));             // in parameter
 
 	return ok - 1; // NIST convention: 0 == zero errors, -1 == error condition
 } // end PQCLEAN_CROSSRSDP128FAST_AVX2_crypto_sign_open
@@ -92,8 +92,8 @@ int PQCLEAN_CROSSRSDP128FAST_AVX2_crypto_sign_signature(unsigned char *sig, uint
 	/* sign cannot fail */
 	PQCLEAN_CROSSRSDP128FAST_AVX2_CROSS_sign((const prikey_t *) sk,                                    // in parameter
 	        (const char *const) m, (const uint64_t) mlen,              // in parameter
-	        (sig_t *) sig);                                            // out parameter
-	*siglen = (uint64_t) sizeof(sig_t);
+	        (CROSS_sig_t *) sig);                                            // out parameter
+	*siglen = (uint64_t) sizeof(CROSS_sig_t);
 
 	return 0;  // NIST convention: 0 == zero errors
 } // end PQCLEAN_CROSSRSDP128FAST_AVX2_crypto_sign_signature
@@ -117,7 +117,7 @@ int PQCLEAN_CROSSRSDP128FAST_AVX2_crypto_sign_verify(const unsigned char *sig, u
 	/* verify returns 1 if signature is ok, 0 otherwise */
 	int ok = PQCLEAN_CROSSRSDP128FAST_AVX2_CROSS_verify((const pubkey_t *const) pk,                     // in parameter
 	         (const char *const) m, (const uint64_t) mlen,    // in parameter
-	         (const sig_t * const) sig);                      // in parameter
+	         (const CROSS_sig_t *const) sig);                       // in parameter
 
 	return ok - 1; // NIST convention: 0 == zero errors, -1 == error condition
 } // end PQCLEAN_CROSSRSDP128FAST_AVX2_crypto_sign_verify

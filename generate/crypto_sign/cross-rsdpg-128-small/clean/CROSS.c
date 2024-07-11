@@ -122,10 +122,10 @@ void PQCLEAN_CROSSRSDPG128SMALL_CLEAN_CROSS_keygen(prikey_t *SK,
 void PQCLEAN_CROSSRSDPG128SMALL_CLEAN_CROSS_sign(const prikey_t *const SK,
         const char *const m,
         const uint64_t mlen,
-        sig_t *const sig) {
+        CROSS_sig_t *const sig) {
 	/* Wipe any residual information in the sig structure allocated by the
 	 * caller */
-	memset(sig, 0, sizeof(sig_t));
+	memset(sig, 0, sizeof(CROSS_sig_t));
 	/* Key material expansion */
 	FQ_ELEM V_tr[K][N - K];
 	FZ_ELEM eta[N];
@@ -297,7 +297,7 @@ void PQCLEAN_CROSSRSDPG128SMALL_CLEAN_CROSS_sign(const prikey_t *const SK,
 int PQCLEAN_CROSSRSDPG128SMALL_CLEAN_CROSS_verify(const pubkey_t *const PK,
         const char *const m,
         const uint64_t mlen,
-        const sig_t *const sig) {
+        const CROSS_sig_t *const sig) {
 	CSPRNG_STATE_T CSPRNG_state;
 
 	FQ_ELEM V_tr[K][N - K];

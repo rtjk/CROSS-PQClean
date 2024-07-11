@@ -57,7 +57,7 @@ typedef struct {
 	uint8_t mtp[HASH_DIGEST_LENGTH * TREE_NODES_TO_STORE];
 	rsp_0_t rsp_0[T - W];
 	uint8_t rsp_1[T - W][HASH_DIGEST_LENGTH];
-} sig_t;
+} CROSS_sig_t;
 
 /* keygen cannot fail */
 void PQCLEAN_CROSSRSDP256SMALL_CLEAN_CROSS_keygen(prikey_t *SK,
@@ -67,10 +67,10 @@ void PQCLEAN_CROSSRSDP256SMALL_CLEAN_CROSS_keygen(prikey_t *SK,
 void PQCLEAN_CROSSRSDP256SMALL_CLEAN_CROSS_sign(const prikey_t *SK,
         const char *m,
         uint64_t mlen,
-        sig_t *sig);
+        CROSS_sig_t *sig);
 
 /* verify returns 1 if signature is ok, 0 otherwise */
 int PQCLEAN_CROSSRSDP256SMALL_CLEAN_CROSS_verify(const pubkey_t *PK,
         const char *m,
         uint64_t mlen,
-        const sig_t *sig);
+        const CROSS_sig_t *sig);

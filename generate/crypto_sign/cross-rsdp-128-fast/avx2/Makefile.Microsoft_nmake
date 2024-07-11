@@ -12,8 +12,8 @@ all: $(LIBRARY)
 $(OBJECTS): *.h
 
 $(LIBRARY): $(OBJECTS)
-LIB.EXE /NOLOGO /WX /OUT:$@ $**
+    LIB.EXE /NOLOGO /WX /OUT:$@ $**
 
 clean:
--DEL $(OBJECTS)
--DEL $(LIBRARY)
+    -DEL $(OBJECTS)
+    -DEL $(LIBRARY)

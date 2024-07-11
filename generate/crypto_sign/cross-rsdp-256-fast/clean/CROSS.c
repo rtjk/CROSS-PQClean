@@ -268,7 +268,8 @@ void PQCLEAN_CROSSRSDP256FAST_CLEAN_CROSS_sign(const prikey_t *const SK,
 }
 
 /* PQClean-edit: avoid VLA */
-#define CSPRNG_INPUT_LENGTH (SALT_LENGTH_BYTES+SEED_LENGTH_BYTES+2)
+#define CSPRNG_INPUT_LENGTH (SALT_LENGTH_BYTES+SEED_LENGTH_BYTES+SIZEOF_UINT16)
+//const int csprng_input_length = SALT_LENGTH_BYTES+SEED_LENGTH_BYTES+sizeof(uint16_t);
 
 /* verify returns 1 if signature is ok, 0 otherwise */
 int PQCLEAN_CROSSRSDP256FAST_CLEAN_CROSS_verify(const pubkey_t *const PK,
@@ -347,7 +348,6 @@ int PQCLEAN_CROSSRSDP256FAST_CLEAN_CROSS_verify(const pubkey_t *const PK,
 
 			/* CSPRNG is fed with concat(seed,salt,round index) represented
 			* as a 2 bytes little endian unsigned integer */
-			const int csprng_input_length = SALT_LENGTH_BYTES + SEED_LENGTH_BYTES + sizeof(uint16_t);
 			uint8_t csprng_input[CSPRNG_INPUT_LENGTH];
 			memcpy(csprng_input + SEED_LENGTH_BYTES, sig->salt, SALT_LENGTH_BYTES);
 			memcpy(csprng_input, rounds_seeds + SEED_LENGTH_BYTES * i, SEED_LENGTH_BYTES);
@@ -355,7 +355,7 @@ int PQCLEAN_CROSSRSDP256FAST_CLEAN_CROSS_verify(const pubkey_t *const PK,
 			csprng_input[SALT_LENGTH_BYTES + SEED_LENGTH_BYTES + 1] = domain_sep_i & 0xFF;
 
 			/* expand seed[i] into seed_e and seed_u */
-			initialize_csprng(&CSPRNG_state, csprng_input, csprng_input_length);
+			initialize_csprng(&CSPRNG_state, csprng_input, CSPRNG_INPUT_LENGTH);
 			/* expand eta_tilde */
 			CSPRNG_zz_vec(eta_tilde, &CSPRNG_state);
 			/* expand u_tilde */

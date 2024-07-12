@@ -14,7 +14,7 @@
 #if defined(HIGH_COMPATIBILITY_X86_64)
 #include <stdalign.h>
 #include <wmmintrin.h>
-// TODO: windows can'r find x86intrin.h
+// TODO: windows can't find x86intrin.h
 //#include <x86intrin.h>
 #endif
 

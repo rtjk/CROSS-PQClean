@@ -7,7 +7,7 @@
 
 #include <stdalign.h>
 #include <wmmintrin.h>
-// TODO: windows can'r find x86intrin.h
+// TODO: windows can't find x86intrin.h
 //#include <x86intrin.h>
 
 #define EPI8_PER_REG 32

@@ -191,7 +191,7 @@ void __namespace__CROSS_keygen(prikey_t *SK,
 /* sign cannot fail */
 void __namespace__CROSS_sign(const prikey_t * const SK,
                 const char * const m,
-                const uint64_t mlen,
+                const size_t mlen,
                 CROSS_sig_t * const sig){
     /* Wipe any residual information in the sig structure allocated by the 
      * caller */
@@ -466,7 +466,7 @@ void __namespace__CROSS_sign(const prikey_t * const SK,
 /* verify returns 1 if signature is ok, 0 otherwise */
 int __namespace__CROSS_verify(const pubkey_t * const PK,
                  const char * const m,
-                 const uint64_t mlen,
+                 const size_t mlen,
                  const CROSS_sig_t * const sig){
     CSPRNG_STATE_T CSPRNG_state;
 

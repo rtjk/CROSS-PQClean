@@ -45,15 +45,15 @@ int PQCLEAN_CROSSRSDP192FAST_CLEAN_crypto_sign_keypair(unsigned char *pk,
 /*... from original message m[0],m[1],...,m[mlen-1]                           */
 /*... under secret key sk[0],sk[1],...                                        */
 int PQCLEAN_CROSSRSDP192FAST_CLEAN_crypto_sign(unsigned char *sm,
-        uint64_t *smlen,     // out parameter
-        const unsigned char *m, uint64_t mlen,  // in parameter
+        size_t *smlen,     // out parameter
+        const unsigned char *m, size_t mlen,  // in parameter
         const unsigned char *sk) {                        // in parameter
 	/* sign cannot fail */
 	memcpy(sm, m, mlen);
 	PQCLEAN_CROSSRSDP192FAST_CLEAN_CROSS_sign((const prikey_t *) sk,                               // in parameter
-	        (const char *const) m, (const uint64_t) mlen,         // in parameter
+	        (const char *const) m, (const size_t) mlen,         // in parameter
 	        (CROSS_sig_t *) (sm + mlen));                               // out parameter
-	*smlen = mlen + (uint64_t) sizeof(CROSS_sig_t);
+	*smlen = mlen + (size_t) sizeof(CROSS_sig_t);
 
 	return 0;  // NIST convention: 0 == zero errors
 } // end PQCLEAN_CROSSRSDP192FAST_CLEAN_crypto_sign
@@ -64,17 +64,17 @@ int PQCLEAN_CROSSRSDP192FAST_CLEAN_crypto_sign(unsigned char *sm,
 /*.  ... under public key pk[0],pk[1],...                                     */
 /*.  ... and producing original message m[0],m[1],...,m[*mlen-1]              */
 int PQCLEAN_CROSSRSDP192FAST_CLEAN_crypto_sign_open(unsigned char *m,
-        uint64_t *mlen,        // out parameter
-        const unsigned char *sm, uint64_t smlen, // in parameter
+        size_t *mlen,        // out parameter
+        const unsigned char *sm, size_t smlen, // in parameter
         const unsigned char *pk) {                         // in parameter
 
 	/* verify returns 1 if signature is ok, 0 otherwise */
-	*mlen = smlen - (uint64_t) sizeof(CROSS_sig_t);
+	*mlen = smlen - (size_t) sizeof(CROSS_sig_t);
 
 	memcpy((unsigned char *) m, (const unsigned char *) sm, (size_t) *mlen);
 	int ok = PQCLEAN_CROSSRSDP192FAST_CLEAN_CROSS_verify((const pubkey_t *const)
 	         pk,                     // in parameter
-	         (const char *const) m, (const uint64_t) * mlen, // in parameter
+	         (const char *const) m, (const size_t) * mlen, // in parameter
 	         (const CROSS_sig_t *const) (sm + *mlen));             // in parameter
 
 	return ok - 1; // NIST convention: 0 == zero errors, -1 == error condition
@@ -85,15 +85,15 @@ int PQCLEAN_CROSSRSDP192FAST_CLEAN_crypto_sign_open(unsigned char *m,
 /*... generating a signature sig[0],sig[1],...,sig[*siglen-1]                */
 /*... from original message m[0],m[1],...,m[mlen-1]                           */
 /*... under secret key sk[0],sk[1],...                                        */
-int PQCLEAN_CROSSRSDP192FAST_CLEAN_crypto_sign_signature(unsigned char *sig, uint64_t *siglen,         // out parameter
-        const unsigned char *m, uint64_t mlen,                  // in parameter
+int PQCLEAN_CROSSRSDP192FAST_CLEAN_crypto_sign_signature(unsigned char *sig, size_t *siglen,         // out parameter
+        const unsigned char *m, size_t mlen,                  // in parameter
         const unsigned char *sk                                 // in parameter
                                                         ) {
 	/* sign cannot fail */
 	PQCLEAN_CROSSRSDP192FAST_CLEAN_CROSS_sign((const prikey_t *) sk,                                    // in parameter
-	        (const char *const) m, (const uint64_t) mlen,              // in parameter
+	        (const char *const) m, (const size_t) mlen,              // in parameter
 	        (CROSS_sig_t *) sig);                                            // out parameter
-	*siglen = (uint64_t) sizeof(CROSS_sig_t);
+	*siglen = (size_t) sizeof(CROSS_sig_t);
 
 	return 0;  // NIST convention: 0 == zero errors
 } // end PQCLEAN_CROSSRSDP192FAST_CLEAN_crypto_sign_signature
@@ -103,20 +103,20 @@ int PQCLEAN_CROSSRSDP192FAST_CLEAN_crypto_sign_signature(unsigned char *sig, uin
 /*.  ... verifying a signature sig[0],sig[1],...,sig[siglen-1]               */
 /*.  ... under public key pk[0],pk[1],...                                     */
 /*.  ... and producing original message m[0],m[1],...,m[*mlen-1]              */
-int PQCLEAN_CROSSRSDP192FAST_CLEAN_crypto_sign_verify(const unsigned char *sig, uint64_t siglen,      // in parameter
-        const unsigned char *m, uint64_t mlen,                  // in parameter
+int PQCLEAN_CROSSRSDP192FAST_CLEAN_crypto_sign_verify(const unsigned char *sig, size_t siglen,      // in parameter
+        const unsigned char *m, size_t mlen,                  // in parameter
         const unsigned char *pk                                 // in parameter
                                                      ) {
 
 	/* PQClean-edit: unused parameter */
 	if (siglen == 0) {
-		uint64_t tmp = siglen;
+		size_t tmp = siglen;
 		tmp++;
 	}
 
 	/* verify returns 1 if signature is ok, 0 otherwise */
 	int ok = PQCLEAN_CROSSRSDP192FAST_CLEAN_CROSS_verify((const pubkey_t *const) pk,                     // in parameter
-	         (const char *const) m, (const uint64_t) mlen,    // in parameter
+	         (const char *const) m, (const size_t) mlen,    // in parameter
 	         (const CROSS_sig_t *const) sig);                       // in parameter
 
 	return ok - 1; // NIST convention: 0 == zero errors, -1 == error condition

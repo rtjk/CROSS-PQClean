@@ -28,6 +28,7 @@
 
 #pragma once
 
+#include <stddef.h>
 #include <stdint.h>
 
 #define __namespace__CRYPTO_ALGNAME "__dir__"
@@ -50,30 +51,30 @@ int __namespace__crypto_sign_keypair(unsigned char *pk,
                        );
 
 int __namespace__crypto_sign(unsigned char *sm,
-                uint64_t *smlen,
+                size_t *smlen,
                 const unsigned char *m,
-                uint64_t mlen,
+                size_t mlen,
                 const unsigned char *sk
                );
 
 int __namespace__crypto_sign_open(unsigned char *m,
-                     uint64_t *mlen,
+                     size_t *mlen,
                      const unsigned char *sm,
-                     uint64_t smlen,
+                     size_t smlen,
                      const unsigned char *pk
                     );
 
 int __namespace__crypto_sign_signature(unsigned char *sig,
-                uint64_t *siglen,
+                size_t *siglen,
                 const unsigned char *m,
-                uint64_t mlen,
+                size_t mlen,
                 const unsigned char *sk
                );
 
 int __namespace__crypto_sign_verify(const unsigned char *sig,
-                uint64_t siglen,
+                size_t siglen,
                 const unsigned char *m,
-                uint64_t mlen,
+                size_t mlen,
                 const unsigned char *pk
                );
                

@@ -223,7 +223,7 @@ void PQCLEAN_CROSSRSDP192FAST_CLEAN_expand_digest_to_fixed_weight(uint8_t fixed_
 #define BITS_FOR_Q BITS_TO_REPRESENT(Q-1)
 #define BITS_FOR_Z BITS_TO_REPRESENT(Z-1)
 
-// TODO: PQclean-edit: avoid VLA
+/* PQClean-edit: avoid VLA */
 #define CORRECTION_FQ_VEC ((BITS_N_ZQ_CT_RNG - N*BITS_FOR_Q)* (BITS_FOR_Q-1))
 #define BUFSIZE_FQ_VEC (ROUND_UP(BITS_N_ZQ_CT_RNG+CORRECTION_FQ_VEC,8)/8)
 
@@ -235,10 +235,13 @@ void CSPRNG_fq_vec(FQ_ELEM res[N],
 	 * whenever they appear in a run; an upper bound on the bit-cost is considering
 	 * the failures to be discarding the entire value, instead of a single bit.
 	 * The following correction factor takes this into account */
-	////uint32_t correction_bit_len =  (BITS_N_ZQ_CT_RNG - N*BITS_FOR_Q)* (BITS_FOR_Q-1);
-	////uint32_t CSPRNG_buffer_size = ROUND_UP(BITS_N_ZQ_CT_RNG+correction_bit_len,8)/8;
-	////uint8_t CSPRNG_buffer[ROUND_UP(CSPRNG_buffer_size,4)];
+
+	/* PQClean-edit: avoid VLA */
+	//uint32_t correction_bit_len =  (BITS_N_ZQ_CT_RNG - N*BITS_FOR_Q)* (BITS_FOR_Q-1);
+	//uint32_t CSPRNG_buffer_size = ROUND_UP(BITS_N_ZQ_CT_RNG+correction_bit_len,8)/8;
+	//uint8_t CSPRNG_buffer[ROUND_UP(CSPRNG_buffer_size,4)];
 	uint8_t CSPRNG_buffer[BUFSIZE_FQ_VEC];
+
 	/* To facilitate hardware implementations, the uint64_t
 	 * sub-buffer is consumed starting from the least significant byte
 	 * i.e., from the first being output by SHAKE. Bits in the byte are
@@ -273,7 +276,7 @@ void CSPRNG_fq_vec(FQ_ELEM res[N],
 
 #define BITS_FOR_Q_M_ONE BITS_TO_REPRESENT(Q-2)
 
-// TODO: PQclean-edit: avoid VLA
+/* PQClean-edit: avoid VLA */
 #define CORRECTION_FQ_VEC_BETA ((BITS_BETA_ZQSTAR_CT_RNG - T*BITS_FOR_Q_M_ONE) * (BITS_FOR_Q_M_ONE-1))
 #define BUFSIZE_FQ_VEC_BETA (ROUND_UP(BITS_BETA_ZQSTAR_CT_RNG+CORRECTION_FQ_VEC_BETA,8)/8)
 
@@ -281,10 +284,13 @@ static inline
 void CSPRNG_fq_vec_beta(FQ_ELEM res[T],
                         CSPRNG_STATE_T *const csprng_state) {
 	const FQ_ELEM mask = ( (FQ_ELEM) 1 << BITS_FOR_Q_M_ONE) - 1;
-	////uint32_t correction_bit_len =  (BITS_BETA_ZQSTAR_CT_RNG - T*BITS_FOR_Q_M_ONE) * (BITS_FOR_Q_M_ONE-1);
-	////uint32_t CSPRNG_buffer_size = ROUND_UP(BITS_BETA_ZQSTAR_CT_RNG+correction_bit_len,8)/8;
-	////uint8_t CSPRNG_buffer[ROUND_UP(CSPRNG_buffer_size,4)];
+
+	/* PQClean-edit: avoid VLA */
+	//uint32_t correction_bit_len =  (BITS_BETA_ZQSTAR_CT_RNG - T*BITS_FOR_Q_M_ONE) * (BITS_FOR_Q_M_ONE-1);
+	//uint32_t CSPRNG_buffer_size = ROUND_UP(BITS_BETA_ZQSTAR_CT_RNG+correction_bit_len,8)/8;
+	//uint8_t CSPRNG_buffer[ROUND_UP(CSPRNG_buffer_size,4)];
 	uint8_t CSPRNG_buffer[BUFSIZE_FQ_VEC_BETA];
+
 	/* To facilitate hardware implementations, the uint64_t
 	 * sub-buffer is consumed starting from the least significant byte
 	 * i.e., from the first being output by SHAKE. Bits in the byte are
@@ -317,7 +323,7 @@ void CSPRNG_fq_vec_beta(FQ_ELEM res[T],
 	}
 }
 
-// TODO: PQclean-edit: avoid VLA
+/* PQClean-edit: avoid VLA */
 #define CORRECTION_FQ_MAT ((BITS_V_CT_RNG - K*(N-K)*BITS_FOR_Q) * (BITS_FOR_Q-1))
 #define BUFSIZE_FQ_MAT (ROUND_UP(BITS_V_CT_RNG+CORRECTION_FQ_MAT,8)/8)
 
@@ -325,10 +331,13 @@ static inline
 void CSPRNG_fq_mat(FQ_ELEM res[K][N - K],
                    CSPRNG_STATE_T *const csprng_state) {
 	const FQ_ELEM mask = ( (FQ_ELEM) 1 << BITS_FOR_Q) - 1;
-	////uint32_t correction_bit_len =  (BITS_V_CT_RNG - K*(N-K)*BITS_FOR_Q) * (BITS_FOR_Q-1);
-	////uint32_t CSPRNG_buffer_size = ROUND_UP(BITS_V_CT_RNG+correction_bit_len,8)/8;
-	////uint8_t CSPRNG_buffer[ROUND_UP(CSPRNG_buffer_size,4)];
+
+	/* PQClean-edit: avoid VLA */
+	//uint32_t correction_bit_len =  (BITS_V_CT_RNG - K*(N-K)*BITS_FOR_Q) * (BITS_FOR_Q-1);
+	//uint32_t CSPRNG_buffer_size = ROUND_UP(BITS_V_CT_RNG+correction_bit_len,8)/8;
+	//uint8_t CSPRNG_buffer[ROUND_UP(CSPRNG_buffer_size,4)];
 	uint8_t CSPRNG_buffer[BUFSIZE_FQ_MAT];
+
 	/* To facilitate hardware implementations, the uint64_t
 	 * sub-buffer is consumed starting from the least significant byte
 	 * i.e., from the first being output by SHAKE. Bits in the byte are
@@ -362,7 +371,7 @@ void CSPRNG_fq_mat(FQ_ELEM res[K][N - K],
 	}
 }
 
-// TODO: PQclean-edit: avoid VLA
+/* PQClean-edit: avoid VLA */
 #define CORRECTION_ZZ_VEC ((BITS_N_ZZ_CT_RNG - N*BITS_FOR_Z) * (BITS_FOR_Z-1))
 #define BUFSIZE_ZZ_VEC ROUND_UP(BITS_N_ZZ_CT_RNG+CORRECTION_ZZ_VEC,8)/8
 
@@ -370,10 +379,13 @@ static inline
 void CSPRNG_zz_vec(FZ_ELEM res[N],
                    CSPRNG_STATE_T *const csprng_state) {
 	const FZ_ELEM mask = ( (FZ_ELEM) 1 << BITS_FOR_Z) - 1;
-	////uint32_t correction_bit_len =  (BITS_N_ZZ_CT_RNG - N*BITS_FOR_Z) * (BITS_FOR_Z-1);
-	////uint32_t CSPRNG_buffer_size = ROUND_UP(BITS_N_ZZ_CT_RNG+correction_bit_len,8)/8;
-	////uint8_t CSPRNG_buffer[ROUND_UP(CSPRNG_buffer_size,4)];
+
+	/* PQClean-edit: avoid VLA */
+	//uint32_t correction_bit_len =  (BITS_N_ZZ_CT_RNG - N*BITS_FOR_Z) * (BITS_FOR_Z-1);
+	//uint32_t CSPRNG_buffer_size = ROUND_UP(BITS_N_ZZ_CT_RNG+correction_bit_len,8)/8;
+	//uint8_t CSPRNG_buffer[ROUND_UP(CSPRNG_buffer_size,4)];
 	uint8_t CSPRNG_buffer[BUFSIZE_ZZ_VEC];
+
 	/* To facilitate hardware implementations, the uint64_t
 	 * sub-buffer is consumed starting from the least significant byte
 	 * i.e., from the first being output by SHAKE. Bits in the byte are

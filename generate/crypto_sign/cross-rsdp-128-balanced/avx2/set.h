@@ -20,8 +20,8 @@
 /* Variant */
 #undef RSDPG
 /* Category */
-#undef CATEGORY_2
 #undef CATEGORY_3
+#undef CATEGORY_5
 /* Target */
 #undef SPEED
 #undef SIG_SIZE

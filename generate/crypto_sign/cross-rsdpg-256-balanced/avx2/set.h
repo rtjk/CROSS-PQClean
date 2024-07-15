@@ -21,7 +21,6 @@
 #undef RSDP
 /* Category */
 #undef CATEGORY_1
-#undef CATEGORY_2
 #undef CATEGORY_3
 /* Target */
 #undef SPEED

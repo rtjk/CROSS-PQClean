@@ -33,11 +33,11 @@
 #ifndef CATEGORY_1
 #undef CATEGORY_1
 #endif
-#ifndef CATEGORY_2
-#undef CATEGORY_2
-#endif
 #ifndef CATEGORY_3
 #undef CATEGORY_3
+#endif
+#ifndef CATEGORY_5
+#undef CATEGORY_5
 #endif
 /* Target */
 #ifndef BALANCED

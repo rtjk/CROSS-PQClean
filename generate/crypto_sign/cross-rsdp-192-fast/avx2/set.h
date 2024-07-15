@@ -21,7 +21,7 @@
 #undef RSDPG
 /* Category */
 #undef CATEGORY_1
-#undef CATEGORY_2
+#undef CATEGORY_5
 /* Target */
 #undef BALANCED
 #undef SIG_SIZE

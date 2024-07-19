@@ -233,4 +233,5 @@ TODO:
   https://github.com/rtjk/CROSS-keccak-times4
 - document the temporary fix for the CSPRNG buffer size in csprng_hash.h (since it deviates from version 1.2 of the NIST submission package)
 - document the changes to architecture_detect.h that force optimizations when compiling for AVX2
+- document: with nmake avx2 needs flag /std:c11
 ```

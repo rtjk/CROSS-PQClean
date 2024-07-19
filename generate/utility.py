@@ -14,10 +14,10 @@ def replace_in_dir(dir, text_to_search, replacement_text):
             if os.path.isfile(file_path):
                 replace_in_file(file_path, text_to_search, replacement_text)
 
-def run_astyle(dir):
+def run_astyle(dir, astyle_config_file):
     for file in os.listdir(dir):
         if file.endswith('.c') or file.endswith('.h'):
-            astyle_command = 'astyle --options=astyle/liboqs_astyle.ini '+dir+'/'+file+' > /dev/null 2>&1'
+            astyle_command = 'astyle --options='+astyle_config_file+' '+dir+'/'+file+' > /dev/null 2>&1'
             os.system(astyle_command)
 
 # use the unifdef utility to remove #if, #ifdef, #elif, etc.

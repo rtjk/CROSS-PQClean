@@ -1,7 +1,7 @@
 # for every parameter set create the corresponding directory
 # then copy the templates for the 'clean' and 'avx2' implementations inside that directory
 # then substitute the actual parameters (listed in parameter_sets.csv)
-# finally remove dead code (#if, #ifdef, #elif, etc.)
+# finally remove dead code (#if, #ifdef, #elif, etc.) and run astyle
 
 import os
 import csv
@@ -17,6 +17,8 @@ TARGET_DIR = './crypto_sign'
 # unifded is used to remove dead code
 if os.system('which unifdef > /dev/null 2>&1') != 0:
     raise Exception('unifdef package not found, please install it')
+
+astyle_config_file = './astyle/liboqs_astyle.ini'
 
 # delete output directory if it already exists
 if os.path.exists(TARGET_DIR):
@@ -67,7 +69,7 @@ with open(csv_filename, 'r') as csvfile:
 
         utility.remove_dead_code(dir)
 
-        utility.run_astyle(dir)
+        utility.run_astyle(dir, astyle_config_file)
 
 current_time = datetime.datetime.now().strftime("%H:%M")
 print("\nImplementations placed in", TARGET_DIR, "@", current_time)

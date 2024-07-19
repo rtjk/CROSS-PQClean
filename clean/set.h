@@ -9,20 +9,18 @@
 #undef NO_TREES
 #endif
 
-/* When compiling avx2 override the behaviour of architecture_detect.h */
+/* liboqs-edit: when compiling avx2 just assume that Intel Instrinsics are available */
 #define IMPLEMENTATION___implementation__
 #if defined(IMPLEMENTATION_avx2)
 #define HIGH_COMPATIBILITY_X86_64
 #define HIGH_PERFORMANCE_X86_64
 #endif
 
-/* PQClean-edit: avoid VLA */
+/* PQClean-edit: avoid VLA (don't call sizeof() when creating arrays) */
 #define SIZEOF_UINT16 2
 
 /* Undefine unused macros to facilitate dead code removal using unifdef */
-
 #undef SHA_3_LIBKECCAK
-
 /* Variant */
 #if defined(RSDP)
 #undef RSDPG

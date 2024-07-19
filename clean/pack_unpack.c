@@ -510,7 +510,7 @@ void __namespace__generic_unpack_fq(FQ_ELEM *out, const uint8_t *in,
 #if Q == 127
 
    /* PQClean-edit: unused parameter */
-   if(inlen == 0) {size_t tmp = inlen; tmp++;}
+   (void)inlen;
 
    size_t i;
    for(i = 0; i < outlen; i++)
@@ -1026,7 +1026,7 @@ void __namespace__generic_uint16_t_pack(uint8_t *out, const uint16_t *in,
       }
    }
    /* PQClean-edit: unused parameter */
-   if(skip == 0) {uint8_t tmp = skip; tmp++;}
+   (void)skip;
 }
 
 void __namespace__generic_uint16_t_unpack(uint16_t *out, const uint8_t *in,
@@ -1149,5 +1149,5 @@ void __namespace__generic_uint16_t_unpack(uint16_t *out, const uint8_t *in,
       }
    }
    /* PQClean-edit: unused parameter */
-   if(skip == 0) {uint8_t tmp = skip; tmp++;}
+   (void)skip;
 }

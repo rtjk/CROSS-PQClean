@@ -115,7 +115,7 @@ int __namespace__crypto_sign_verify(const unsigned char *sig, size_t siglen,    
 {
 
    /* PQClean-edit: unused parameter */
-   if(siglen == 0) {size_t tmp = siglen; tmp++;}
+   (void)siglen;
 
    /* verify returns 1 if signature is ok, 0 otherwise */   
    int ok = __namespace__CROSS_verify((const pubkey_t *const) pk,                     // in parameter

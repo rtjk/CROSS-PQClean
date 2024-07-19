@@ -109,10 +109,7 @@ int PQCLEAN_CROSSRSDP192FAST_AVX2_crypto_sign_verify(const unsigned char *sig, s
                                                     ) {
 
 	/* PQClean-edit: unused parameter */
-	if (siglen == 0) {
-		size_t tmp = siglen;
-		tmp++;
-	}
+	(void)siglen;
 
 	/* verify returns 1 if signature is ok, 0 otherwise */
 	int ok = PQCLEAN_CROSSRSDP192FAST_AVX2_CROSS_verify((const pubkey_t *const) pk,                     // in parameter

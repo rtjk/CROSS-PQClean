@@ -279,10 +279,7 @@ void PQCLEAN_CROSSRSDP192FAST_AVX2_generic_unpack_fq(FQ_ELEM *out, const uint8_t
         size_t outlen, size_t inlen) {
 
 	/* PQClean-edit: unused parameter */
-	if (inlen == 0) {
-		size_t tmp = inlen;
-		tmp++;
-	}
+	(void)inlen;
 
 	size_t i;
 	for (i = 0; i < outlen; i++) {
@@ -522,10 +519,7 @@ void PQCLEAN_CROSSRSDP192FAST_AVX2_generic_uint16_t_pack(uint8_t *out, const uin
 		}
 	}
 	/* PQClean-edit: unused parameter */
-	if (skip == 0) {
-		uint8_t tmp = skip;
-		tmp++;
-	}
+	(void)skip;
 }
 
 void PQCLEAN_CROSSRSDP192FAST_AVX2_generic_uint16_t_unpack(uint16_t *out, const uint8_t *in,
@@ -620,8 +614,5 @@ void PQCLEAN_CROSSRSDP192FAST_AVX2_generic_uint16_t_unpack(uint16_t *out, const 
 		}
 	}
 	/* PQClean-edit: unused parameter */
-	if (skip == 0) {
-		uint8_t tmp = skip;
-		tmp++;
-	}
+	(void)skip;
 }

@@ -550,10 +550,7 @@ void PQCLEAN_CROSSRSDPG256BALANCED_CLEAN_generic_uint16_t_pack(uint8_t *out, con
 		}
 	}
 	/* PQClean-edit: unused parameter */
-	if (skip == 0) {
-		uint8_t tmp = skip;
-		tmp++;
-	}
+	(void)skip;
 }
 
 void PQCLEAN_CROSSRSDPG256BALANCED_CLEAN_generic_uint16_t_unpack(uint16_t *out, const uint8_t *in,
@@ -648,8 +645,5 @@ void PQCLEAN_CROSSRSDPG256BALANCED_CLEAN_generic_uint16_t_unpack(uint16_t *out, 
 		}
 	}
 	/* PQClean-edit: unused parameter */
-	if (skip == 0) {
-		uint8_t tmp = skip;
-		tmp++;
-	}
+	(void)skip;
 }

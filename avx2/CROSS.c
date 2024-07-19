@@ -460,7 +460,7 @@ void __namespace__CROSS_sign(const prikey_t * const SK,
 }
 
 /* PQClean-edit: avoid VLA */
-#define CSPRNG_INPUT_LENGTH SALT_LENGTH_BYTES+SEED_LENGTH_BYTES+SIZEOF_UINT16
+#define CSPRNG_INPUT_LENGTH (SALT_LENGTH_BYTES+SEED_LENGTH_BYTES+SIZEOF_UINT16)
 //const int csprng_input_length = SALT_LENGTH_BYTES+SEED_LENGTH_BYTES+sizeof(uint16_t);
 
 /* verify returns 1 if signature is ok, 0 otherwise */

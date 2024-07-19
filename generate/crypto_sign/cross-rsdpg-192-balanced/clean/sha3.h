@@ -34,10 +34,8 @@
 static inline
 void xof_shake_init(SHAKE_STATE_STRUCT *state, int val) {
 	/* PQClean-edit: unused parameter */
-	if (val == 0) {
-		int tmp = val;
-		tmp++;
-	}
+	(void)val; //testunusedparameter
+	//if(val == 0) {int tmp = val; tmp++;}
 	shake256_inc_init(state);
 }
 

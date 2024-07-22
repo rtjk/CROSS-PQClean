@@ -22,7 +22,7 @@ This is a recipe for adding the CROSS signature algorithm to post-quantum librar
    * [Unused parameters](#unused-parameters)
    * [Missing prototypes](#missing-prototypes)
    * [Parameter sets](#parameter-sets)
-   * [Placeholders](#placeholders)
+   * [Placeholders and code generation](#placeholders-and-code-generation)
    * [Namespacing](#namespacing)
    * [Makefiles](#makefiles)
    * [META.yml](#metayml)
@@ -45,6 +45,7 @@ This is a recipe for adding the CROSS signature algorithm to post-quantum librar
    * [curl](#curl)
    * [httpd](#httpd)
 - [OQS-bind](#oqs-bind)
+
 
 ## Get CROSS ready for PQClean
 
@@ -81,9 +82,15 @@ PQClean requires fixed sized integer types.
 | `unsigned long` | `uint32_t` |
 | `unsigned long long` | `uint64_t` |
 
+The size of a message (`mlen` and `smlen`) becomes of type `size_t` instead of `uint64_t`.
+
 ### No variable-length arrays
 
-PQClean requires the absence of variable length arrays: use a `#define` placed before the function (instead of a normal variable definition) for the size of the array. This happens in function `CROSS_verify` of `CROSS.c` and function `compute_round_seeds` of `seedtree.c`.
+PQClean requires the absence of variable length arrays: use a `#define` placed before the function (instead of a normal variable definition) for the size of the array. This happens with:
+
+- function `CROSS_verify` of `CROSS.c`.
+- function `compute_round_seeds` of `seedtree.c`.
+- all the functions of `csprng_hash.h` that use a buffer for the CSPRNG.
 
 ### Remove assertions
 
@@ -104,7 +111,7 @@ PQClean is compiled with flag `-Werror=missing-prototypes`, add the missing decl
 ### Parameter sets
 A parameter set is an instance of the algorithm defined by all its possible parameters. CROSS has two variants (RSDP and RSPDG), three security levels (128, 192, 256 bits) and three "targets" (signature size, balanced, speed). In total there are 18 possible parameter sets. Each parameter set contains two implementations: the reference (clean) one and the avx2 optimized one. The script `make_csv.py` uses Python's `itertools` to generate all the possible combinations of parameters, which will be used as placeholders in a parameter set.
 
-### Placeholders
+### Placeholders and code generation
 PQClean requires that every parameter set is placed in a separate directory. The script `generate.py` will use CROSS's source files as templates, copying them in an appropriately named directory for each parameter set. After copying it will use text substitution to replace all the necessary parameters in the source files. For example, every time a source file needs to access the length of the public key the placeholder `__length-public-key__` is used instead. The script will then substitute the placeholder with an actual value like 77 while generating the parameter sets.
 
 ### Namespacing
@@ -124,7 +131,7 @@ Every parameter set in PQClean also needs a file listing its parameters, the has
 ### Parameter file
 Create a new file `set.h` with placeholders for the parameters in a set, the definitions in here were previously done externally like in `Benchmarking/CMakeLists.txt`. Include `set.h` in `parameters.h` and in the makefiles.
 
-`set.h` also undefines macros that are unused for a specific parameter set, this helps when removing dead code with `generate.py`.
+`set.h` also undefines macros that are unused for a specific parameter set, this helps when removing dead code in `generate.py`.
 
 `TODO: set.h also has defines for avx2`
 
@@ -143,7 +150,7 @@ PQClean requires that the api file does not include any external file. Define pa
 
 ### Astyle
 
-`TODO`
+The last step of the code generation script `generate.py` is running astyle usign the configuration file from the target library (e.g. `generate/astyle/liboqs_astyle.ini`).
 
 ## PQClean
 
@@ -234,4 +241,7 @@ TODO:
 - document the temporary fix for the CSPRNG buffer size in csprng_hash.h (since it deviates from version 1.2 of the NIST submission package)
 - document the changes to architecture_detect.h that force optimizations when compiling for AVX2
 - document: with nmake avx2 needs flag /std:c11
+- document: removed x86intrin.h because it's not available on Windows
+- document: renamed type sig_t to CROSS_sig_t to solve a name conflict in iOS
+- document: cosmetic changes to make PQClean's linter happy
 ```

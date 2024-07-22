@@ -19,11 +19,13 @@ principal-submitters:
   - Freeman Slaughter
   - Antonia Wachter-Zeh
   - Violetta Weger
+auxiliary-submitters:
+  - TODO
 implementations:
   - name: clean
-    version: 1.2
+    version: 1.2 + Keccak_x4 + PQClean fixes
   - name: avx2
-    version: 1.2
+    version: 1.2 + Keccak_x4 + PQClean fixes
     supported_platforms:
       - architecture: x86_64
         required_flags:

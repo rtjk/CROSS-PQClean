@@ -184,6 +184,12 @@ The idea is to edit a configuration file in liboqs, adding a git repository as a
    * Create `docs/algs/sig/cross.yml` to add information about the scheme in general (e.g. the website), and about each specific parameter set (e.g. `length-secret-key`).
    * Run `update_docs_from_yaml.py` and `update_cbom.py` to update the documentation files
 
+`TODO: the documentation is updated by copy_from_upstream.py`
+
+`TODO: document valgrind suppression files`
+
+`TODO: document Zephyr configuration`
+
 ### Build liboqs
 
 First install all dependencies listed in liboqs' `README.md`. Then export the variable indicating the source folder and build with:

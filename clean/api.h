@@ -34,13 +34,13 @@
 #define __namespace__CRYPTO_ALGNAME "__dir__"
 
 /*  no. of bytes of the secret key */
-#define __namespace__CRYPTO_SECRETKEYBYTES __length-secret-key__L
+#define __namespace__CRYPTO_SECRETKEYBYTES __length-secret-key__
 
 /*  no. of bytes of the public key */
-#define __namespace__CRYPTO_PUBLICKEYBYTES __length-public-key__L
+#define __namespace__CRYPTO_PUBLICKEYBYTES __length-public-key__
 
 /* no. of bytes of overhead in a signed message */
-#define __namespace__CRYPTO_BYTES __length-signature__L
+#define __namespace__CRYPTO_BYTES __length-signature__
 
 /* required bytes of input randomness */
 #define __namespace__CRYPTO_RANDOMBYTES __random-bytes__

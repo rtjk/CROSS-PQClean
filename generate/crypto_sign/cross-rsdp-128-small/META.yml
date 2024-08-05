@@ -20,7 +20,7 @@ principal-submitters:
   - Antonia Wachter-Zeh
   - Violetta Weger
 auxiliary-submitters:
-  - TODO
+  - Marco Gianvecchio
 implementations:
   - name: clean
     version: 1.2 + Keccak_x4 + PQClean fixes

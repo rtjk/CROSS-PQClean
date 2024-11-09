@@ -39,7 +39,7 @@ When the codebase of CROSS changes we need to port the modifications to liboqs, 
     git_commit: a880bb3561f68d0012bf82eff0eb557bf9ae3df3 # <- replace this
     ```
 
-- Update the documentation and import the "upstream" code:
+- Import the "upstream" code:
     ```
     export LIBOQS_DIR=/your/path/to/liboqs
     cd ./scripts/copy_from_upstream

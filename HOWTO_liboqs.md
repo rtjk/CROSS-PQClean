@@ -4,6 +4,8 @@ When the codebase of CROSS changes we need to port the modifications to liboqs, 
 
 - Apply the changes to the files in the `clean` and `avx2` directories
 
+- If necessary, edit also the metadata in file `META.yml`
+
 - Generate code for the 18 variants:
     ```
     cd generate

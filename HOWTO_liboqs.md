@@ -28,21 +28,24 @@ When the codebase of CROSS changes we need to port the modifications to liboqs, 
     python3 -m venv .venv
     source .venv/bin/activate
     pip install -r ./scripts/copy_from_upstream/requirements.txt
+    echo "*" > .venv/.gitignore
     ```
 
-- Replace the commit SHA in these two configuration files with the one copied before:
-    - `docs/algorithms/sig/cross.yml`
-    - `scripts/copy_from_upstream/copy_from_upstream.yml`
-
-- If necessary update also the version name (`spec-version`) in `cross.yml`
+- Replace the commit SHA in the configuration file (`scripts/copy_from_upstream/copy_from_upstream.yml`) with the one copied before:
+    ```
+    name: upcross
+    ...
+    git_branch: master
+    git_commit: a880bb3561f68d0012bf82eff0eb557bf9ae3df3 # <- replace this
+    ```
 
 - Update the documentation and import the "upstream" code:
     ```
     export LIBOQS_DIR=/your/path/to/liboqs
-    python3 ./scripts/update_docs_from_yaml.py
     cd ./scripts/copy_from_upstream
     rm -rf repos
-    python3 copy_from_upstream.py "copy"
+    rm -rf ../../src/sig/cross
+    python3 copy_from_upstream.py copy
     ```
 
 - Build and test liboqs:
@@ -51,4 +54,23 @@ When the codebase of CROSS changes we need to port the modifications to liboqs, 
     ./build/tests/speed_sig -f
     ```
 
+- Commit everything and push to GitHub. Make sure to sign every commit with your name, by adding a line like this to the commit message:
+    ```
+    Signed-off-by: Alice alice@example.com
+    ```
+
 - Go to your branch on `github.com` and you will be pompted to open a Pull Request to liboqs
+
+ <br/><br/>
+ <br/><br/>
+<br/><br/>
+
+```
+KNOWN BUG:
+
+The script copy_from_upstream.py will not update files if they dospencern't already exist, a solution is to add this to the "generator" function:
+
+if not os.path.exists(os.path.join(os.environ['LIBOQS_DIR'], destination_file_path)):
+    open(os.path.join(os.environ['LIBOQS_DIR'], destination_file_path), 'a').close()
+
+```

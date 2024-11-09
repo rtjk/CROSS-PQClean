@@ -44,7 +44,7 @@ When the codebase of CROSS changes we need to port the modifications to liboqs, 
     export LIBOQS_DIR=/your/path/to/liboqs
     cd ./scripts/copy_from_upstream
     rm -rf repos
-    rm -rf ../../src/sig/cross
+    # rm -rf ../../src/sig/cross
     python3 copy_from_upstream.py copy
     ```
 
@@ -68,7 +68,7 @@ When the codebase of CROSS changes we need to port the modifications to liboqs, 
 ```
 KNOWN BUG:
 
-The script copy_from_upstream.py will not update files if they dospencern't already exist, a solution is to add this to the "generator" function:
+The script copy_from_upstream.py will not update files if they don't already exist, a solution is to add this to the "generator" function:
 
 if not os.path.exists(os.path.join(os.environ['LIBOQS_DIR'], destination_file_path)):
     open(os.path.join(os.environ['LIBOQS_DIR'], destination_file_path), 'a').close()

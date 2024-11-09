@@ -1,6 +1,6 @@
 # CROSS integration
 
-See also: [&#8594; HOWTO Keep CROSS updated in liboqs](https://github.com/rtjk/CROSS-PQClean/blob/main/README.md)
+See also: [&#8594; HOWTO Keep CROSS updated in liboqs](https://github.com/rtjk/CROSS-PQClean/blob/main/HOWTO_liboqs.md)
 
 
 This is a recipe for adding the CROSS signature algorithm to post-quantum libraries ([PQClean][repo_PQClean], [liboqs][repo_liboqs], [oqs-provider][repo_oqs-provider], [oqs-demos][repo_oqs-demos], [OQS-bind][repo_oqs-bind]) starting from the [NIST submission package][CROSS_package].

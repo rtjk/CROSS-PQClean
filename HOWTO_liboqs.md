@@ -43,7 +43,7 @@ When the codebase of CROSS changes we need to port the modifications to liboqs, 
 
 - Import the "upstream" code:
     ```
-    export LIBOQS_DIR=/your/path/to/liboqs
+    export LIBOQS_DIR=$(pwd)
     cd ./scripts/copy_from_upstream
     rm -rf repos
     # rm -rf ../../src/sig/cross

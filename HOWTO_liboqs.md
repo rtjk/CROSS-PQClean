@@ -57,6 +57,20 @@ When the codebase of CROSS changes we need to port the modifications to liboqs, 
     ./build/tests/speed_sig -f
     ```
 
+- Some other files in liboqs might also need attention when modifying CROSS:
+    - Documentation file, stores metadata about CROSS
+    \
+    `liboqs/docs/algorithms/sig/cross.yml`
+    - Valgrind suppression file, ensures any suspect non-constant-time behaviour in CROSS is documented
+    \
+    `liboqs/tests/constant_time/sig/passes/cross`
+    - Signature test, CROSS variants that use a large amount of stack are prevented from running in threads
+    \
+    `liboqs/tests/test_sig.c`
+    - Zephyr configuration file, CROSS variants that use a large amount of stack are disabled in Zephyr
+    \
+    `liboqs/zephyr/CMakeLists.txt`
+
 - Commit everything and push to GitHub. Make sure to sign every commit with your name, by adding a line like this to the commit message:
     ```
     Signed-off-by: Alice alice@example.com

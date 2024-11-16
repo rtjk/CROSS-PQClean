@@ -70,6 +70,11 @@ When the codebase of CROSS changes we need to port the modifications to liboqs, 
     - Zephyr configuration file, CROSS variants that use a large amount of stack are disabled in Zephyr
     \
     `liboqs/zephyr/CMakeLists.txt`
+    - Lists of code owners and contributors
+    \
+    `liboqs/.github/CODEOWNERS`
+    \
+    `liboqs/CONTRIBUTING.md`
 
 - Commit everything and push to GitHub. Make sure to sign every commit with your name, by adding a line like this to the commit message:
     ```

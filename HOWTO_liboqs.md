@@ -52,6 +52,7 @@ When the codebase of CROSS changes we need to port the modifications to liboqs, 
 
 - Build and test liboqs:
     ```
+    cd $LIBOQS_DIR
     rm -rf build; mkdir build && cd build; cmake -GNinja ..; ninja; cd ..
     ./build/tests/speed_sig -f
     ```
@@ -63,8 +64,7 @@ When the codebase of CROSS changes we need to port the modifications to liboqs, 
 
 - Go to your branch on `github.com` and you will be pompted to open a Pull Request to liboqs
 
- <br/><br/>
- <br/><br/>
+<br/><br/>
 <br/><br/>
 
 ```

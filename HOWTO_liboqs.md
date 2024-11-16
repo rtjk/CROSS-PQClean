@@ -57,7 +57,7 @@ When the codebase of CROSS changes we need to port the modifications to liboqs, 
     ./build/tests/speed_sig -f
     ```
 
-- Some other files in liboqs might also need attention when modifying CROSS:
+- Some files in liboqs might also need attention when modifying CROSS:
     - Documentation file, stores metadata about CROSS
     \
     `liboqs/docs/algorithms/sig/cross.yml`

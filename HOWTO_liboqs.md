@@ -18,9 +18,9 @@ When the codebase of CROSS changes we need to port the modifications to liboqs, 
 
 - All the changes are now part of the "upstream" repository, it's time to deal with liboqs. Move to a fresh directory to follow the next steps
 
-- Clone liboqs and create a new branch, change the branch name to something significant (e.g. `CROSS-fix-endianness-issue`):
+- Fork liboqs and create a new branch, change the branch name to something significant (e.g. `CROSS-fix-endianness-issue`):
     ```
-    git clone https://github.com/open-quantum-safe/liboqs
+    git clone https://github.com/CROSS-signature/liboqs # <- replace "CROSS-signature" with your username
     cd liboqs
     git checkout -b CROSS-fix
     ```
@@ -89,7 +89,7 @@ When the codebase of CROSS changes we need to port the modifications to liboqs, 
 ```
 KNOWN BUG:
 
-The script copy_from_upstream.py will not update files if they don't already exist, a solution is to add this to the "generator" function:
+The script copy_from_upstream.py in liboqs will not update files if they don't already exist, a solution is to add this to the "generator" function:
 
 if not os.path.exists(os.path.join(os.environ['LIBOQS_DIR'], destination_file_path)):
     open(os.path.join(os.environ['LIBOQS_DIR'], destination_file_path), 'a').close()

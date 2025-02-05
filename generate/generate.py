@@ -10,6 +10,10 @@ import datetime
 
 import utility
 
+# move to the directory where the script is located
+base_directory = os.path.dirname(os.path.realpath(__file__))
+os.chdir(base_directory)
+
 # output here
 TARGET_DIR = './crypto_sign'
 

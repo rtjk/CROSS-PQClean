@@ -2,7 +2,7 @@
 
 LIB = libcross-rsdp-128-balanced_clean.a
 
-HEADERS = api.h CROSS.h csprng_hash.h fq_arith.h merkle.h merkle_tree.h pack_unpack.h parameters.h restr_arith.h seedtree.h sha3.h set.h
+HEADERS = api.h CROSS.h csprng_hash.h fq_arith.h merkle_tree.h pack_unpack.h parameters.h restr_arith.h seedtree.h sha3.h set.h
 OBJECTS = CROSS.o csprng_hash.o merkle.o pack_unpack.o seedtree.o sign.o
 CFLAGS=-std=c99 -I../../../common $(EXTRAFLAGS) -march=native -O3 -g3 -std=c99 -Wpedantic -Werror -Wredundant-decls -Wmissing-prototypes -Wuninitialized -Wall -Wextra
 

@@ -3,12 +3,13 @@ type: signature
 claimed-nist-level: 5
 length-public-key: 106
 length-secret-key: 64
-length-signature: 48938
-nistkat-sha256: 1aa83013bad860b40a4680299ff5c8cd794aad6578e4c4929a5a2d244c9a0f85
+length-signature: 48102
+nistkat-sha256: ce480adf4d0afa394edc7fb319217c980bef7d6d8425890c165b7971619aa6f5
 testvectors-sha256: c7c2d9794c099196907ec9d1ac1c5e9156a15ef71c67e98039b000dd8ea1c68f
 principal-submitters:
   - Marco Baldi
   - Alessandro Barenghi
+  - Michele Battagliola
   - Sebastian Bitzer
   - Patrick Karl
   - Felice Manganiello
@@ -16,6 +17,7 @@ principal-submitters:
   - Gerardo Pelosi
   - Paolo Santini
   - Jonas Schupp
+  - Edoardo Signorini
   - Freeman Slaughter
   - Antonia Wachter-Zeh
   - Violetta Weger
@@ -23,9 +25,9 @@ auxiliary-submitters:
   - Marco Gianvecchio
 implementations:
   - name: clean
-    version: 1.2 + Keccak_x4 + PQClean fixes
+    version: 2.0 + PQClean and OQS patches
   - name: avx2
-    version: 1.2 + Keccak_x4 + PQClean fixes
+    version: 2.0 + PQClean and OQS patches
     supported_platforms:
       - architecture: x86_64
         required_flags:

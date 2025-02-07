@@ -11,6 +11,9 @@
 /* PQClean-edit: avoid VLA (don't call sizeof() when creating arrays) */
 #define SIZEOF_UINT16 2
 
+/* PQClean-edit: skip asserts so that verify() always returns a value */
+#define SKIP_ASSERT
+
 /* Undefine unused macros to facilitate dead code removal using unifdef */
 #undef SHA_3_LIBKECCAK
 /* Variant */

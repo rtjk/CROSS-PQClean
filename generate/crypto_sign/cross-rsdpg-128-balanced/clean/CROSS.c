@@ -409,6 +409,9 @@ int CROSS_verify(const pk_t *const PK,
 			                    unpack_fp_vec(y[i], sig->resp_0[used_rsps].y);
 
 			FZ_ELEM v_bar[N];
+			for (int tmp = 0; tmp < N; tmp++) {
+				v_bar[tmp] = 0;
+			}
 			/*v_G_bar is memcpy'ed directly into cmt_0 input buffer */
 			FZ_ELEM *v_G_bar_ptr = cmt_0_i_input + DENSELY_PACKED_FP_SYN_SIZE;
 			memcpy(v_G_bar_ptr,

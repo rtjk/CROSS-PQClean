@@ -36,6 +36,7 @@
 
 /*Implementation of packing and unpacking of 3/7/9 bit elements into byte vectors*/
 
+/* liboqs-edit: generic_pack_3_bit is unused in RSDPG */
 /*
  * generic_pack_3_bit()
  *
@@ -150,80 +151,7 @@ void generic_pack_7_bit(uint8_t *out, const uint8_t *in,
 	}
 }
 
-/*
- * generic_pack_9_bit()
- *
- * uint8_t *out       :    9 bit inputs packed in bytes
- * const uint16_t *in :    uint16_t Vec input, to be packed
- * size_t outlen      :    Length of out
- * size_t in          :    Length of in
- *
- * This function handles the packing of an vector of uint16_t elements with 9 bit of information
- * of arbitrary length
- */
-static inline
-void generic_pack_9_bit(uint8_t *out, const uint16_t *in,
-                        const size_t outlen, const size_t inlen) {
-	size_t i;
-	for (i = 0; i < outlen; i++) {
-		out[i] = 0;
-	}
-	for (i = 0; i < inlen / 8; i++) {
-		out[i * 9] = in[i * 8];
-		out[i * 9 + 1] |= (in[i * 8] >> 8) | (in[i * 8 + 1] << 1);
-		out[i * 9 + 2] |= (in[i * 8 + 1] >> 7) | (in[i * 8 + 2] << 2);
-		out[i * 9 + 3] |= (in[i * 8 + 2] >> 6) | (in[i * 8 + 3] << 3);
-		out[i * 9 + 4] |= (in[i * 8 + 3] >> 5) | (in[i * 8 + 4] << 4);
-		out[i * 9 + 5] |= (in[i * 8 + 4] >> 4) | (in[i * 8 + 5] << 5);
-		out[i * 9 + 6] |= (in[i * 8 + 5] >> 3) | (in[i * 8 + 6] << 6);
-		out[i * 9 + 7] |= (in[i * 8 + 6] >> 2) | (in[i * 8 + 7] << 7);
-		out[i * 9 + 8] |= (in[i * 8 + 7] >> 1);
-	}
-	const uint8_t n_remainder = inlen & 0x7;
-	if (n_remainder == 1) {
-		out[i * 9] = in[i * 8];
-		out[i * 9 + 1] |= (in[i * 8] >> 8);
-	} else if (n_remainder == 2) {
-		out[i * 9] = in[i * 8];
-		out[i * 9 + 1] |= (in[i * 8] >> 8) | (in[i * 8 + 1] << 1);
-		out[i * 9 + 2] |= (in[i * 8 + 1] >> 7);
-	} else if (n_remainder == 3) {
-		out[i * 9] = in[i * 8];
-		out[i * 9 + 1] |= (in[i * 8] >> 8) | (in[i * 8 + 1] << 1);
-		out[i * 9 + 2] |= (in[i * 8 + 1] >> 7) | (in[i * 8 + 2] << 2);
-		out[i * 9 + 3] |= (in[i * 8 + 2] >> 6);
-	} else if (n_remainder == 4) {
-		out[i * 9] = in[i * 8];
-		out[i * 9 + 1] |= (in[i * 8] >> 8) | (in[i * 8 + 1] << 1);
-		out[i * 9 + 2] |= (in[i * 8 + 1] >> 7) | (in[i * 8 + 2] << 2);
-		out[i * 9 + 3] |= (in[i * 8 + 2] >> 6) | (in[i * 8 + 3] << 3);
-		out[i * 9 + 4] |= (in[i * 8 + 3] >> 5);
-	} else if (n_remainder == 5) {
-		out[i * 9] = in[i * 8];
-		out[i * 9 + 1] |= (in[i * 8] >> 8) | (in[i * 8 + 1] << 1);
-		out[i * 9 + 2] |= (in[i * 8 + 1] >> 7) | (in[i * 8 + 2] << 2);
-		out[i * 9 + 3] |= (in[i * 8 + 2] >> 6) | (in[i * 8 + 3] << 3);
-		out[i * 9 + 4] |= (in[i * 8 + 3] >> 5) | (in[i * 8 + 4] << 4);
-		out[i * 9 + 5] |= (in[i * 8 + 4] >> 4);
-	} else if (n_remainder == 6) {
-		out[i * 9] = in[i * 8];
-		out[i * 9 + 1] |= (in[i * 8] >> 8) | (in[i * 8 + 1] << 1);
-		out[i * 9 + 2] |= (in[i * 8 + 1] >> 7) | (in[i * 8 + 2] << 2);
-		out[i * 9 + 3] |= (in[i * 8 + 2] >> 6) | (in[i * 8 + 3] << 3);
-		out[i * 9 + 4] |= (in[i * 8 + 3] >> 5) | (in[i * 8 + 4] << 4);
-		out[i * 9 + 5] |= (in[i * 8 + 4] >> 4) | (in[i * 8 + 5] << 5);
-		out[i * 9 + 6] |= (in[i * 8 + 5] >> 3);
-	} else if (n_remainder == 7) {
-		out[i * 9] = in[i * 8];
-		out[i * 9 + 1] |= (in[i * 8] >> 8) | (in[i * 8 + 1] << 1);
-		out[i * 9 + 2] |= (in[i * 8 + 1] >> 7) | (in[i * 8 + 2] << 2);
-		out[i * 9 + 3] |= (in[i * 8 + 2] >> 6) | (in[i * 8 + 3] << 3);
-		out[i * 9 + 4] |= (in[i * 8 + 3] >> 5) | (in[i * 8 + 4] << 4);
-		out[i * 9 + 5] |= (in[i * 8 + 4] >> 4) | (in[i * 8 + 5] << 5);
-		out[i * 9 + 6] |= (in[i * 8 + 5] >> 3) | (in[i * 8 + 6] << 6);
-		out[i * 9 + 7] |= (in[i * 8 + 6] >> 2);
-	}
-}
+/* liboqs-edit: generic_pack_9_bit is unused in RSDP */
 
 /*
  * generic_pack_fp()
@@ -258,6 +186,7 @@ void generic_pack_fz(uint8_t *out, const FZ_ELEM *in, const size_t outlen, const
 
 }
 
+/* liboqs-edit: generic_unpack_3_bit is unused in RSDPG */
 /*
  * generic_unpack_3_bit()
  *
@@ -404,78 +333,7 @@ uint8_t generic_unpack_7_bit(uint8_t *out, const uint8_t *in,
 	return is_packed_padd_ok;
 }
 
-/*
- * generic_unpack_9_bit()
- *
- * uint16_t *out       :    uint16_t output, unpacked
- * const uint8_t *in  :    9 bit input, packed in bytes
- * size_t outlen      :    Length of out
- * size_t in          :    Length of in
- *
- * This function handles the packing of an vector of uint8_t elements with 7 bit of information
- * of arbitrary length
- */
-static inline
-uint8_t generic_unpack_9_bit(uint16_t *out, const uint8_t *in,
-                             const size_t outlen, const size_t inlen) {
-	uint8_t is_packed_padd_ok = 1;
-	size_t i;
-	for (i = 0; i < outlen; i++) {
-		out[i] = 0;
-	}
-	for (i = 0; i < inlen / 9; i++) {
-		out[i * 8]   = (in[i * 9] | (in[i * 9 + 1] << 8)) & 0x1FF;
-		out[i * 8 + 1]  = ((in[i * 9 + 1] >> 1) | (in[i * 9 + 2] << 7)) & 0x1FF;
-		out[i * 8 + 2]  = ((in[i * 9 + 2] >> 2) | (in[i * 9 + 3] << 6)) & 0x1FF;
-		out[i * 8 + 3]  = ((in[i * 9 + 3] >> 3) | (in[i * 9 + 4] << 5)) & 0x1FF;
-		out[i * 8 + 4]  = ((in[i * 9 + 4] >> 4) | (in[i * 9 + 5] << 4)) & 0x1FF;
-		out[i * 8 + 5]  = ((in[i * 9 + 5] >> 5) | (in[i * 9 + 6] << 3)) & 0x1FF;
-		out[i * 8 + 6]  = ((in[i * 9 + 6] >> 6) | (in[i * 9 + 7] << 2)) & 0x1FF;
-		out[i * 8 + 7]  = ((in[i * 9 + 7] >> 7) | (in[i * 9 + 8] << 1)) & 0x1FF;
-	}
-	const uint8_t n_remainder = outlen & 0x7;
-	if (n_remainder == 1) {
-		out[i * 8]   = (in[i * 9] | (in[i * 9 + 1] << 8)) & 0x1FF;
-	} else if (n_remainder == 2) {
-		out[i * 8]   = (in[i * 9] | (in[i * 9 + 1] << 8)) & 0x1FF;
-		out[i * 8 + 1]  = ((in[i * 9 + 1] >> 1) | (in[i * 9 + 2] << 7)) & 0x1FF;
-	} else if (n_remainder == 3) {
-		out[i * 8]   = (in[i * 9] | (in[i * 9 + 1] << 8)) & 0x1FF;
-		out[i * 8 + 1]  = ((in[i * 9 + 1] >> 1) | (in[i * 9 + 2] << 7)) & 0x1FF;
-		out[i * 8 + 2]  = ((in[i * 9 + 2] >> 2) | (in[i * 9 + 3] << 6)) & 0x1FF;
-	} else if (n_remainder == 4) {
-		out[i * 8]   = (in[i * 9] | (in[i * 9 + 1] << 8)) & 0x1FF;
-		out[i * 8 + 1]  = ((in[i * 9 + 1] >> 1) | (in[i * 9 + 2] << 7)) & 0x1FF;
-		out[i * 8 + 2]  = ((in[i * 9 + 2] >> 2) | (in[i * 9 + 3] << 6)) & 0x1FF;
-		out[i * 8 + 3]  = ((in[i * 9 + 3] >> 3) | (in[i * 9 + 4] << 5)) & 0x1FF;
-	} else if (n_remainder == 5) {
-		out[i * 8]   = (in[i * 9] | (in[i * 9 + 1] << 8)) & 0x1FF;
-		out[i * 8 + 1]  = ((in[i * 9 + 1] >> 1) | (in[i * 9 + 2] << 7)) & 0x1FF;
-		out[i * 8 + 2]  = ((in[i * 9 + 2] >> 2) | (in[i * 9 + 3] << 6)) & 0x1FF;
-		out[i * 8 + 3]  = ((in[i * 9 + 3] >> 3) | (in[i * 9 + 4] << 5)) & 0x1FF;
-		out[i * 8 + 4]  = ((in[i * 9 + 4] >> 4) | (in[i * 9 + 5] << 4)) & 0x1FF;
-	} else if (n_remainder == 6) {
-		out[i * 8]   = (in[i * 9] | (in[i * 9 + 1] << 8)) & 0x1FF;
-		out[i * 8 + 1]  = ((in[i * 9 + 1] >> 1) | (in[i * 9 + 2] << 7)) & 0x1FF;
-		out[i * 8 + 2]  = ((in[i * 9 + 2] >> 2) | (in[i * 9 + 3] << 6)) & 0x1FF;
-		out[i * 8 + 3]  = ((in[i * 9 + 3] >> 3) | (in[i * 9 + 4] << 5)) & 0x1FF;
-		out[i * 8 + 4]  = ((in[i * 9 + 4] >> 4) | (in[i * 9 + 5] << 4)) & 0x1FF;
-		out[i * 8 + 5]  = ((in[i * 9 + 5] >> 5) | (in[i * 9 + 6] << 3)) & 0x1FF;
-	} else if (n_remainder == 7) {
-		out[i * 8]   = (in[i * 9] | (in[i * 9 + 1] << 8)) & 0x1FF;
-		out[i * 8 + 1]  = ((in[i * 9 + 1] >> 1) | (in[i * 9 + 2] << 7)) & 0x1FF;
-		out[i * 8 + 2]  = ((in[i * 9 + 2] >> 2) | (in[i * 9 + 3] << 6)) & 0x1FF;
-		out[i * 8 + 3]  = ((in[i * 9 + 3] >> 3) | (in[i * 9 + 4] << 5)) & 0x1FF;
-		out[i * 8 + 4]  = ((in[i * 9 + 4] >> 4) | (in[i * 9 + 5] << 4)) & 0x1FF;
-		out[i * 8 + 5]  = ((in[i * 9 + 5] >> 5) | (in[i * 9 + 6] << 3)) & 0x1FF;
-		out[i * 8 + 6]  = ((in[i * 9 + 6] >> 6) | (in[i * 9 + 7] << 2)) & 0x1FF;
-	}
-	if (n_remainder > 0) {
-		is_packed_padd_ok = ((in[inlen - 1] & (0xFF << n_remainder)) == 0);
-	}
-
-	return is_packed_padd_ok;
-}
+/* liboqs-edit: generic_unpack_9_bit is unused in RSDP */
 
 /*
  * generic_unpack_fp()

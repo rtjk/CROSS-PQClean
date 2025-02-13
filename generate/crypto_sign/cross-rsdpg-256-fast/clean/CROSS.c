@@ -410,8 +410,9 @@ int CROSS_verify(const pk_t *const PK,
 			       &sig->resp_0[used_rsps].v_G_bar,
 			       DENSELY_PACKED_FZ_RSDP_G_VEC_SIZE);
 			FZ_ELEM v_G_bar[M];
-			is_packed_padd_ok = is_packed_padd_ok &&
-			                    unpack_fz_rsdp_g_vec(v_G_bar, sig->resp_0[used_rsps].v_G_bar);
+			/* liboqs-edit: separate && operands to avoid "garbage value" in clang static analyzer (scan-build) */
+			uint8_t is_packed_padd_v_G_bar_ok = unpack_fz_rsdp_g_vec(v_G_bar, sig->resp_0[used_rsps].v_G_bar);
+			is_packed_padd_ok = is_packed_padd_ok && is_packed_padd_v_G_bar_ok;
 			is_signature_ok = is_signature_ok &&
 			                  is_fz_vec_in_restr_group_m(v_G_bar);
 			fz_inf_w_by_fz_matrix(v_bar, v_G_bar, W_mat);

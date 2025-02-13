@@ -512,8 +512,9 @@ int CROSS_verify(const pk_t *const PK,
 			round_idx_queue_cmt_0[to_hash_cmt_0 - 1] = i;
 
 			/* place y[i] in the buffer for later on hashing */
-			is_packed_padd_ok = is_packed_padd_ok &&
-			                    unpack_fp_vec(y[i], sig->resp_0[used_rsps].y);
+			/* liboqs-edit: separate && operands to avoid "garbage value" in clang static analyzer (scan-build) and valgrind */
+			uint8_t is_packed_padd_y_ok = unpack_fp_vec(y[i], sig->resp_0[used_rsps].y);
+			is_packed_padd_ok = is_packed_padd_ok && is_packed_padd_y_ok;
 
 			FZ_ELEM v_bar[N];
 			/*v_G_bar is memcpy'ed directly into cmt_0 input buffer */
@@ -522,8 +523,9 @@ int CROSS_verify(const pk_t *const PK,
 			       &sig->resp_0[used_rsps].v_G_bar,
 			       DENSELY_PACKED_FZ_RSDP_G_VEC_SIZE);
 			FZ_ELEM v_G_bar[M];
-			is_packed_padd_ok = is_packed_padd_ok &&
-			                    unpack_fz_rsdp_g_vec(v_G_bar, sig->resp_0[used_rsps].v_G_bar);
+			/* liboqs-edit: separate && operands to avoid "garbage value" in clang static analyzer (scan-build) and valgrind */
+			uint8_t is_packed_padd_v_G_bar_ok = unpack_fz_rsdp_g_vec(v_G_bar, sig->resp_0[used_rsps].v_G_bar);
+			is_packed_padd_ok = is_packed_padd_ok && is_packed_padd_v_G_bar_ok;
 			is_signature_ok = is_signature_ok &&
 			                  is_fz_vec_in_restr_group_m(v_G_bar);
 			fz_inf_w_by_fz_matrix(v_bar, v_G_bar, W_mat_avx);

@@ -384,13 +384,14 @@ int CROSS_verify(const pk_t *const PK,
 			fp_dz_norm(y[i]);
 		} else {
 			/* place y[i] in the buffer for later on hashing */
-			is_packed_padd_ok = is_packed_padd_ok &&
-			                    unpack_fp_vec(y[i], sig->resp_0[used_rsps].y);
+			/* liboqs-edit: separate && operands to avoid "garbage value" in clang static analyzer (scan-build) and valgrind */
+			uint8_t is_packed_padd_y_ok = unpack_fp_vec(y[i], sig->resp_0[used_rsps].y);
+			is_packed_padd_ok = is_packed_padd_ok && is_packed_padd_y_ok;
 
 			FZ_ELEM v_bar[N];
 			/*v_bar is memcpy'ed directly into cmt_0 input buffer */
 			FZ_ELEM *v_bar_ptr = cmt_0_i_input + DENSELY_PACKED_FP_SYN_SIZE;
-			/* liboqs-edit: separate && operands to avoid "garbage value" in clang static analyzer (scan-build) */
+			/* liboqs-edit: separate && operands to avoid "garbage value" in clang static analyzer (scan-build) and valgrind */
 			uint8_t is_packed_padd_v_bar_ok = unpack_fz_vec(v_bar, sig->resp_0[used_rsps].v_bar);
 			is_packed_padd_ok = is_packed_padd_ok && is_packed_padd_v_bar_ok;
 			memcpy(v_bar_ptr,

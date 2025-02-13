@@ -319,8 +319,6 @@ uint8_t rebuild_tree(unsigned char
     unsigned char flags_tree_to_publish[NUM_NODES_SEED_TREE] = {0};
     compute_seeds_to_publish(flags_tree_to_publish, indices_to_publish);
 
-    const uint32_t CSPRNG_INPUT_LENGTH = SALT_LENGTH_BYTES +
-        SEED_LENGTH_BYTES;
     unsigned char csprng_input[CSPRNG_INPUT_LENGTH];
     CSPRNG_STATE_T tree_csprng_state;
 

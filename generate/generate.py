@@ -29,7 +29,7 @@ if os.path.exists(TARGET_DIR):
     shutil.rmtree(TARGET_DIR)
 
 # csv file
-# the first column '__dir__' constains the directory name for a given set of parameters
+# the column '__dir__' constains the directory name for a given set of parameters
 # the other columns contain the values to replace (e.g. replace "__random-bytes__" with "16")
 csv_filename = './parameter_sets.csv'
 

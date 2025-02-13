@@ -54,12 +54,9 @@ int seed_leaves(unsigned char rounds_seeds[T * SEED_LENGTH_BYTES],
 	CSPRNG_STATE_T single_csprng_state;
 	PAR_CSPRNG_STATE_T par_csprng_state;
 
-	const uint32_t csprng_input_len = SALT_LENGTH_BYTES +
-	                                  SEED_LENGTH_BYTES;
-
 	/* CSPRNG input: seed | salt | domain separation counter (0 to 4) */
-	unsigned char single_csprng_input[csprng_input_len];
-	unsigned char par_csprng_input[4][csprng_input_len];
+	unsigned char single_csprng_input[CSPRNG_INPUT_LENGTH];
+	unsigned char par_csprng_input[4][CSPRNG_INPUT_LENGTH];
 	unsigned char par_csprng_output[4][(T / 4 + 1)*SEED_LENGTH_BYTES];
 
 	/* copy the root seed and the salt */
@@ -68,12 +65,12 @@ int seed_leaves(unsigned char rounds_seeds[T * SEED_LENGTH_BYTES],
 
 	/* call the CSPRNG once to generate 4 intermediate seeds */
 	unsigned char quad_seed[4 * SEED_LENGTH_BYTES];
-	csprng_initialize(&single_csprng_state, single_csprng_input, csprng_input_len, 0);
+	csprng_initialize(&single_csprng_state, single_csprng_input, CSPRNG_INPUT_LENGTH, 0);
 	csprng_randombytes(quad_seed, 4 * SEED_LENGTH_BYTES, &single_csprng_state);
 	/* PQClean-edit: CSPRNG release context */
 	csprng_release(&single_csprng_state);
 
-	memset(par_csprng_input, 0, 4 * csprng_input_len);
+	memset(par_csprng_input, 0, 4 * CSPRNG_INPUT_LENGTH);
 
 	/* copy the salt */
 	for (int i = 0; i < 4; i++) {
@@ -104,7 +101,7 @@ int seed_leaves(unsigned char rounds_seeds[T * SEED_LENGTH_BYTES],
 	    par_csprng_input[1],
 	    par_csprng_input[2],
 	    par_csprng_input[3],
-	    csprng_input_len,
+	    CSPRNG_INPUT_LENGTH,
 	    CSPRNG_DOMAIN_SEP_CONST + 1,
 	    CSPRNG_DOMAIN_SEP_CONST + 2,
 	    CSPRNG_DOMAIN_SEP_CONST + 3,

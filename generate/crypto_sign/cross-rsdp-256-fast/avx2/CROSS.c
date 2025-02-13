@@ -56,6 +56,7 @@ void expand_pk(FP_ELEM V_tr[K][N - K],
 	csprng_release(&csprng_state_mat);
 }
 
+
 static
 void expand_sk(FZ_ELEM e_bar[N],
                FP_ELEM V_tr[K][N - K],
@@ -84,6 +85,7 @@ void expand_sk(FZ_ELEM e_bar[N],
 	/* PQClean-edit: CSPRNG release context */
 	csprng_release(&csprng_state_e_bar);
 }
+
 
 void CROSS_keygen(sk_t *SK,
                   pk_t *PK) {
@@ -436,13 +438,12 @@ int CROSS_verify(const pk_t *const PK,
 
 			/* CSPRNG is fed with concat(seed,salt,round index) represented
 			* as a 2 bytes little endian unsigned integer */
-			const int csprng_input_length = SALT_LENGTH_BYTES + SEED_LENGTH_BYTES;
-			uint8_t csprng_input[csprng_input_length];
+			uint8_t csprng_input[CSPRNG_INPUT_LENGTH];
 			memcpy(csprng_input + SEED_LENGTH_BYTES, sig->salt, SALT_LENGTH_BYTES);
 			memcpy(csprng_input, round_seeds + SEED_LENGTH_BYTES * i, SEED_LENGTH_BYTES);
 
 			/* expand seed[i] into seed_e and seed_u */
-			csprng_initialize(&csprng_state, csprng_input, csprng_input_length, domain_sep_csprng);
+			csprng_initialize(&csprng_state, csprng_input, CSPRNG_INPUT_LENGTH, domain_sep_csprng);
 			/* expand e_bar_prime */
 			csprng_fz_vec(e_bar_prime, &csprng_state);
 			/* expand u_prime */
@@ -536,6 +537,7 @@ int CROSS_verify(const pk_t *const PK,
 
 	} /* end for iterating on ZKID iterations */
 
+
 	uint8_t digest_cmt0_cmt1[2 * HASH_DIGEST_LENGTH];
 
 	uint8_t is_mtree_padding_ok = recompute_root(digest_cmt0_cmt1,
@@ -547,6 +549,7 @@ int CROSS_verify(const pk_t *const PK,
 	uint8_t digest_cmt_prime[HASH_DIGEST_LENGTH];
 	hash(digest_cmt_prime, digest_cmt0_cmt1, sizeof(digest_cmt0_cmt1), HASH_DOMAIN_SEP_CONST);
 
+
 	uint8_t y_digest_chall_1[T * DENSELY_PACKED_FP_VEC_SIZE + HASH_DIGEST_LENGTH];
 
 	for (int x = 0; x < T; x++) {
@@ -556,6 +559,7 @@ int CROSS_verify(const pk_t *const PK,
 
 	uint8_t digest_chall_2_prime[HASH_DIGEST_LENGTH];
 	hash(digest_chall_2_prime, y_digest_chall_1, sizeof(y_digest_chall_1), HASH_DOMAIN_SEP_CONST);
+
 
 	int does_digest_cmt_match = ( memcmp(digest_cmt_prime,
 	                                     sig->digest_cmt,

@@ -48,6 +48,8 @@
 #define FP_DOUBLE_ZERO_NORM(x) (((x) + (((x) + 1) >> 7)) & 0x7F)
 #define RESTR_TO_VAL(x) ( (FP_ELEM) (RESTR_G_TABLE >> (8*(uint64_t)(x))) )
 
+
+
 /* in-place normalization of redundant zero representation for syndromes*/
 static inline
 void fp_dz_norm_synd(FP_ELEM v[N - K]) {
@@ -92,6 +94,7 @@ void restr_vec_by_fp_matrix(FP_ELEM res[N - K],
 	}
 }
 
+
 /* Computes e * [I_k V]^T, V is already in transposed form
  * since  */
 static
@@ -127,6 +130,7 @@ void fp_vec_by_fp_matrix(FP_ELEM res[N - K],
 		res[i] = FPRED_DOUBLE(res_dprec[i]);
 	}
 }
+
 
 static inline
 void fp_vec_by_fp_vec_pointwise(FP_ELEM res[N],
@@ -209,6 +213,8 @@ void fp_vec_by_restr_vec_scaled(FP_ELEM res[N],
 	}
 	memcpy(res, res_align, N);
 }
+
+
 
 static inline
 void fp_synd_minus_fp_vec_scaled(FP_ELEM res[N - K],

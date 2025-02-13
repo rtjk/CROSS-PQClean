@@ -58,6 +58,7 @@ void expand_pk(FP_ELEM V_tr[K][N - K],
 	csprng_release(&csprng_state_mat);
 }
 
+
 static
 void expand_sk(FZ_ELEM e_bar[N],
                FZ_ELEM e_G_bar[M],
@@ -91,6 +92,7 @@ void expand_sk(FZ_ELEM e_bar[N],
 	fz_inf_w_by_fz_matrix(e_bar, e_G_bar, W_mat);
 	fz_dz_norm_n(e_bar);
 }
+
 
 void CROSS_keygen(sk_t *SK,
                   pk_t *PK) {
@@ -167,14 +169,14 @@ void CROSS_sign(const sk_t *const SK,
 	FZ_ELEM e_G_bar_prime[M];
 	FZ_ELEM v_G_bar[T][M];
 	uint8_t cmt_0_i_input[DENSELY_PACKED_FP_SYN_SIZE +
-	                      DENSELY_PACKED_FZ_RSDP_G_VEC_SIZE +
-	                      SALT_LENGTH_BYTES];
+	                                                 DENSELY_PACKED_FZ_RSDP_G_VEC_SIZE +
+	                                                 SALT_LENGTH_BYTES];
 	const int offset_salt = DENSELY_PACKED_FP_SYN_SIZE + DENSELY_PACKED_FZ_RSDP_G_VEC_SIZE;
 	/* cmt_0_i_input is syndrome || v_bar resp. v_G_bar || salt ; place salt at the end */
 	memcpy(cmt_0_i_input + offset_salt, sig->salt, SALT_LENGTH_BYTES);
 
 	uint8_t cmt_1_i_input[SEED_LENGTH_BYTES +
-	                      SALT_LENGTH_BYTES];
+	                                        SALT_LENGTH_BYTES];
 	/* cmt_1_i_input is concat(seed,salt,round index + 2T-1) */
 	memcpy(cmt_1_i_input + SEED_LENGTH_BYTES, sig->salt, SALT_LENGTH_BYTES);
 
@@ -338,8 +340,8 @@ int CROSS_verify(const pk_t *const PK,
 	is_stree_padding_ok = rebuild_leaves(round_seeds, chall_2, sig->path);
 
 	uint8_t cmt_0_i_input[DENSELY_PACKED_FP_SYN_SIZE +
-	                      DENSELY_PACKED_FZ_RSDP_G_VEC_SIZE +
-	                      SALT_LENGTH_BYTES];
+	                                                 DENSELY_PACKED_FZ_RSDP_G_VEC_SIZE +
+	                                                 SALT_LENGTH_BYTES];
 	const int offset_salt = DENSELY_PACKED_FP_SYN_SIZE + DENSELY_PACKED_FZ_RSDP_G_VEC_SIZE;
 	/* cmt_0_i_input is syndrome || v_bar resp. v_G_bar || salt */
 	memcpy(cmt_0_i_input + offset_salt, sig->salt, SALT_LENGTH_BYTES);
@@ -377,13 +379,12 @@ int CROSS_verify(const pk_t *const PK,
 
 			/* CSPRNG is fed with concat(seed,salt,round index) represented
 			* as a 2 bytes little endian unsigned integer */
-			const int csprng_input_length = SALT_LENGTH_BYTES + SEED_LENGTH_BYTES;
-			uint8_t csprng_input[csprng_input_length];
+			uint8_t csprng_input[CSPRNG_INPUT_LENGTH];
 			memcpy(csprng_input + SEED_LENGTH_BYTES, sig->salt, SALT_LENGTH_BYTES);
 			memcpy(csprng_input, round_seeds + SEED_LENGTH_BYTES * i, SEED_LENGTH_BYTES);
 
 			/* expand seed[i] into seed_e and seed_u */
-			csprng_initialize(&csprng_state, csprng_input, csprng_input_length, domain_sep_csprng);
+			csprng_initialize(&csprng_state, csprng_input, CSPRNG_INPUT_LENGTH, domain_sep_csprng);
 			FZ_ELEM e_G_bar_prime[M];
 			csprng_fz_inf_w(e_G_bar_prime, &csprng_state);
 			fz_inf_w_by_fz_matrix(e_bar_prime, e_G_bar_prime, W_mat);
@@ -403,9 +404,6 @@ int CROSS_verify(const pk_t *const PK,
 			                    unpack_fp_vec(y[i], sig->resp_0[used_rsps].y);
 
 			FZ_ELEM v_bar[N];
-			for (int tmp = 0; tmp < N; tmp++) {
-				v_bar[tmp] = 0;
-			}
 			/*v_G_bar is memcpy'ed directly into cmt_0 input buffer */
 			FZ_ELEM *v_G_bar_ptr = cmt_0_i_input + DENSELY_PACKED_FP_SYN_SIZE;
 			memcpy(v_G_bar_ptr,
@@ -437,6 +435,7 @@ int CROSS_verify(const pk_t *const PK,
 		}
 	} /* end for iterating on ZKID iterations */
 
+
 	uint8_t digest_cmt0_cmt1[2 * HASH_DIGEST_LENGTH];
 
 	uint8_t is_mtree_padding_ok = recompute_root(digest_cmt0_cmt1,
@@ -458,9 +457,11 @@ int CROSS_verify(const pk_t *const PK,
 	uint8_t digest_chall_2_prime[HASH_DIGEST_LENGTH];
 	hash(digest_chall_2_prime, y_digest_chall_1, sizeof(y_digest_chall_1), HASH_DOMAIN_SEP_CONST);
 
+
 	int does_digest_cmt_match = ( memcmp(digest_cmt_prime,
 	                                     sig->digest_cmt,
 	                                     HASH_DIGEST_LENGTH) == 0);
+
 
 	int does_digest_chall_2_match = ( memcmp(digest_chall_2_prime,
 	                                  sig->digest_chall_2,

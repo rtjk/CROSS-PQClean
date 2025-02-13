@@ -131,12 +131,10 @@ void gen_seed_tree(unsigned char seed_tree[NUM_NODES_SEED_TREE * SEED_LENGTH_BYT
 
 	/* CSPRNG input: father seed | salt | father node index
 	 * CSPRNG output: left child seed | right child seed */
-	const uint32_t csprng_input_len = SALT_LENGTH_BYTES +
-	                                  SEED_LENGTH_BYTES;
 
 	/* enqueue the calls to the CSPRNG */
 	int to_expand = 0;
-	unsigned char in_queue[4][csprng_input_len];
+	unsigned char in_queue[4][CSPRNG_INPUT_LENGTH];
 	uint16_t in_queue_dsc[4];
 	int out_pos_queue[4] = {0};
 
@@ -188,7 +186,7 @@ void gen_seed_tree(unsigned char seed_tree[NUM_NODES_SEED_TREE * SEED_LENGTH_BYT
 				    in_queue[1],
 				    in_queue[2],
 				    in_queue[3],
-				    csprng_input_len,
+				    CSPRNG_INPUT_LENGTH,
 				    in_queue_dsc[0],
 				    in_queue_dsc[1],
 				    in_queue_dsc[2],
@@ -210,6 +208,7 @@ void gen_seed_tree(unsigned char seed_tree[NUM_NODES_SEED_TREE * SEED_LENGTH_BYT
 	}
 } /* end generate_seed_tree */
 
+
 /*****************************************************************************/
 void seed_leaves(unsigned char rounds_seeds[T * SEED_LENGTH_BYTES],
                  unsigned char seed_tree[NUM_NODES_SEED_TREE * SEED_LENGTH_BYTES]) {
@@ -226,6 +225,7 @@ void seed_leaves(unsigned char rounds_seeds[T * SEED_LENGTH_BYTES],
 		}
 	}
 }
+
 
 /*****************************************************************************/
 int seed_path(unsigned char *seed_storage,
@@ -283,12 +283,9 @@ uint8_t rebuild_tree(unsigned char
 
 	PAR_CSPRNG_STATE_T tree_csprng_state;
 
-	const uint32_t csprng_input_len = SALT_LENGTH_BYTES +
-	                                  SEED_LENGTH_BYTES;
-
 	/* enqueue the calls to the CSPRNG */
 	int to_expand = 0;
-	unsigned char in_queue[4][csprng_input_len];
+	unsigned char in_queue[4][CSPRNG_INPUT_LENGTH];
 	uint16_t in_queue_dsc[4];
 	int out_pos_queue[4] = {0};
 
@@ -350,7 +347,7 @@ uint8_t rebuild_tree(unsigned char
 				    in_queue[1],
 				    in_queue[2],
 				    in_queue[3],
-				    csprng_input_len,
+				    CSPRNG_INPUT_LENGTH,
 				    in_queue_dsc[0],
 				    in_queue_dsc[1],
 				    in_queue_dsc[2],

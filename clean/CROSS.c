@@ -494,13 +494,12 @@ int CROSS_verify(const pk_t *const PK,
 
             /* CSPRNG is fed with concat(seed,salt,round index) represented
             * as a 2 bytes little endian unsigned integer */
-            const int csprng_input_length = SALT_LENGTH_BYTES+SEED_LENGTH_BYTES;
-            uint8_t csprng_input[csprng_input_length];
+            uint8_t csprng_input[CSPRNG_INPUT_LENGTH];
             memcpy(csprng_input+SEED_LENGTH_BYTES,sig->salt,SALT_LENGTH_BYTES);
             memcpy(csprng_input,round_seeds+SEED_LENGTH_BYTES*i,SEED_LENGTH_BYTES);
 
             /* expand seed[i] into seed_e and seed_u */
-            csprng_initialize(&csprng_state, csprng_input, csprng_input_length, domain_sep_csprng);
+            csprng_initialize(&csprng_state, csprng_input, CSPRNG_INPUT_LENGTH, domain_sep_csprng);
 #if defined(RSDP)
             /* expand e_bar_prime */
             csprng_fz_vec(e_bar_prime, &csprng_state);
@@ -525,14 +524,12 @@ int CROSS_verify(const pk_t *const PK,
                                 unpack_fp_vec(y[i], sig->resp_0[used_rsps].y);
 
             FZ_ELEM v_bar[N];
-            for(int tmp = 0; tmp < N; tmp++){
-                v_bar[tmp] = 0;
-            }
 #if defined(RSDP)
             /*v_bar is memcpy'ed directly into cmt_0 input buffer */
             FZ_ELEM* v_bar_ptr = cmt_0_i_input+DENSELY_PACKED_FP_SYN_SIZE;
-            is_packed_padd_ok = is_packed_padd_ok &&
-                                unpack_fz_vec(v_bar, sig->resp_0[used_rsps].v_bar);
+            /* liboqs-edit: separate && operands to avoid "garbage value" in clang static analyzer (scan-build) */
+            uint8_t is_packed_padd_v_bar_ok = unpack_fz_vec(v_bar, sig->resp_0[used_rsps].v_bar);
+            is_packed_padd_ok = is_packed_padd_ok && is_packed_padd_v_bar_ok;
             memcpy(v_bar_ptr,
                    &sig->resp_0[used_rsps].v_bar,
                    DENSELY_PACKED_FZ_VEC_SIZE);

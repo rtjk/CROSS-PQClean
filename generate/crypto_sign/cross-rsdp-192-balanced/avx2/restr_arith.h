@@ -37,8 +37,6 @@
 #define FZRED_OPPOSITE(x) ((x) ^ 0x07)
 #define FZ_DOUBLE_ZERO_NORM(x) (((x) + (((x) + 1) >> 3)) & 0x07)
 
-
-
 static inline
 void fz_dz_norm_n(FZ_ELEM v[N]) {
 	for (int i = 0; i < N; i++) {
@@ -65,4 +63,3 @@ int is_fz_vec_in_restr_group_n(const FZ_ELEM in[N]) {
 	}
 	return is_in_ok;
 }
-

@@ -51,7 +51,6 @@
 /* required bytes of input randomness */
 #define PQCLEAN_CROSSRSDP128FAST_CLEAN_CRYPTO_RANDOMBYTES 16
 
-
 int PQCLEAN_CROSSRSDP128FAST_CLEAN_crypto_sign_keypair(unsigned char *pk,
         unsigned char *sk
                                                       );

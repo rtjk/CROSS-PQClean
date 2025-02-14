@@ -59,7 +59,6 @@ void expand_pk(FP_ELEM V_tr[K][N - K],
 	csprng_release(&csprng_state_mat);
 }
 
-
 static
 void expand_sk(FZ_ELEM e_bar[N],
                FZ_ELEM e_G_bar[M],
@@ -98,7 +97,6 @@ void expand_sk(FZ_ELEM e_bar[N],
 	fz_inf_w_by_fz_matrix(e_bar, e_G_bar, W_mat_avx);
 	fz_dz_norm_n(e_bar);
 }
-
 
 void CROSS_keygen(sk_t *SK,
                   pk_t *PK) {
@@ -592,7 +590,6 @@ int CROSS_verify(const pk_t *const PK,
 
 	} /* end for iterating on ZKID iterations */
 
-
 	uint8_t digest_cmt0_cmt1[2 * HASH_DIGEST_LENGTH];
 
 	uint8_t is_mtree_padding_ok = recompute_root(digest_cmt0_cmt1,
@@ -604,7 +601,6 @@ int CROSS_verify(const pk_t *const PK,
 	uint8_t digest_cmt_prime[HASH_DIGEST_LENGTH];
 	hash(digest_cmt_prime, digest_cmt0_cmt1, sizeof(digest_cmt0_cmt1), HASH_DOMAIN_SEP_CONST);
 
-
 	uint8_t y_digest_chall_1[T * DENSELY_PACKED_FP_VEC_SIZE + HASH_DIGEST_LENGTH];
 
 	for (int x = 0; x < T; x++) {
@@ -614,7 +610,6 @@ int CROSS_verify(const pk_t *const PK,
 
 	uint8_t digest_chall_2_prime[HASH_DIGEST_LENGTH];
 	hash(digest_chall_2_prime, y_digest_chall_1, sizeof(y_digest_chall_1), HASH_DOMAIN_SEP_CONST);
-
 
 	int does_digest_cmt_match = ( memcmp(digest_cmt_prime,
 	                                     sig->digest_cmt,

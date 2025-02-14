@@ -51,7 +51,6 @@
 /* required bytes of input randomness */
 #define PQCLEAN_CROSSRSDP192BALANCED_CLEAN_CRYPTO_RANDOMBYTES 24
 
-
 int PQCLEAN_CROSSRSDP192BALANCED_CLEAN_crypto_sign_keypair(unsigned char *pk,
         unsigned char *sk
                                                           );

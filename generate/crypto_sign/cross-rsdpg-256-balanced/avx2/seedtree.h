@@ -35,7 +35,6 @@
 #include "namespace.h"
 #include "parameters.h"
 
-
 /******************************************************************************/
 void seed_leaves(unsigned char rounds_seeds[T * SEED_LENGTH_BYTES],
                  unsigned char seed_tree[NUM_NODES_SEED_TREE * SEED_LENGTH_BYTES]);
@@ -60,4 +59,3 @@ uint8_t rebuild_tree(unsigned char
                      const unsigned char indices_to_publish[T],
                      const unsigned char *stored_seeds,
                      const unsigned char salt[SALT_LENGTH_BYTES]);   // input
-

@@ -51,7 +51,6 @@
 /* required bytes of input randomness */
 #define PQCLEAN_CROSSRSDP256SMALL_AVX2_CRYPTO_RANDOMBYTES 32
 
-
 int PQCLEAN_CROSSRSDP256SMALL_AVX2_crypto_sign_keypair(unsigned char *pk,
         unsigned char *sk
                                                       );

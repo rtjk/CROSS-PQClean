@@ -55,7 +55,6 @@ void expand_pk(FP_ELEM V_tr[K][N - K],
 	csprng_release(&csprng_state_mat);
 }
 
-
 static
 void expand_sk(FZ_ELEM e_bar[N],
                FP_ELEM V_tr[K][N - K],
@@ -85,7 +84,6 @@ void expand_sk(FZ_ELEM e_bar[N],
 	/* PQClean-edit: CSPRNG release context */
 	csprng_release(&csprng_state_e_bar);
 }
-
 
 void CROSS_keygen(sk_t *SK,
                   pk_t *PK) {
@@ -154,14 +152,14 @@ void CROSS_sign(const sk_t *const SK,
 	FP_ELEM s_prime[N - K];
 
 	uint8_t cmt_0_i_input[DENSELY_PACKED_FP_SYN_SIZE +
-	                                                 DENSELY_PACKED_FZ_VEC_SIZE +
-	                                                 SALT_LENGTH_BYTES];
+	                      DENSELY_PACKED_FZ_VEC_SIZE +
+	                      SALT_LENGTH_BYTES];
 	const int offset_salt = DENSELY_PACKED_FP_SYN_SIZE + DENSELY_PACKED_FZ_VEC_SIZE;
 	/* cmt_0_i_input is syndrome || v_bar resp. v_G_bar || salt ; place salt at the end */
 	memcpy(cmt_0_i_input + offset_salt, sig->salt, SALT_LENGTH_BYTES);
 
 	uint8_t cmt_1_i_input[SEED_LENGTH_BYTES +
-	                                        SALT_LENGTH_BYTES];
+	                      SALT_LENGTH_BYTES];
 	/* cmt_1_i_input is concat(seed,salt,round index + 2T-1) */
 	memcpy(cmt_1_i_input + SEED_LENGTH_BYTES, sig->salt, SALT_LENGTH_BYTES);
 
@@ -320,8 +318,8 @@ int CROSS_verify(const pk_t *const PK,
 	is_stree_padding_ok = rebuild_leaves(round_seeds, chall_2, sig->path);
 
 	uint8_t cmt_0_i_input[DENSELY_PACKED_FP_SYN_SIZE +
-	                                                 DENSELY_PACKED_FZ_VEC_SIZE +
-	                                                 SALT_LENGTH_BYTES];
+	                      DENSELY_PACKED_FZ_VEC_SIZE +
+	                      SALT_LENGTH_BYTES];
 	const int offset_salt = DENSELY_PACKED_FP_SYN_SIZE + DENSELY_PACKED_FZ_VEC_SIZE;
 	/* cmt_0_i_input is syndrome || v_bar resp. v_G_bar || salt */
 	memcpy(cmt_0_i_input + offset_salt, sig->salt, SALT_LENGTH_BYTES);
@@ -412,7 +410,6 @@ int CROSS_verify(const pk_t *const PK,
 		}
 	} /* end for iterating on ZKID iterations */
 
-
 	uint8_t digest_cmt0_cmt1[2 * HASH_DIGEST_LENGTH];
 
 	uint8_t is_mtree_padding_ok = recompute_root(digest_cmt0_cmt1,
@@ -434,11 +431,9 @@ int CROSS_verify(const pk_t *const PK,
 	uint8_t digest_chall_2_prime[HASH_DIGEST_LENGTH];
 	hash(digest_chall_2_prime, y_digest_chall_1, sizeof(y_digest_chall_1), HASH_DOMAIN_SEP_CONST);
 
-
 	int does_digest_cmt_match = ( memcmp(digest_cmt_prime,
 	                                     sig->digest_cmt,
 	                                     HASH_DIGEST_LENGTH) == 0);
-
 
 	int does_digest_chall_2_match = ( memcmp(digest_chall_2_prime,
 	                                  sig->digest_chall_2,

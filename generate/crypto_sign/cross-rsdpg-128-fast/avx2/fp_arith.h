@@ -85,8 +85,6 @@ FP_ELEM RESTR_TO_VAL(FP_ELEM x) {
 	return FPRED_SINGLE( FPRED_SINGLE(res1 * res2) * FPRED_SINGLE(res3 * res4) );
 }
 
-
-
 /* in-place normalization of redundant zero representation for syndromes*/
 static inline
 void fp_dz_norm_synd(FP_ELEM v[N - K]) {
@@ -130,8 +128,6 @@ void restr_vec_by_fp_matrix(FP_ELEM res[N - K],
 		res[i] = FPRED_SINGLE(res_dprec[i]);
 	}
 }
-
-
 
 /* reduce modulo 509 eigth 32-bit integers packed into a 256-bit vector, using Barrett's method
  * each 32-bit integer sould be in the range [0, 508*508] i.e. the result of a mul in FP
@@ -216,7 +212,6 @@ void fp_vec_by_restr_vec_scaled(FP_ELEM res[N],
 		                       (FP_DOUBLEPREC) RESTR_TO_VAL(e[i]) * (FP_DOUBLEPREC) chall_1) ;
 	}
 }
-
 
 static inline
 void fp_synd_minus_fp_vec_scaled(FP_ELEM res[N - K],

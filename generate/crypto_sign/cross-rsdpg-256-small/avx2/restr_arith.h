@@ -38,7 +38,6 @@
 #define FZRED_OPPOSITE(x) ((x) ^ 0x7f)
 #define FZ_DOUBLE_ZERO_NORM(x) (((x) + (((x) + 1) >> 7)) & 0x7f)
 
-
 static inline
 void fz_dz_norm_n(FZ_ELEM v[N]) {
 	for (int i = 0; i < N; i++) {
@@ -94,7 +93,6 @@ void fz_inf_w_by_fz_matrix(FZ_ELEM res[N],
 			_mm256_store_si256 ((__m256i *) &res_dprec[j * EPI16_PER_REG], res_w);
 		}
 	}
-
 
 	/* Save result trimming to regular precision */
 	for (int i = 0; i < N - M; i++) {

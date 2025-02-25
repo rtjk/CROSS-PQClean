@@ -1,5 +1,9 @@
 # CROSS integration
 
+> [!WARNING]  
+> This repository is out of date. Please visit the new version here:\
+> https://github.com/CROSS-signature/CROSS-lib-oqs
+
 Everything needed to integrate the CROSS signature algorithm into post-quantum libraries  ([PQClean][repo_PQClean], [liboqs][repo_liboqs], [oqs-provider][repo_oqs-provider], [oqs-demos][repo_oqs-demos]), starting from the [NIST submission package][CROSS_package].
 
 [CROSS_package]: https://www.cross-crypto.com/nist-submission.html
